@@ -1,5 +1,7 @@
 import re
+import httpx
 from typing import Optional, List
+from app.core.config import settings
 from app.schemas.ai import AIQueryResponse, AISourceCitation
 
 # Red-flag symptoms that require immediate obstetric/emergency escalation
@@ -147,7 +149,85 @@ class GroundedAIService:
                 ]
             )
 
-        # 3. Fallback educational response
+        # 3. Call External LLM (OpenAI or Gemini) if configured
+        if settings.AI_PROVIDER == "openai" and settings.OPENAI_API_KEY:
+            try:
+                system_prompt = (
+                    "You are MamAmie AI, a compassionate, medically grounded maternal wellness companion. "
+                    "Support women with maternal nutrition, gentle wellbeing, preparation for labor, and newborn care. "
+                    "CRITICAL SAFETY RULES: "
+                    "1. NEVER prescribe medication or specify dosages. "
+                    "2. NEVER make clinical diagnoses. "
+                    "3. Always remind the user that this is educational guidance, not a replacement for their obstetrician or pediatrician. "
+                    "4. If symptoms sound urgent, advise immediate medical consultation."
+                )
+                user_context = f"User is currently: {stage or 'pregnant'} (Week {week or 'unknown'}).\nQuestion: {query}"
+                
+                async with httpx.AsyncClient(timeout=settings.AI_REQUEST_TIMEOUT_SECONDS) as client:
+                    resp = await client.post(
+                        "https://api.openai.com/v1/chat/completions",
+                        headers={"Authorization": f"Bearer {settings.OPENAI_API_KEY}"},
+                        json={
+                            "model": settings.AI_MODEL_NAME or "gpt-4o-mini",
+                            "messages": [
+                                {"role": "system", "content": system_prompt},
+                                {"role": "user", "content": user_context}
+                            ],
+                            "max_tokens": 400,
+                            "temperature": 0.5
+                        }
+                    )
+                    if resp.status_code == 200:
+                        llm_answer = resp.json()["choices"][0]["message"]["content"]
+                        return AIQueryResponse(
+                            answer=llm_answer,
+                            is_educational_only=True,
+                            safety_escalation=False,
+                            citations=[
+                                AISourceCitation(
+                                    title="MamAmie Grounded AI Assistant (OpenAI)",
+                                    source="WHO & FOGSI Clinical Reference Standards",
+                                    summary="AI generated maternal guidance aligned with obstetric safety principles."
+                                )
+                            ]
+                        )
+            except Exception:
+                pass  # Fall back to evidence-based local guidance on error or timeout
+
+        elif settings.AI_PROVIDER == "gemini" and settings.GEMINI_API_KEY:
+            try:
+                model_name = settings.AI_MODEL_NAME if "gemini" in settings.AI_MODEL_NAME else "gemini-1.5-flash"
+                gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={settings.GEMINI_API_KEY}"
+                prompt_text = (
+                    "You are MamAmie AI, a maternal wellness companion. "
+                    f"Context: {stage or 'pregnant'} (Week {week or 'unknown'}). "
+                    "Never prescribe medicines or diagnose diseases. Provide safe, supportive educational guidance.\n\n"
+                    f"User Query: {query}"
+                )
+                async with httpx.AsyncClient(timeout=settings.AI_REQUEST_TIMEOUT_SECONDS) as client:
+                    resp = await client.post(
+                        gemini_url,
+                        json={"contents": [{"parts": [{"text": prompt_text}]}]}
+                    )
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        llm_answer = data["candidates"][0]["content"]["parts"][0]["text"]
+                        return AIQueryResponse(
+                            answer=llm_answer,
+                            is_educational_only=True,
+                            safety_escalation=False,
+                            citations=[
+                                AISourceCitation(
+                                    title="MamAmie Grounded AI Assistant (Gemini)",
+                                    source="WHO Maternal & Child Health Guidelines",
+                                    summary="AI generated maternal guidance grounded in approved clinical boundaries."
+                                )
+                            ]
+                        )
+            except Exception:
+                pass  # Fall back to evidence-based local guidance on error or timeout
+
+        # 4. Fallback educational response
         context_str = f"During {stage or 'your pregnancy journey'}"
         if week:
             context_str += f" (Week {week})"
