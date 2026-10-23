@@ -8,6 +8,8 @@ from app.core.logging import setup_logging, logger
 from app.core.exceptions import MamAmieException
 from app.db.session import init_db
 from app.api.v1.router import api_v1_router
+# Register all mapped classes before create_all, including knowledge index models.
+from app import models as _models  # noqa: F401
 
 
 @asynccontextmanager
@@ -64,13 +66,19 @@ async def mamamie_exception_handler(request: Request, exc: MamAmieException):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    # Validation errors can carry the rejected input (including report text).
+    # Pydantic's ctx/input can contain rejected health text. Expose only the
+    # schema location and generic validation message to the caller.
+    safe_errors = [{"loc": error.get("loc", []), "msg": error.get("msg", "Invalid value"),
+                    "type": error.get("type", "validation_error")}
+                   for error in exc.errors()]
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
             "error": {
                 "code": "VALIDATION_ERROR",
                 "message": "Invalid request parameters",
-                "details": exc.errors()
+                "details": safe_errors
             }
         }
     )

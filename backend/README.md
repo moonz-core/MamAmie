@@ -97,11 +97,9 @@ pip install -r requirements.txt
 ```
 
 ### Step 3: Configure Environment
-A ready-to-run `.env` file is already created for local development with zero external dependencies (using local SQLite storage).
-To inspect or customize options, refer to `.env.example`:
+A local `.env` is not committed. The application uses documented defaults for SQLite and local extraction. Copy `.env.example` only if you need overrides:
 ```bash
-# Verify .env contents
-cat .env
+Copy-Item .env.example .env
 ```
 
 ### Step 4: Run the Backend
@@ -157,3 +155,48 @@ MamAmie AI adheres strictly to medical safety principles:
 2. **Deterministic Calculations:** Gestational age and trimester calculations use audited, deterministic medical formulas (Naegele's rule) rather than probabilistic LLMs.
 3. **Emergency Escalation:** Red-flag symptoms (e.g., vaginal bleeding, fluid leakage, severe headache with visual disturbances, decreased fetal movement) immediately trigger prominent clinical escalation notices directing users to emergency obstetric care.
 4. **Data Isolation:** All personal health records, journal entries, and uploaded medical scans enforce strict tenant-level isolation.
+
+## 8. Maternal-health RAG assistant (demonstration)
+
+The assistant API is authenticated and available at `POST /api/v1/ai/query`,
+`POST /api/v1/ai/triage`, `POST /api/v1/ai/reports/explain`, and
+`GET /api/v1/knowledge/sources`. Run the Alembic migrations before deployment:
+
+```powershell
+alembic upgrade head
+pytest -q
+```
+
+Development and test environments seed a small curated corpus of official WHO
+and Indian government source summaries. Every seeded record is marked
+`unreviewed_demo`; these summaries are not clinician reviewed, and licensing
+must be checked before redistributing source material. Production does not seed
+demo content. Add approved PDF, TXT, or Markdown documents locally using the
+authenticated operator's development workflow:
+
+```powershell
+python -m app.services.knowledge_ingestion .\approved-guide.pdf --metadata .\guide-metadata.json
+```
+
+See `knowledge_sources/README.md` for the required metadata and source
+governance. PDF page text is extracted where available; extraction gaps are
+reported. Content changes at the same source URL replace the prior indexed
+version. Hash-based local lexical vectors plus BM25 keyword matching and
+reciprocal-rank fusion are the offline default. These vectors are not a
+pretrained semantic embedding model. Optional OpenAI embeddings or OpenAI/Gemini
+generation require an explicitly configured provider, backend-only credentials,
+and per-request external-processing consent. No API credits are included or
+assumed. In absence of a configured provider, the system returns retrieved
+evidence excerpts or abstains; it does not fabricate live AI analysis.
+
+Emergency phrase screening runs before retrieval and model generation. The
+rules are a hackathon demonstration, are not clinically reviewed, can miss or
+misclassify symptoms, and must not be represented as validated triage. Reports
+currently accept pasted text only, are not persisted, and are not sent to an
+external model without consent. PDF/image upload and OCR are not implemented in
+this assistant flow. The existing separate medical-record feature is unchanged.
+
+The iOS app requires an HTTPS backend URL configured in the assistant settings
+and a user account; it stores the access token in Keychain. On-device symptom
+screening is an early warning aid only. The iOS project cannot be compiled in
+the Windows backend development environment; build it with Xcode on macOS.
