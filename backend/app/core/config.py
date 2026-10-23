@@ -66,7 +66,9 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     AI_MODEL_NAME: str = "gpt-4o-mini"
+    AI_EMBEDDING_MODEL: str = "text-embedding-3-small"
     AI_REQUEST_TIMEOUT_SECONDS: int = 20
+    AI_MAX_CONTEXT_CHARS: int = 9000
 
     # Notifications
     NOTIFICATION_PROVIDER: str = "mock"

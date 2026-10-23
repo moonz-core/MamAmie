@@ -11,6 +11,7 @@ from app.models.newborn import NewbornProfile, VaccinationRecord, CaregiverAutho
 from app.models.postpartum import PostpartumRecord
 from app.models.notification import NotificationRecord
 from app.models.ai_interaction import AIInteraction
+from app.models.knowledge import KnowledgeChunk, KnowledgeSource
 
 __all__ = [
     "Base",
@@ -34,4 +35,6 @@ __all__ = [
     "PostpartumRecord",
     "NotificationRecord",
     "AIInteraction",
+    "KnowledgeSource",
+    "KnowledgeChunk",
 ]
