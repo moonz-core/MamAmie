@@ -12,7 +12,11 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView(onOpenHealth: { selectedTab = 1 })
+            HomeView(
+                onOpenHealth: { selectedTab = 1 },
+                onOpenAssistant: { selectedTab = 6 },
+                onOpenFood: { selectedTab = 5 }
+            )
                 .tabItem {
                     Label("Today", systemImage: "heart.fill")
                 }
@@ -31,6 +35,12 @@ struct ContentView: View {
                 Label("Calendar", systemImage: "calendar")
             }
             .tag(2)
+
+            AssistantView()
+                .tabItem {
+                    Label("Ask", systemImage: "heart.text.clipboard")
+                }
+                .tag(6)
 
             FoodScannerView(store: foodDiaryStore)
                 .tabItem {

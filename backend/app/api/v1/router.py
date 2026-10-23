@@ -11,6 +11,7 @@ from app.api.v1.education import router as education_router
 from app.api.v1.postpartum import router as postpartum_router
 from app.api.v1.newborn import router as newborn_router
 from app.api.v1.ai_assistant import router as ai_assistant_router
+from app.api.v1.knowledge import router as knowledge_router
 from app.api.v1.notifications import router as notifications_router
 from app.api.v1.privacy import router as privacy_router
 
@@ -28,5 +29,6 @@ api_v1_router.include_router(education_router)
 api_v1_router.include_router(postpartum_router)
 api_v1_router.include_router(newborn_router)
 api_v1_router.include_router(ai_assistant_router)
+api_v1_router.include_router(knowledge_router)
 api_v1_router.include_router(notifications_router)
 api_v1_router.include_router(privacy_router)

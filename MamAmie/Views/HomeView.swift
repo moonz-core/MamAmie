@@ -2,6 +2,8 @@ import SwiftUI
 
 struct HomeView: View {
     var onOpenHealth: (() -> Void)? = nil
+    var onOpenAssistant: (() -> Void)? = nil
+    var onOpenFood: (() -> Void)? = nil
     @State private var waterGlasses: Int = 5
 
     var body: some View {
@@ -195,6 +197,25 @@ struct HomeView: View {
                         }
                     }
 
+                    VStack(spacing: 10) {
+                        Button { onOpenAssistant?() } label: {
+                            FeatureEntryCard(
+                                icon: "heart.text.clipboard.fill",
+                                title: "Ask MamAmie",
+                                detail: "Explore maternal-health guidance with sources",
+                                tint: Color("AccentColor")
+                            )
+                        }.buttonStyle(.plain)
+                        Button { onOpenFood?() } label: {
+                            FeatureEntryCard(
+                                icon: "fork.knife.circle.fill",
+                                title: "Food & nutrition",
+                                detail: "Scan or log a meal",
+                                tint: Color("AccentColor")
+                            )
+                        }.buttonStyle(.plain)
+                    }
+
                     VStack(alignment: .leading, spacing: 14) {
                         Text("Today’s check-in")
                             .font(.title3.bold())
@@ -223,6 +244,26 @@ struct HomeView: View {
             .navigationTitle("MamAmie")
             .navigationBarTitleDisplayMode(.inline)
         }
+    }
+}
+
+private struct FeatureEntryCard: View {
+    let icon: String
+    let title: String
+    let detail: String
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon).font(.title2).foregroundStyle(tint)
+                .frame(width: 44, height: 44).background(tint.opacity(0.12)).clipShape(Circle())
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
+                Text(detail).font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Image(systemName: "chevron.right").font(.caption.weight(.bold)).foregroundStyle(.tertiary)
+        }.padding(15).background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 18))
     }
 }
 
