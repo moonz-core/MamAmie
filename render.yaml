@@ -14,3 +14,9 @@ services:
         generateValue: true
       - key: DATABASE_URL
         value: sqlite+aiosqlite:///./mamamie.db
+      - key: AI_PROVIDER
+        value: gemini
+      - key: AI_MODEL_NAME
+        value: gemini-1.5-flash
+      - key: GEMINI_API_KEY
+        sync: false

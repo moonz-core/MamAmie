@@ -1,6 +1,6 @@
 from datetime import date
 from typing import Optional, List
-from sqlalchemy import Boolean, Date, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Date, ForeignKey, Integer, String, Text, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, UUIDMixin, TimestampMixin
 
@@ -21,6 +21,9 @@ class NewbornProfile(Base, UUIDMixin, TimestampMixin):
 
 class VaccinationRecord(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "vaccination_records"
+    __table_args__ = (
+        Index("ix_vaccination_newborn_status", "newborn_id", "status"),
+    )
 
     newborn_id: Mapped[str] = mapped_column(String(36), ForeignKey("newborn_profiles.id", ondelete="CASCADE"), index=True, nullable=False)
     vaccine_name: Mapped[str] = mapped_column(String(255), nullable=False)

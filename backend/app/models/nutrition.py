@@ -1,12 +1,15 @@
 from datetime import datetime, timezone
 from typing import Optional
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text, Index
 from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base, UUIDMixin, TimestampMixin
 
 
 class FoodLog(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "food_logs"
+    __table_args__ = (
+        Index("ix_food_logs_user_date", "user_id", "logged_at"),
+    )
 
     user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False)
     meal_category: Mapped[str] = mapped_column(String(32), default="lunch", nullable=False) # breakfast, lunch, dinner, snack, other

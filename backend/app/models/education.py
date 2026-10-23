@@ -1,12 +1,15 @@
 from datetime import date
 from typing import Optional
-from sqlalchemy import Boolean, Date, Integer, String, Text
+from sqlalchemy import Boolean, Date, Integer, String, Text, Index
 from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base, UUIDMixin, TimestampMixin
 
 
 class EducationalArticle(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "educational_articles"
+    __table_args__ = (
+        Index("ix_educational_stage_week", "stage", "target_week"),
+    )
 
     stage: Mapped[str] = mapped_column(String(32), index=True, nullable=False) # planning, pregnant, postpartum, newborn
     target_week: Mapped[Optional[int]] = mapped_column(Integer, index=True, nullable=True) # week 1 to 42
