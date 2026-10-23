@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "title": "Inspect project structure and identify app entry points",
+      "status": "done"
+    },
+    {
+      "title": "Add an Xcode-compatible iOS project wrapper and configuration",
+      "status": "done"
+    },
+    {
+      "title": "Validate generated project files and document how to open them",
+      "status": "done"
+    }
+  ],
+  "updated_at": "2026-10-23T15:59:57.568Z",
+  "session_id": "01a16974-33ff-7617-94cb-8f6a2ebd635a"
+}
