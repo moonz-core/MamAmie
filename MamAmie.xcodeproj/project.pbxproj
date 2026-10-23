@@ -10,6 +10,38 @@
 		A10000000000000000000001 /* MamAmieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* MamAmieApp.swift */; };
 		A10000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* ContentView.swift */; };
 		A10000000000000000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* Assets.xcassets */; };
+		B10000000000000000000001 /* CalendarEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* CalendarEntry.swift */; };
+		B10000000000000000000002 /* JournalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000002 /* JournalStore.swift */; };
+		B10000000000000000000003 /* CalendarJournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000003 /* CalendarJournalView.swift */; };
+		B10000000000000000000004 /* EntryEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000004 /* EntryEditorView.swift */; };
+		B10000000000000000000005 /* EntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000005 /* EntryDetailView.swift */; };
+		C10000000000000000000001 /* LocalDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000001 /* LocalDay.swift */; };
+		C10000000000000000000002 /* EntryCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000002 /* EntryCategory.swift */; };
+		C10000000000000000000003 /* EntryStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000003 /* EntryStatus.swift */; };
+		C10000000000000000000004 /* MedicationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000004 /* MedicationModels.swift */; };
+		C10000000000000000000005 /* TimelineItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000005 /* TimelineItem.swift */; };
+		C10000000000000000000006 /* JournalPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000006 /* JournalPersistence.swift */; };
+		C10000000000000000000007 /* JournalStoreQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000007 /* JournalStoreQueries.swift */; };
+		C10000000000000000000008 /* JournalStoreMutations.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000008 /* JournalStoreMutations.swift */; };
+		C10000000000000000000009 /* JournalStorePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000009 /* JournalStorePersistence.swift */; };
+		C10000000000000000000010 /* CalendarHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000010 /* CalendarHeaderView.swift */; };
+		C10000000000000000000011 /* CalendarCategoryStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000011 /* CalendarCategoryStyle.swift */; };
+		C10000000000000000000012 /* MonthCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000012 /* MonthCalendarView.swift */; };
+		C10000000000000000000013 /* CalendarDayCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000013 /* CalendarDayCellView.swift */; };
+		C10000000000000000000014 /* CalendarLegendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000014 /* CalendarLegendView.swift */; };
+		C10000000000000000000015 /* DayTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000015 /* DayTimelineView.swift */; };
+		C10000000000000000000016 /* EmptyDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000016 /* EmptyDayView.swift */; };
+		C10000000000000000000017 /* TimelineRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000017 /* TimelineRowView.swift */; };
+		C10000000000000000000018 /* UpcomingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000018 /* UpcomingSectionView.swift */; };
+		C10000000000000000000019 /* AddEntrySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000019 /* AddEntrySheet.swift */; };
+		C10000000000000000000020 /* EntryEditorSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000020 /* EntryEditorSections.swift */; };
+		C10000000000000000000021 /* EntryFormState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000021 /* EntryFormState.swift */; };
+		C10000000000000000000022 /* EntryDetailContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000022 /* EntryDetailContentView.swift */; };
+		C10000000000000000000023 /* EntryDetailComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000023 /* EntryDetailComponents.swift */; };
+		C10000000000000000000024 /* AttachmentImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000024 /* AttachmentImageLoader.swift */; };
+		C10000000000000000000025 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000025 /* HomeView.swift */; };
+		C10000000000000000000026 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000026 /* PlaceholderView.swift */; };
+		C10000000000000000000027 /* AttachmentViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000027 /* AttachmentViews.swift */; };
 		A10000000000000000000011 /* HealthMetricType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* HealthMetricType.swift */; };
 		A10000000000000000000012 /* HealthReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* HealthReading.swift */; };
 		A10000000000000000000013 /* HealthTrendPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* HealthTrendPoint.swift */; };
@@ -27,6 +59,11 @@
 		A10000000000000000000025 /* HealthSourceSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* HealthSourceSettingsSheet.swift */; };
 		A10000000000000000000026 /* MedicalSafetyBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* MedicalSafetyBannerView.swift */; };
 		A10000000000000000000030 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20000000000000000000030 /* HealthKit.framework */; };
+		F10000000000000000000001 /* FoodNutritionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000001 /* FoodNutritionModels.swift */; };
+		F10000000000000000000002 /* FoodDiaryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000002 /* FoodDiaryStore.swift */; };
+		F10000000000000000000003 /* FoodScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000003 /* FoodScannerView.swift */; };
+		F10000000000000000000004 /* FoodMealEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000004 /* FoodMealEditorView.swift */; };
+		F10000000000000000000005 /* FoodDailyDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000005 /* FoodDailyDashboardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +71,38 @@
 		A20000000000000000000001 /* MamAmieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MamAmieApp.swift; sourceTree = "<group>"; };
 		A20000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A20000000000000000000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B20000000000000000000001 /* CalendarEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEntry.swift; sourceTree = "<group>"; };
+		B20000000000000000000002 /* JournalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalStore.swift; sourceTree = "<group>"; };
+		B20000000000000000000003 /* CalendarJournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarJournalView.swift; sourceTree = "<group>"; };
+		B20000000000000000000004 /* EntryEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryEditorView.swift; sourceTree = "<group>"; };
+		B20000000000000000000005 /* EntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailView.swift; sourceTree = "<group>"; };
+		C20000000000000000000001 /* LocalDay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDay.swift; sourceTree = "<group>"; };
+		C20000000000000000000002 /* EntryCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryCategory.swift; sourceTree = "<group>"; };
+		C20000000000000000000003 /* EntryStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryStatus.swift; sourceTree = "<group>"; };
+		C20000000000000000000004 /* MedicationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationModels.swift; sourceTree = "<group>"; };
+		C20000000000000000000005 /* TimelineItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineItem.swift; sourceTree = "<group>"; };
+		C20000000000000000000006 /* JournalPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalPersistence.swift; sourceTree = "<group>"; };
+		C20000000000000000000007 /* JournalStoreQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalStoreQueries.swift; sourceTree = "<group>"; };
+		C20000000000000000000008 /* JournalStoreMutations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalStoreMutations.swift; sourceTree = "<group>"; };
+		C20000000000000000000009 /* JournalStorePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalStorePersistence.swift; sourceTree = "<group>"; };
+		C20000000000000000000010 /* CalendarHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarHeaderView.swift; sourceTree = "<group>"; };
+		C20000000000000000000011 /* CalendarCategoryStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCategoryStyle.swift; sourceTree = "<group>"; };
+		C20000000000000000000012 /* MonthCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthCalendarView.swift; sourceTree = "<group>"; };
+		C20000000000000000000013 /* CalendarDayCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDayCellView.swift; sourceTree = "<group>"; };
+		C20000000000000000000014 /* CalendarLegendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarLegendView.swift; sourceTree = "<group>"; };
+		C20000000000000000000015 /* DayTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimelineView.swift; sourceTree = "<group>"; };
+		C20000000000000000000016 /* EmptyDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyDayView.swift; sourceTree = "<group>"; };
+		C20000000000000000000017 /* TimelineRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineRowView.swift; sourceTree = "<group>"; };
+		C20000000000000000000018 /* UpcomingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpcomingSectionView.swift; sourceTree = "<group>"; };
+		C20000000000000000000019 /* AddEntrySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEntrySheet.swift; sourceTree = "<group>"; };
+		C20000000000000000000020 /* EntryEditorSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryEditorSections.swift; sourceTree = "<group>"; };
+		C20000000000000000000021 /* EntryFormState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryFormState.swift; sourceTree = "<group>"; };
+		C20000000000000000000022 /* EntryDetailContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailContentView.swift; sourceTree = "<group>"; };
+		C20000000000000000000023 /* EntryDetailComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailComponents.swift; sourceTree = "<group>"; };
+		C20000000000000000000024 /* AttachmentImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentImageLoader.swift; sourceTree = "<group>"; };
+		C20000000000000000000025 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		C20000000000000000000026 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
+		C20000000000000000000027 /* AttachmentViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentViews.swift; sourceTree = "<group>"; };
 		A20000000000000000000011 /* HealthMetricType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/HealthMetricType.swift"; sourceTree = "<group>"; };
 		A20000000000000000000012 /* HealthReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/HealthReading.swift"; sourceTree = "<group>"; };
 		A20000000000000000000013 /* HealthTrendPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/HealthTrendPoint.swift"; sourceTree = "<group>"; };
@@ -52,6 +121,11 @@
 		A20000000000000000000026 /* MedicalSafetyBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/MedicalSafetyBannerView.swift"; sourceTree = "<group>"; };
 		A20000000000000000000027 /* MamAmie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MamAmie.entitlements; sourceTree = "<group>"; };
 		A20000000000000000000030 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		F20000000000000000000001 /* FoodNutritionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodNutritionModels.swift; sourceTree = "<group>"; };
+		F20000000000000000000002 /* FoodDiaryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDiaryStore.swift; sourceTree = "<group>"; };
+		F20000000000000000000003 /* FoodScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodScannerView.swift; sourceTree = "<group>"; };
+		F20000000000000000000004 /* FoodMealEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodMealEditorView.swift; sourceTree = "<group>"; };
+		F20000000000000000000005 /* FoodDailyDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDailyDashboardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +153,9 @@
 			children = (
 				A20000000000000000000001 /* MamAmieApp.swift */,
 				A20000000000000000000002 /* ContentView.swift */,
+				B40000000000000000000001 /* Models */,
+				B40000000000000000000002 /* Services */,
+				B40000000000000000000003 /* Views */,
 				A20000000000000000000003 /* Assets.xcassets */,
 				A20000000000000000000027 /* MamAmie.entitlements */,
 				A20000000000000000000011 /* HealthMetricType.swift */,
@@ -100,6 +177,64 @@
 				A20000000000000000000030 /* HealthKit.framework */,
 			);
 			path = MamAmie;
+			sourceTree = "<group>";
+		};
+		B40000000000000000000001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B20000000000000000000001 /* CalendarEntry.swift */,
+				C20000000000000000000001 /* LocalDay.swift */,
+				C20000000000000000000002 /* EntryCategory.swift */,
+				C20000000000000000000003 /* EntryStatus.swift */,
+				C20000000000000000000004 /* MedicationModels.swift */,
+				C20000000000000000000005 /* TimelineItem.swift */,
+				F20000000000000000000001 /* FoodNutritionModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		B40000000000000000000002 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				B20000000000000000000002 /* JournalStore.swift */,
+				C20000000000000000000006 /* JournalPersistence.swift */,
+				C20000000000000000000024 /* AttachmentImageLoader.swift */,
+				C20000000000000000000007 /* JournalStoreQueries.swift */,
+				C20000000000000000000008 /* JournalStoreMutations.swift */,
+				C20000000000000000000009 /* JournalStorePersistence.swift */,
+				F20000000000000000000002 /* FoodDiaryStore.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		B40000000000000000000003 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B20000000000000000000003 /* CalendarJournalView.swift */,
+				C20000000000000000000025 /* HomeView.swift */,
+				C20000000000000000000026 /* PlaceholderView.swift */,
+				C20000000000000000000010 /* CalendarHeaderView.swift */,
+				C20000000000000000000011 /* CalendarCategoryStyle.swift */,
+				C20000000000000000000012 /* MonthCalendarView.swift */,
+				C20000000000000000000013 /* CalendarDayCellView.swift */,
+				C20000000000000000000014 /* CalendarLegendView.swift */,
+				C20000000000000000000015 /* DayTimelineView.swift */,
+				C20000000000000000000016 /* EmptyDayView.swift */,
+				C20000000000000000000017 /* TimelineRowView.swift */,
+				C20000000000000000000018 /* UpcomingSectionView.swift */,
+				C20000000000000000000019 /* AddEntrySheet.swift */,
+				B20000000000000000000004 /* EntryEditorView.swift */,
+				C20000000000000000000020 /* EntryEditorSections.swift */,
+				C20000000000000000000021 /* EntryFormState.swift */,
+				B20000000000000000000005 /* EntryDetailView.swift */,
+				C20000000000000000000027 /* AttachmentViews.swift */,
+				F20000000000000000000003 /* FoodScannerView.swift */,
+				F20000000000000000000004 /* FoodMealEditorView.swift */,
+				F20000000000000000000005 /* FoodDailyDashboardView.swift */,
+				C20000000000000000000022 /* EntryDetailContentView.swift */,
+				C20000000000000000000023 /* EntryDetailComponents.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		A40000000000000000000002 /* Products */ = {
@@ -176,6 +311,38 @@
 			files = (
 				A10000000000000000000001 /* MamAmieApp.swift in Sources */,
 				A10000000000000000000002 /* ContentView.swift in Sources */,
+				B10000000000000000000001 /* CalendarEntry.swift in Sources */,
+				B10000000000000000000002 /* JournalStore.swift in Sources */,
+				B10000000000000000000003 /* CalendarJournalView.swift in Sources */,
+				B10000000000000000000004 /* EntryEditorView.swift in Sources */,
+				B10000000000000000000005 /* EntryDetailView.swift in Sources */,
+				C10000000000000000000001 /* LocalDay.swift in Sources */,
+				C10000000000000000000002 /* EntryCategory.swift in Sources */,
+				C10000000000000000000003 /* EntryStatus.swift in Sources */,
+				C10000000000000000000004 /* MedicationModels.swift in Sources */,
+				C10000000000000000000005 /* TimelineItem.swift in Sources */,
+				C10000000000000000000006 /* JournalPersistence.swift in Sources */,
+				C10000000000000000000007 /* JournalStoreQueries.swift in Sources */,
+				C10000000000000000000008 /* JournalStoreMutations.swift in Sources */,
+				C10000000000000000000009 /* JournalStorePersistence.swift in Sources */,
+				C10000000000000000000010 /* CalendarHeaderView.swift in Sources */,
+				C10000000000000000000011 /* CalendarCategoryStyle.swift in Sources */,
+				C10000000000000000000012 /* MonthCalendarView.swift in Sources */,
+				C10000000000000000000013 /* CalendarDayCellView.swift in Sources */,
+				C10000000000000000000014 /* CalendarLegendView.swift in Sources */,
+				C10000000000000000000015 /* DayTimelineView.swift in Sources */,
+				C10000000000000000000016 /* EmptyDayView.swift in Sources */,
+				C10000000000000000000017 /* TimelineRowView.swift in Sources */,
+				C10000000000000000000018 /* UpcomingSectionView.swift in Sources */,
+				C10000000000000000000019 /* AddEntrySheet.swift in Sources */,
+				C10000000000000000000020 /* EntryEditorSections.swift in Sources */,
+				C10000000000000000000021 /* EntryFormState.swift in Sources */,
+				C10000000000000000000022 /* EntryDetailContentView.swift in Sources */,
+				C10000000000000000000023 /* EntryDetailComponents.swift in Sources */,
+				C10000000000000000000024 /* AttachmentImageLoader.swift in Sources */,
+				C10000000000000000000025 /* HomeView.swift in Sources */,
+				C10000000000000000000026 /* PlaceholderView.swift in Sources */,
+				C10000000000000000000027 /* AttachmentViews.swift in Sources */,
 				A10000000000000000000011 /* HealthMetricType.swift in Sources */,
 				A10000000000000000000012 /* HealthReading.swift in Sources */,
 				A10000000000000000000013 /* HealthTrendPoint.swift in Sources */,
@@ -192,6 +359,11 @@
 				A10000000000000000000024 /* HealthPermissionSheet.swift in Sources */,
 				A10000000000000000000025 /* HealthSourceSettingsSheet.swift in Sources */,
 				A10000000000000000000026 /* MedicalSafetyBannerView.swift in Sources */,
+				F10000000000000000000001 /* FoodNutritionModels.swift in Sources */,
+				F10000000000000000000002 /* FoodDiaryStore.swift in Sources */,
+				F10000000000000000000003 /* FoodScannerView.swift in Sources */,
+				F10000000000000000000004 /* FoodMealEditorView.swift in Sources */,
+				F10000000000000000000005 /* FoodDailyDashboardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,6 +480,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "MamAmie accesses Apple Health measurements from your Apple Watch and compatible devices to display your resting heart rate, sleep duration, blood oxygen, activity, and maternal wellness trends.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "MamAmie uses Apple Health to support maternal wellness tracking.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "MamAmie uses the camera only when you choose to take a photo of your meal.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -336,6 +509,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "MamAmie accesses Apple Health measurements from your Apple Watch and compatible devices to display your resting heart rate, sleep duration, blood oxygen, activity, and maternal wellness trends.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "MamAmie uses Apple Health to support maternal wellness tracking.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "MamAmie uses the camera only when you choose to take a photo of your meal.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
