@@ -5,11 +5,17 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView()
+            HomeView(onOpenHealth: { selectedTab = 1 })
                 .tabItem {
                     Label("Today", systemImage: "heart.fill")
                 }
                 .tag(0)
+
+            ConnectedHealthDashboardView()
+                .tabItem {
+                    Label("Health", systemImage: "waveform.path.ecg")
+                }
+                .tag(1)
 
             PlaceholderView(
                 title: "Journal",
@@ -19,7 +25,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Journal", systemImage: "book.closed.fill")
             }
-            .tag(1)
+            .tag(2)
 
             PlaceholderView(
                 title: "Resources",
@@ -29,7 +35,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Resources", systemImage: "sparkles")
             }
-            .tag(2)
+            .tag(3)
 
             PlaceholderView(
                 title: "Profile",
@@ -39,13 +45,15 @@ struct ContentView: View {
             .tabItem {
                 Label("Profile", systemImage: "person.crop.circle")
             }
-            .tag(3)
+            .tag(4)
         }
         .tint(Color("AccentColor"))
     }
 }
 
 private struct HomeView: View {
+    var onOpenHealth: (() -> Void)? = nil
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -83,6 +91,50 @@ private struct HomeView: View {
                     .padding(20)
                     .background(Color("AccentColor").opacity(0.10))
                     .clipShape(RoundedRectangle(cornerRadius: 20))
+
+                    // Connected Health Quick Entry Card
+                    Button {
+                        onOpenHealth?()
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(systemName: "applewatch.radiowaves.left.and.right")
+                                .font(.title2)
+                                .foregroundStyle(Color("AccentColor"))
+                                .frame(width: 44, height: 44)
+                                .background(Color("AccentColor").opacity(0.12))
+                                .clipShape(Circle())
+
+                            VStack(alignment: .leading, spacing: 3) {
+                                HStack(spacing: 6) {
+                                    Text("Connected Health")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(.primary)
+
+                                    Text("Apple Watch")
+                                        .font(.caption2.weight(.bold))
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color("AccentColor").opacity(0.12))
+                                        .foregroundStyle(Color("AccentColor"))
+                                        .clipShape(Capsule())
+                                }
+
+                                Text("View heart rate, rest, and sleep trends")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(.tertiary)
+                        }
+                        .padding(16)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                    }
+                    .buttonStyle(.plain)
 
                     VStack(alignment: .leading, spacing: 14) {
                         Text("Today’s check-in")
