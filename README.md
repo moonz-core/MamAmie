@@ -10,6 +10,15 @@ MamAmie is an iOS app for pregnant women, built with SwiftUI.
 
 The project uses iOS 16.0 as its minimum deployment target and has no external dependencies. The app's bundle identifier is `com.mamamie.app`; change it in the target's **Signing & Capabilities** settings before installing on a physical device or submitting to the App Store.
 
+## Backend API & Cloud Services
+
+The MamAmie AI backend is deployed live on Render:
+* **Live API Base URL:** `https://mamamie.onrender.com/api/v1`
+* **Interactive OpenAPI (Swagger):** [https://mamamie.onrender.com/docs](https://mamamie.onrender.com/docs)
+* **Health Check Endpoint:** [https://mamamie.onrender.com/health](https://mamamie.onrender.com/health)
+
+Full backend documentation, database models, and local setup instructions are available in the [backend/](backend/) directory.
+
 ## Connected Health (Smartwatch & Maternal Health Monitoring)
 
 MamAmie provides a dedicated **Connected Health** section integrating with Apple HealthKit and compatible wearables (such as Apple Watch).

@@ -4,6 +4,14 @@ Production-minded, modular, and privacy-conscious backend service for **MamAmie 
 
 ---
 
+## Live Production Deployment
+* **API Base URL:** `https://mamamie.onrender.com/api/v1`
+* **Interactive Swagger Documentation:** [https://mamamie.onrender.com/docs](https://mamamie.onrender.com/docs)
+* **ReDoc Documentation:** [https://mamamie.onrender.com/redoc](https://mamamie.onrender.com/redoc)
+* **System Health Check:** [https://mamamie.onrender.com/health](https://mamamie.onrender.com/health)
+
+---
+
 ## 1. Architecture & Technology Stack
 
 * **Language:** Python 3.12 / 3.13
