@@ -2,9 +2,11 @@ import SwiftUI
 
 @main
 struct MamAmieApp: App {
+    @StateObject private var journalStore = JournalStore()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(journalStore: journalStore)
         }
     }
 }
