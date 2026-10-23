@@ -10,6 +10,23 @@
 		A10000000000000000000001 /* MamAmieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* MamAmieApp.swift */; };
 		A10000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* ContentView.swift */; };
 		A10000000000000000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* Assets.xcassets */; };
+		A10000000000000000000011 /* HealthMetricType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* HealthMetricType.swift */; };
+		A10000000000000000000012 /* HealthReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* HealthReading.swift */; };
+		A10000000000000000000013 /* HealthTrendPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* HealthTrendPoint.swift */; };
+		A10000000000000000000014 /* PersonalHealthSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* PersonalHealthSummary.swift */; };
+		A10000000000000000000015 /* MaternalHealthProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* MaternalHealthProfile.swift */; };
+		A10000000000000000000016 /* HealthKitServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* HealthKitServiceProtocol.swift */; };
+		A10000000000000000000017 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* HealthKitService.swift */; };
+		A10000000000000000000018 /* MockHealthDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* MockHealthDataProvider.swift */; };
+		A10000000000000000000019 /* ConnectedHealthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* ConnectedHealthViewModel.swift */; };
+		A10000000000000000000020 /* ConnectedHealthDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* ConnectedHealthDashboardView.swift */; };
+		A10000000000000000000021 /* HealthMetricCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* HealthMetricCardView.swift */; };
+		A10000000000000000000022 /* HealthMetricDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* HealthMetricDetailView.swift */; };
+		A10000000000000000000023 /* WeeklyWellbeingSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* WeeklyWellbeingSummaryCard.swift */; };
+		A10000000000000000000024 /* HealthPermissionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* HealthPermissionSheet.swift */; };
+		A10000000000000000000025 /* HealthSourceSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* HealthSourceSettingsSheet.swift */; };
+		A10000000000000000000026 /* MedicalSafetyBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* MedicalSafetyBannerView.swift */; };
+		A10000000000000000000030 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20000000000000000000030 /* HealthKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -17,6 +34,24 @@
 		A20000000000000000000001 /* MamAmieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MamAmieApp.swift; sourceTree = "<group>"; };
 		A20000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A20000000000000000000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A20000000000000000000011 /* HealthMetricType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/HealthMetricType.swift"; sourceTree = "<group>"; };
+		A20000000000000000000012 /* HealthReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/HealthReading.swift"; sourceTree = "<group>"; };
+		A20000000000000000000013 /* HealthTrendPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/HealthTrendPoint.swift"; sourceTree = "<group>"; };
+		A20000000000000000000014 /* PersonalHealthSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/PersonalHealthSummary.swift"; sourceTree = "<group>"; };
+		A20000000000000000000015 /* MaternalHealthProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/MaternalHealthProfile.swift"; sourceTree = "<group>"; };
+		A20000000000000000000016 /* HealthKitServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/Health/HealthKitServiceProtocol.swift"; sourceTree = "<group>"; };
+		A20000000000000000000017 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/Health/HealthKitService.swift"; sourceTree = "<group>"; };
+		A20000000000000000000018 /* MockHealthDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/Health/MockHealthDataProvider.swift"; sourceTree = "<group>"; };
+		A20000000000000000000019 /* ConnectedHealthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewModels/ConnectedHealthViewModel.swift"; sourceTree = "<group>"; };
+		A20000000000000000000020 /* ConnectedHealthDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/ConnectedHealthDashboardView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000021 /* HealthMetricCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthMetricCardView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000022 /* HealthMetricDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthMetricDetailView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000023 /* WeeklyWellbeingSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/WeeklyWellbeingSummaryCard.swift"; sourceTree = "<group>"; };
+		A20000000000000000000024 /* HealthPermissionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthPermissionSheet.swift"; sourceTree = "<group>"; };
+		A20000000000000000000025 /* HealthSourceSettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthSourceSettingsSheet.swift"; sourceTree = "<group>"; };
+		A20000000000000000000026 /* MedicalSafetyBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/MedicalSafetyBannerView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000027 /* MamAmie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MamAmie.entitlements; sourceTree = "<group>"; };
+		A20000000000000000000030 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -24,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000000000000000000030 /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +80,24 @@
 				A20000000000000000000001 /* MamAmieApp.swift */,
 				A20000000000000000000002 /* ContentView.swift */,
 				A20000000000000000000003 /* Assets.xcassets */,
+				A20000000000000000000027 /* MamAmie.entitlements */,
+				A20000000000000000000011 /* HealthMetricType.swift */,
+				A20000000000000000000012 /* HealthReading.swift */,
+				A20000000000000000000013 /* HealthTrendPoint.swift */,
+				A20000000000000000000014 /* PersonalHealthSummary.swift */,
+				A20000000000000000000015 /* MaternalHealthProfile.swift */,
+				A20000000000000000000016 /* HealthKitServiceProtocol.swift */,
+				A20000000000000000000017 /* HealthKitService.swift */,
+				A20000000000000000000018 /* MockHealthDataProvider.swift */,
+				A20000000000000000000019 /* ConnectedHealthViewModel.swift */,
+				A20000000000000000000020 /* ConnectedHealthDashboardView.swift */,
+				A20000000000000000000021 /* HealthMetricCardView.swift */,
+				A20000000000000000000022 /* HealthMetricDetailView.swift */,
+				A20000000000000000000023 /* WeeklyWellbeingSummaryCard.swift */,
+				A20000000000000000000024 /* HealthPermissionSheet.swift */,
+				A20000000000000000000025 /* HealthSourceSettingsSheet.swift */,
+				A20000000000000000000026 /* MedicalSafetyBannerView.swift */,
+				A20000000000000000000030 /* HealthKit.framework */,
 			);
 			path = MamAmie;
 			sourceTree = "<group>";
@@ -122,6 +176,22 @@
 			files = (
 				A10000000000000000000001 /* MamAmieApp.swift in Sources */,
 				A10000000000000000000002 /* ContentView.swift in Sources */,
+				A10000000000000000000011 /* HealthMetricType.swift in Sources */,
+				A10000000000000000000012 /* HealthReading.swift in Sources */,
+				A10000000000000000000013 /* HealthTrendPoint.swift in Sources */,
+				A10000000000000000000014 /* PersonalHealthSummary.swift in Sources */,
+				A10000000000000000000015 /* MaternalHealthProfile.swift in Sources */,
+				A10000000000000000000016 /* HealthKitServiceProtocol.swift in Sources */,
+				A10000000000000000000017 /* HealthKitService.swift in Sources */,
+				A10000000000000000000018 /* MockHealthDataProvider.swift in Sources */,
+				A10000000000000000000019 /* ConnectedHealthViewModel.swift in Sources */,
+				A10000000000000000000020 /* ConnectedHealthDashboardView.swift in Sources */,
+				A10000000000000000000021 /* HealthMetricCardView.swift in Sources */,
+				A10000000000000000000022 /* HealthMetricDetailView.swift in Sources */,
+				A10000000000000000000023 /* WeeklyWellbeingSummaryCard.swift in Sources */,
+				A10000000000000000000024 /* HealthPermissionSheet.swift in Sources */,
+				A10000000000000000000025 /* HealthSourceSettingsSheet.swift in Sources */,
+				A10000000000000000000026 /* MedicalSafetyBannerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,10 +301,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MamAmie/MamAmie.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MamAmie;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "MamAmie accesses Apple Health measurements from your Apple Watch and compatible devices to display your resting heart rate, sleep duration, blood oxygen, activity, and maternal wellness trends.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "MamAmie uses Apple Health to support maternal wellness tracking.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -256,10 +329,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MamAmie/MamAmie.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MamAmie;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "MamAmie accesses Apple Health measurements from your Apple Watch and compatible devices to display your resting heart rate, sleep duration, blood oxygen, activity, and maternal wellness trends.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "MamAmie uses Apple Health to support maternal wellness tracking.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
