@@ -10,11 +10,17 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView()
+            HomeView(onOpenHealth: { selectedTab = 1 })
                 .tabItem {
                     Label("Today", systemImage: "heart.fill")
                 }
                 .tag(0)
+
+            ConnectedHealthDashboardView()
+                .tabItem {
+                    Label("Health", systemImage: "waveform.path.ecg")
+                }
+                .tag(1)
 
             NavigationStack {
                 CalendarJournalView(store: journalStore)
@@ -22,7 +28,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Calendar", systemImage: "calendar")
             }
-            .tag(1)
+            .tag(2)
 
             PlaceholderView(
                 title: "Resources",
@@ -32,7 +38,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Resources", systemImage: "sparkles")
             }
-            .tag(2)
+            .tag(3)
 
             PlaceholderView(
                 title: "Profile",
@@ -42,7 +48,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Profile", systemImage: "person.crop.circle")
             }
-            .tag(3)
+            .tag(4)
         }
         .tint(Color("AccentColor"))
     }
