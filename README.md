@@ -10,6 +10,22 @@ MamAmie is an iOS app for pregnant women, built with SwiftUI.
 
 The project uses iOS 16.0 as its minimum deployment target and has no external dependencies. The app's bundle identifier is `com.mamamie.app`; change it in the target's **Signing & Capabilities** settings before installing on a physical device or submitting to the App Store.
 
+## Onboarding
+
+The `feature/onboarding` branch adds a complete local onboarding flow for the iOS app. It covers:
+
+- Welcome and privacy explanation.
+- Journey stage selection: preparing for pregnancy, currently pregnant, or postpartum support.
+- Optional pregnancy dating using a clinician-provided due date or the first day of the last period.
+- Deterministic estimated due-date and gestational-week calculations when reliable dates are supplied.
+- Optional display name personalization.
+- Local privacy acknowledgment and a review screen before completion.
+- Persistence across launches using a versioned Codable file in the app's private Application Support directory.
+- Launch gating so first-time users complete onboarding before the main tabs open.
+- Profile access to review and update onboarding answers.
+
+No authentication or remote onboarding API exists in this iOS branch, so answers are intentionally stored locally in the app sandbox. HealthKit permission is still requested contextually from Connected Health rather than during onboarding.
+
 ## Connected Health (Smartwatch & Maternal Health Monitoring)
 
 MamAmie provides a dedicated **Connected Health** section integrating with Apple HealthKit and compatible wearables (such as Apple Watch).

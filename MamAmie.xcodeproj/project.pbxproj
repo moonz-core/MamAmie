@@ -33,6 +33,20 @@
 		A10000000000000000000025 /* HealthSourceSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* HealthSourceSettingsSheet.swift */; };
 		A10000000000000000000026 /* MedicalSafetyBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* MedicalSafetyBannerView.swift */; };
 		A10000000000000000000030 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20000000000000000000030 /* HealthKit.framework */; };
+		A10000000000000000000041 /* OnboardingProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000041 /* OnboardingProfile.swift */; };
+		A10000000000000000000042 /* OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* OnboardingStore.swift */; };
+		A10000000000000000000043 /* OnboardingComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000043 /* OnboardingComponents.swift */; };
+		A10000000000000000000044 /* OnboardingWelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000044 /* OnboardingWelcomeView.swift */; };
+		A10000000000000000000045 /* OnboardingStageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000045 /* OnboardingStageView.swift */; };
+		A10000000000000000000046 /* OnboardingDatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000046 /* OnboardingDatesView.swift */; };
+		A10000000000000000000047 /* OnboardingPersonalizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000047 /* OnboardingPersonalizationView.swift */; };
+		A10000000000000000000048 /* OnboardingSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000048 /* OnboardingSummaryView.swift */; };
+		A10000000000000000000049 /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000049 /* OnboardingFlowView.swift */; };
+		A10000000000000000000050 /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000050 /* AppTabView.swift */; };
+		A10000000000000000000051 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000051 /* HomeView.swift */; };
+		A10000000000000000000052 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000052 /* PlaceholderView.swift */; };
+		A10000000000000000000053 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000053 /* ProfileView.swift */; };
+		A10000000000000000000054 /* OnboardingPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000054 /* OnboardingPersistence.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +78,20 @@
 		A20000000000000000000026 /* MedicalSafetyBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/MedicalSafetyBannerView.swift"; sourceTree = "<group>"; };
 		A20000000000000000000027 /* MamAmie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MamAmie.entitlements; sourceTree = "<group>"; };
 		A20000000000000000000030 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		A20000000000000000000041 /* OnboardingProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Onboarding/OnboardingProfile.swift"; sourceTree = "<group>"; };
+		A20000000000000000000042 /* OnboardingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/Onboarding/OnboardingStore.swift"; sourceTree = "<group>"; };
+		A20000000000000000000043 /* OnboardingComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingComponents.swift"; sourceTree = "<group>"; };
+		A20000000000000000000044 /* OnboardingWelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingWelcomeView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000045 /* OnboardingStageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingStageView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000046 /* OnboardingDatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingDatesView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000047 /* OnboardingPersonalizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingPersonalizationView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000048 /* OnboardingSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingSummaryView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000049 /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingFlowView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000050 /* AppTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/AppTabView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000051 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/HomeView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000052 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/PlaceholderView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000053 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/ProfileView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000054 /* OnboardingPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/Onboarding/OnboardingPersistence.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +144,20 @@
 				A20000000000000000000025 /* HealthSourceSettingsSheet.swift */,
 				A20000000000000000000026 /* MedicalSafetyBannerView.swift */,
 				A20000000000000000000030 /* HealthKit.framework */,
+				A20000000000000000000041 /* OnboardingProfile.swift */,
+				A20000000000000000000042 /* OnboardingStore.swift */,
+				A20000000000000000000043 /* OnboardingComponents.swift */,
+				A20000000000000000000044 /* OnboardingWelcomeView.swift */,
+				A20000000000000000000045 /* OnboardingStageView.swift */,
+				A20000000000000000000046 /* OnboardingDatesView.swift */,
+				A20000000000000000000047 /* OnboardingPersonalizationView.swift */,
+				A20000000000000000000048 /* OnboardingSummaryView.swift */,
+				A20000000000000000000049 /* OnboardingFlowView.swift */,
+				A20000000000000000000050 /* AppTabView.swift */,
+				A20000000000000000000051 /* HomeView.swift */,
+				A20000000000000000000052 /* PlaceholderView.swift */,
+				A20000000000000000000053 /* ProfileView.swift */,
+				A20000000000000000000054 /* OnboardingPersistence.swift */,
 			);
 			path = MamAmie;
 			sourceTree = "<group>";
@@ -216,6 +258,20 @@
 				A10000000000000000000024 /* HealthPermissionSheet.swift in Sources */,
 				A10000000000000000000025 /* HealthSourceSettingsSheet.swift in Sources */,
 				A10000000000000000000026 /* MedicalSafetyBannerView.swift in Sources */,
+				A10000000000000000000041 /* OnboardingProfile.swift in Sources */,
+				A10000000000000000000042 /* OnboardingStore.swift in Sources */,
+				A10000000000000000000043 /* OnboardingComponents.swift in Sources */,
+				A10000000000000000000044 /* OnboardingWelcomeView.swift in Sources */,
+				A10000000000000000000045 /* OnboardingStageView.swift in Sources */,
+				A10000000000000000000046 /* OnboardingDatesView.swift in Sources */,
+				A10000000000000000000047 /* OnboardingPersonalizationView.swift in Sources */,
+				A10000000000000000000048 /* OnboardingSummaryView.swift in Sources */,
+				A10000000000000000000049 /* OnboardingFlowView.swift in Sources */,
+				A10000000000000000000050 /* AppTabView.swift in Sources */,
+				A10000000000000000000051 /* HomeView.swift in Sources */,
+				A10000000000000000000052 /* PlaceholderView.swift in Sources */,
+				A10000000000000000000053 /* ProfileView.swift in Sources */,
+				A10000000000000000000054 /* OnboardingPersistence.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
