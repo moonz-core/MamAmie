@@ -1,6 +1,6 @@
 from datetime import date, datetime, timezone
 from typing import List, Optional
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, UploadFile, File, HTTPException
 from sqlalchemy import select, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
@@ -30,6 +30,26 @@ async def analyze_food(
 ):
     """AI-assisted food identification and nutritional composition estimate."""
     return FoodAnalyzerService.analyze_food_input(food_text=food_description, filename=filename)
+
+
+@router.post("/analyze-image", response_model=FoodImageAnalysisResponse)
+async def analyze_food_image(
+    image: UploadFile = File(..., description="JPEG, PNG, HEIC, or WebP meal photo"),
+    current_user: User = Depends(get_current_user),
+):
+    """Analyze a meal photo through the configured backend AI provider."""
+    allowed_types = {"image/jpeg", "image/png", "image/heic", "image/heif", "image/webp"}
+    if image.content_type not in allowed_types:
+        raise HTTPException(status_code=415, detail="Upload a JPEG, PNG, HEIC, HEIF, or WebP image")
+    image_bytes = await image.read(settings.MAX_UPLOAD_SIZE_BYTES + 1)
+    if len(image_bytes) > settings.MAX_UPLOAD_SIZE_BYTES:
+        raise HTTPException(status_code=413, detail="Image is larger than the configured upload limit")
+    try:
+        return await FoodAnalyzerService.analyze_food_image(image_bytes, image.content_type)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post("/logs", response_model=FoodLogResponse, status_code=status.HTTP_201_CREATED)

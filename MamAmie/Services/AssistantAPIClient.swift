@@ -33,6 +33,23 @@ struct AssistantAIResponse: Decodable {
     var disclaimer: String
 }
 
+struct FoodImageAnalysisResponse: Decodable {
+    var suggestedName: String
+    var confidence: Double
+    var ingredients: [String]
+    var portionDescription: String
+    var estimatedCalories: Double
+    var estimatedProteinG: Double
+    var estimatedCarbsG: Double
+    var estimatedFatG: Double
+    var estimatedIronMg: Double
+    var estimatedFolateMcg: Double
+    var estimatedCalciumMg: Double?
+    var estimatedFibreG: Double?
+    var maternalSafetyNote: String
+    var isEstimate: Bool
+}
+
 private struct AssistantTokens: Codable {
     var accessToken: String
     var refreshToken: String
@@ -79,7 +96,7 @@ final class AssistantAPIClient: ObservableObject {
     private var tokens: AssistantTokens?
 
     init() {
-        serverAddress = UserDefaults.standard.string(forKey: "mamamie.assistant.server") ?? ""
+        serverAddress = UserDefaults.standard.string(forKey: "mamamie.assistant.server") ?? APIConfiguration.productionBaseURL.absoluteString
         tokens = readTokens()
         isSignedIn = tokens != nil
     }
@@ -133,6 +150,34 @@ final class AssistantAPIClient: ObservableObject {
             "report_text": text, "question": question, "stage": stage,
             "consent_to_external_processing": externalConsent,
         ])
+    }
+
+    func analyzeFoodImage(_ imageData: Data) async throws -> FoodImageAnalysisResponse {
+        guard let token = tokens?.accessToken else { throw AssistantAPIError.notSignedIn }
+        guard let base = URL(string: serverAddress.trimmingCharacters(in: .whitespacesAndNewlines)), base.scheme == "https", let host = base.host else { throw AssistantAPIError.invalidServer }
+        var components = URLComponents(url: base, resolvingAgainstBaseURL: false)
+        let prefix = base.path.hasSuffix("/") ? String(base.path.dropLast()) : base.path
+        components?.path = prefix + "/nutrition/analyze-image"
+        guard let url = components?.url, url.host == host else { throw AssistantAPIError.invalidServer }
+        let boundary = "Boundary-\(UUID().uuidString)"
+        var body = Data()
+        body.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"image\"; filename=\"meal.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n".utf8))
+        body.append(imageData)
+        body.append(Data("\r\n--\(boundary)--\r\n".utf8))
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.httpBody = body
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse else { throw AssistantAPIError.unavailable }
+            if http.statusCode == 401 { signOut(); throw AssistantAPIError.sessionExpired }
+            guard (200..<300).contains(http.statusCode) else { throw AssistantAPIError.rejected }
+            let decoder = JSONDecoder(); decoder.keyDecodingStrategy = .convertFromSnakeCase
+            return try decoder.decode(FoodImageAnalysisResponse.self, from: data)
+        } catch let error as AssistantAPIError { throw error }
+        catch { throw AssistantAPIError.unavailable }
     }
 
     private func validateServer() async throws {

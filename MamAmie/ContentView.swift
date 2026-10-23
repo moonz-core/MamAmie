@@ -3,11 +3,13 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var journalStore: JournalStore
     @ObservedObject var foodDiaryStore: FoodDiaryStore
+    @ObservedObject var assistantAPI: AssistantAPIClient
     @State private var selectedTab = 0
 
-    init(journalStore: JournalStore, foodDiaryStore: FoodDiaryStore) {
+    init(journalStore: JournalStore, foodDiaryStore: FoodDiaryStore, assistantAPI: AssistantAPIClient) {
         self.journalStore = journalStore
         self.foodDiaryStore = foodDiaryStore
+        self.assistantAPI = assistantAPI
     }
 
     var body: some View {
@@ -36,13 +38,13 @@ struct ContentView: View {
             }
             .tag(2)
 
-            AssistantView()
+            AssistantView(api: assistantAPI)
                 .tabItem {
                     Label("Ask", systemImage: "heart.text.clipboard")
                 }
                 .tag(6)
 
-            FoodScannerView(store: foodDiaryStore)
+            FoodScannerView(store: foodDiaryStore, assistantAPI: assistantAPI)
                 .tabItem {
                     Label("Food", systemImage: "fork.knife")
                 }
@@ -75,6 +77,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(journalStore: JournalStore(), foodDiaryStore: FoodDiaryStore())
+        ContentView(journalStore: JournalStore(), foodDiaryStore: FoodDiaryStore(), assistantAPI: AssistantAPIClient())
     }
 }
