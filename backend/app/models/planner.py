@@ -1,11 +1,14 @@
 from typing import Optional
-from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, JSON
+from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, JSON, Index
 from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base, UUIDMixin, TimestampMixin
 
 
 class PlannerEntry(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "planner_entries"
+    __table_args__ = (
+        Index("ix_planner_user_day", "user_id", "day_key"),
+    )
 
     user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
