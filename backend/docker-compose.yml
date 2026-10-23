@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: mamamie-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: mamamie
+      POSTGRES_PASSWORD: mamamie_secure_password
+      POSTGRES_DB: mamamie_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mamamie -d mamamie_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: mamamie-backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      DEBUG: "false"
+      DATABASE_URL: postgresql+asyncpg://mamamie:mamamie_secure_password@db:5432/mamamie_db
+      SECRET_KEY: ${SECRET_KEY:-change_this_to_a_production_random_secret_key_12345}
+      STORAGE_PROVIDER: local
+      LOCAL_STORAGE_DIR: /app/uploads
+      AI_PROVIDER: grounded_local
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend_uploads:/app/uploads
+
+volumes:
+  postgres_data:
+  backend_uploads:

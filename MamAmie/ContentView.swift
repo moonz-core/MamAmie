@@ -2,10 +2,18 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var onboardingStore: OnboardingStore
+    @ObservedObject var journalStore: JournalStore
+    @ObservedObject var foodDiaryStore: FoodDiaryStore
     @State private var showingOnboarding = false
 
-    init(onboardingStore: OnboardingStore) {
+    init(
+        onboardingStore: OnboardingStore,
+        journalStore: JournalStore,
+        foodDiaryStore: FoodDiaryStore
+    ) {
         self.onboardingStore = onboardingStore
+        self.journalStore = journalStore
+        self.foodDiaryStore = foodDiaryStore
     }
 
     var body: some View {
@@ -13,6 +21,8 @@ struct ContentView: View {
             if onboardingStore.isComplete && !showingOnboarding {
                 AppTabView(
                     onboardingStore: onboardingStore,
+                    journalStore: journalStore,
+                    foodDiaryStore: foodDiaryStore,
                     onEditOnboarding: { showingOnboarding = true }
                 )
             } else {
@@ -28,6 +38,10 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(onboardingStore: OnboardingStore())
+        ContentView(
+            onboardingStore: OnboardingStore(),
+            journalStore: JournalStore(),
+            foodDiaryStore: FoodDiaryStore()
+        )
     }
 }

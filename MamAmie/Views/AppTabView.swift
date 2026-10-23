@@ -2,6 +2,8 @@ import SwiftUI
 
 struct AppTabView: View {
     @ObservedObject var onboardingStore: OnboardingStore
+    @ObservedObject var journalStore: JournalStore
+    @ObservedObject var foodDiaryStore: FoodDiaryStore
     let onEditOnboarding: () -> Void
     @State private var selectedTab = 0
 
@@ -22,15 +24,19 @@ struct AppTabView: View {
                 }
                 .tag(1)
 
-            PlaceholderView(
-                title: "Journal",
-                message: "Keep notes about how you are feeling and the moments you want to remember.",
-                systemImage: "book.closed.fill"
-            )
+            NavigationStack {
+                CalendarJournalView(store: journalStore)
+            }
             .tabItem {
-                Label("Journal", systemImage: "book.closed.fill")
+                Label("Calendar", systemImage: "calendar")
             }
             .tag(2)
+
+            FoodScannerView(store: foodDiaryStore)
+                .tabItem {
+                    Label("Food", systemImage: "fork.knife")
+                }
+                .tag(5)
 
             PlaceholderView(
                 title: "Resources",
