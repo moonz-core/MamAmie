@@ -2,10 +2,12 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var journalStore: JournalStore
+    @ObservedObject var foodDiaryStore: FoodDiaryStore
     @State private var selectedTab = 0
 
-    init(journalStore: JournalStore) {
+    init(journalStore: JournalStore, foodDiaryStore: FoodDiaryStore) {
         self.journalStore = journalStore
+        self.foodDiaryStore = foodDiaryStore
     }
 
     var body: some View {
@@ -30,6 +32,12 @@ struct ContentView: View {
             }
             .tag(2)
 
+            FoodScannerView(store: foodDiaryStore)
+                .tabItem {
+                    Label("Food", systemImage: "fork.knife")
+                }
+                .tag(5)
+
             PlaceholderView(
                 title: "Resources",
                 message: "Helpful guidance for each step of your pregnancy will live here.",
@@ -49,6 +57,7 @@ struct ContentView: View {
                 Label("Profile", systemImage: "person.crop.circle")
             }
             .tag(4)
+
         }
         .tint(Color("AccentColor"))
     }
@@ -56,6 +65,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(journalStore: JournalStore())
+        ContentView(journalStore: JournalStore(), foodDiaryStore: FoodDiaryStore())
     }
 }
