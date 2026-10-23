@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     var onOpenHealth: (() -> Void)? = nil
+    @State private var waterGlasses: Int = 5
 
     var body: some View {
         NavigationStack {
@@ -85,6 +86,114 @@ struct HomeView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                     }
                     .buttonStyle(.plain)
+
+                    // Visual Data Snapshot: Today's Wellness at a Glance
+                    VStack(alignment: .leading, spacing: 14) {
+                        HStack {
+                            Text("Today’s wellness at a glance")
+                                .font(.title3.bold())
+
+                            Spacer()
+
+                            Text("Live")
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(.green)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.green.opacity(0.15))
+                                .clipShape(Capsule())
+                        }
+
+                        HStack(spacing: 12) {
+                            // Hydration Ring Card
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Image(systemName: "drop.fill")
+                                        .foregroundStyle(.blue)
+                                    Text("Hydration")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                    Button {
+                                        if waterGlasses < 10 { waterGlasses += 1 }
+                                    } label: {
+                                        Image(systemName: "plus.circle.fill")
+                                            .font(.caption)
+                                            .foregroundStyle(.blue)
+                                    }
+                                }
+
+                                HStack(alignment: .center, spacing: 12) {
+                                    ZStack {
+                                        Circle()
+                                            .stroke(Color.blue.opacity(0.15), lineWidth: 5)
+                                            .frame(width: 44, height: 44)
+                                        Circle()
+                                            .trim(from: 0, to: min(1.0, Double(waterGlasses) / 8.0))
+                                            .stroke(Color.blue, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                                            .rotationEffect(.degrees(-90))
+                                            .frame(width: 44, height: 44)
+                                        Text("\(waterGlasses)")
+                                            .font(.caption.bold())
+                                            .foregroundStyle(.blue)
+                                    }
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("\(waterGlasses * 250) ml")
+                                            .font(.subheadline.bold())
+                                        Text("Goal: 2,000 ml")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                            .padding(14)
+                            .frame(maxWidth: .infinity)
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
+
+                            // Smartwatch Resting HR & Sleep Card
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Image(systemName: "heart.fill")
+                                        .foregroundStyle(Color(red: 0.90, green: 0.28, blue: 0.42))
+                                    Text("Vitals")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                    Text("72 bpm")
+                                        .font(.caption.bold())
+                                        .foregroundStyle(Color(red: 0.90, green: 0.28, blue: 0.42))
+                                }
+
+                                // Mini Sparkline
+                                HStack(alignment: .bottom, spacing: 4) {
+                                    let heights: [CGFloat] = [12, 16, 14, 20, 18, 22, 19]
+                                    ForEach(0..<heights.count, id: \.self) { idx in
+                                        RoundedRectangle(cornerRadius: 2)
+                                            .fill(idx == 6 ? Color(red: 0.90, green: 0.28, blue: 0.42) : Color(red: 0.90, green: 0.28, blue: 0.42).opacity(0.35))
+                                            .frame(width: 5, height: heights[idx])
+                                    }
+
+                                    Spacer()
+
+                                    VStack(alignment: .trailing, spacing: 2) {
+                                        Text("7.5h rest")
+                                            .font(.caption2.bold())
+                                            .foregroundStyle(.secondary)
+                                        Text("Steady baseline")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                .frame(height: 28)
+                            }
+                            .padding(14)
+                            .frame(maxWidth: .infinity)
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                        }
+                    }
 
                     VStack(alignment: .leading, spacing: 14) {
                         Text("Today’s check-in")

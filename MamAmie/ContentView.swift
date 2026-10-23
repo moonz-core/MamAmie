@@ -38,13 +38,12 @@ struct ContentView: View {
                 }
                 .tag(5)
 
-            PlaceholderView(
-                title: "Resources",
-                message: "Helpful guidance for each step of your pregnancy will live here.",
-                systemImage: "sparkles"
+            MaternalAIView(
+                onOpenHealth: { selectedTab = 1 },
+                onOpenFood: { selectedTab = 5 }
             )
             .tabItem {
-                Label("Resources", systemImage: "sparkles")
+                Label("Guidance", systemImage: "sparkles")
             }
             .tag(3)
 

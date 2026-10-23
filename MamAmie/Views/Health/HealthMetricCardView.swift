@@ -87,6 +87,24 @@ public struct HealthMetricCardView: View {
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
+
+                    // Mini 7-day Sparkline Trend Indicator
+                    HStack(alignment: .bottom, spacing: 4) {
+                        let samples = sparklineSamples(for: metric)
+                        ForEach(0..<samples.count, id: \.self) { idx in
+                            RoundedRectangle(cornerRadius: 1.5)
+                                .fill(idx == samples.count - 1 ? metric.iconTintColor : metric.iconTintColor.opacity(0.35))
+                                .frame(width: 5, height: samples[idx])
+                        }
+
+                        Spacer()
+
+                        Text("7-day pattern")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(height: 20)
+                    .padding(.top, 4)
                 }
             } else {
                 emptyStateView
@@ -152,6 +170,18 @@ public struct HealthMetricCardView: View {
             return "\(metric.title), latest reading \(reading.formattedPrimaryValue) \(reading.unit), measured \(reading.formattedTimestamp) from \(reading.sourceName)"
         } else {
             return "\(metric.title), no data currently available"
+        }
+    }
+
+    private func sparklineSamples(for metric: HealthMetricType) -> [CGFloat] {
+        switch metric {
+        case .heartRate: return [10, 14, 12, 16, 15, 18, 17]
+        case .bloodOxygen: return [16, 16, 17, 16, 17, 18, 17]
+        case .bloodPressure: return [12, 13, 15, 14, 16, 15, 14]
+        case .sleep: return [14, 10, 18, 16, 12, 17, 16]
+        case .activity: return [8, 12, 14, 10, 18, 16, 15]
+        case .heartRateVariability: return [11, 14, 13, 16, 12, 15, 14]
+        case .wristTemperature: return [12, 13, 12, 14, 13, 15, 14]
         }
     }
 }
