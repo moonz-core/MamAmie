@@ -17,6 +17,8 @@ MamAmie provides a dedicated **Connected Health** section integrating with Apple
 ### Supported Health Measurements
 
 * **Heart Rate**: Latest heart rate, measurement timestamp, resting heart rate, and daily/weekly trend charts.
+* **Readable trend graphs**: Chart axes use real local `Date` values, with date labels for week/month views, time labels for day views, and timestamped readings below each graph.
+* **Pregnancy context comparison**: Detail screens show a clearly labeled, broad non-diagnostic pregnancy reference comparison beneath the graph when the user's stage is pregnancy-related. This is contextual information, not a medical target or diagnosis.
 * **Blood Oxygen (SpO2)**: Latest saturation percentage and historical trends when supported by hardware (Apple Watch Series 6+).
 * **Blood Pressure**: Systolic and diastolic records imported from authorized wireless BP monitors.
 * **Sleep Duration**: Sleep pattern and rest summaries across trimesters.

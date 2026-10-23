@@ -22,6 +22,12 @@
 		A10000000000000000000020 /* ConnectedHealthDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* ConnectedHealthDashboardView.swift */; };
 		A10000000000000000000021 /* HealthMetricCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* HealthMetricCardView.swift */; };
 		A10000000000000000000022 /* HealthMetricDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* HealthMetricDetailView.swift */; };
+		A10000000000000000000031 /* HealthTrendFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000031 /* HealthTrendFormatting.swift */; };
+		A10000000000000000000032 /* PregnancyReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000032 /* PregnancyReference.swift */; };
+		A10000000000000000000033 /* HealthTrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000033 /* HealthTrendChartView.swift */; };
+		A10000000000000000000034 /* HealthMetricStatsCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000034 /* HealthMetricStatsCardView.swift */; };
+		A10000000000000000000035 /* PregnancyComparisonCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000035 /* PregnancyComparisonCard.swift */; };
+		A10000000000000000000036 /* TrendReadingsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000036 /* TrendReadingsListView.swift */; };
 		A10000000000000000000023 /* WeeklyWellbeingSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* WeeklyWellbeingSummaryCard.swift */; };
 		A10000000000000000000024 /* HealthPermissionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* HealthPermissionSheet.swift */; };
 		A10000000000000000000025 /* HealthSourceSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* HealthSourceSettingsSheet.swift */; };
@@ -46,6 +52,12 @@
 		A20000000000000000000020 /* ConnectedHealthDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/ConnectedHealthDashboardView.swift"; sourceTree = "<group>"; };
 		A20000000000000000000021 /* HealthMetricCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthMetricCardView.swift"; sourceTree = "<group>"; };
 		A20000000000000000000022 /* HealthMetricDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthMetricDetailView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000031 /* HealthTrendFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/HealthTrendFormatting.swift"; sourceTree = "<group>"; };
+		A20000000000000000000032 /* PregnancyReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/PregnancyReference.swift"; sourceTree = "<group>"; };
+		A20000000000000000000033 /* HealthTrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthTrendChartView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000034 /* HealthMetricStatsCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthMetricStatsCardView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000035 /* PregnancyComparisonCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/PregnancyComparisonCard.swift"; sourceTree = "<group>"; };
+		A20000000000000000000036 /* TrendReadingsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/TrendReadingsListView.swift"; sourceTree = "<group>"; };
 		A20000000000000000000023 /* WeeklyWellbeingSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/WeeklyWellbeingSummaryCard.swift"; sourceTree = "<group>"; };
 		A20000000000000000000024 /* HealthPermissionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthPermissionSheet.swift"; sourceTree = "<group>"; };
 		A20000000000000000000025 /* HealthSourceSettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthSourceSettingsSheet.swift"; sourceTree = "<group>"; };
@@ -84,6 +96,8 @@
 				A20000000000000000000011 /* HealthMetricType.swift */,
 				A20000000000000000000012 /* HealthReading.swift */,
 				A20000000000000000000013 /* HealthTrendPoint.swift */,
+				A20000000000000000000031 /* HealthTrendFormatting.swift */,
+				A20000000000000000000032 /* PregnancyReference.swift */,
 				A20000000000000000000014 /* PersonalHealthSummary.swift */,
 				A20000000000000000000015 /* MaternalHealthProfile.swift */,
 				A20000000000000000000016 /* HealthKitServiceProtocol.swift */,
@@ -93,6 +107,10 @@
 				A20000000000000000000020 /* ConnectedHealthDashboardView.swift */,
 				A20000000000000000000021 /* HealthMetricCardView.swift */,
 				A20000000000000000000022 /* HealthMetricDetailView.swift */,
+				A20000000000000000000033 /* HealthTrendChartView.swift */,
+				A20000000000000000000034 /* HealthMetricStatsCardView.swift */,
+				A20000000000000000000035 /* PregnancyComparisonCard.swift */,
+				A20000000000000000000036 /* TrendReadingsListView.swift */,
 				A20000000000000000000023 /* WeeklyWellbeingSummaryCard.swift */,
 				A20000000000000000000024 /* HealthPermissionSheet.swift */,
 				A20000000000000000000025 /* HealthSourceSettingsSheet.swift */,
@@ -188,6 +206,12 @@
 				A10000000000000000000020 /* ConnectedHealthDashboardView.swift in Sources */,
 				A10000000000000000000021 /* HealthMetricCardView.swift in Sources */,
 				A10000000000000000000022 /* HealthMetricDetailView.swift in Sources */,
+				A10000000000000000000031 /* HealthTrendFormatting.swift in Sources */,
+				A10000000000000000000032 /* PregnancyReference.swift in Sources */,
+				A10000000000000000000033 /* HealthTrendChartView.swift in Sources */,
+				A10000000000000000000034 /* HealthMetricStatsCardView.swift in Sources */,
+				A10000000000000000000035 /* PregnancyComparisonCard.swift in Sources */,
+				A10000000000000000000036 /* TrendReadingsListView.swift in Sources */,
 				A10000000000000000000023 /* WeeklyWellbeingSummaryCard.swift in Sources */,
 				A10000000000000000000024 /* HealthPermissionSheet.swift in Sources */,
 				A10000000000000000000025 /* HealthSourceSettingsSheet.swift in Sources */,
