@@ -11,7 +11,9 @@ struct AppTabView: View {
         TabView(selection: $selectedTab) {
             HomeView(
                 profile: onboardingStore.profile,
-                onOpenHealth: { selectedTab = 1 }
+                onOpenHealth: { selectedTab = 1 },
+                onOpenAssistant: { selectedTab = 6 },
+                onOpenFood: { selectedTab = 5 }
             )
             .tabItem {
                 Label("Today", systemImage: "heart.fill")
@@ -38,15 +40,20 @@ struct AppTabView: View {
                 }
                 .tag(5)
 
-            PlaceholderView(
-                title: "Resources",
-                message: "Helpful guidance for each step of your pregnancy will live here.",
-                systemImage: "sparkles"
+            MaternalAIView(
+                onOpenHealth: { selectedTab = 1 },
+                onOpenFood: { selectedTab = 5 }
             )
             .tabItem {
-                Label("Resources", systemImage: "sparkles")
+                Label("Guidance", systemImage: "sparkles")
             }
             .tag(3)
+
+            AssistantView()
+                .tabItem {
+                    Label("Ask", systemImage: "heart.text.clipboard")
+                }
+                .tag(6)
 
             ProfileView(
                 profile: onboardingStore.profile,

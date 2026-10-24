@@ -3,6 +3,9 @@ import SwiftUI
 struct HomeView: View {
     let profile: OnboardingProfile?
     let onOpenHealth: () -> Void
+    var onOpenAssistant: (() -> Void)? = nil
+    var onOpenFood: (() -> Void)? = nil
+    @State private var waterGlasses: Int = 5
 
     var body: some View {
         NavigationStack {
@@ -11,6 +14,8 @@ struct HomeView: View {
                     greeting
                     journeyCard
                     connectedHealthCard
+                    wellnessSnapshot
+                    featureLinks
                     checkInSection
                     reminderCard
                 }
@@ -111,6 +116,139 @@ struct HomeView: View {
         .buttonStyle(.plain)
     }
 
+    private var wellnessSnapshot: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Text("Today’s wellness at a glance")
+                    .font(.title3.bold())
+
+                Spacer()
+
+                Text("Live")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.green)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.green.opacity(0.15))
+                    .clipShape(Capsule())
+            }
+
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "drop.fill")
+                            .foregroundStyle(.blue)
+                        Text("Hydration")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button {
+                            if waterGlasses < 10 { waterGlasses += 1 }
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.blue)
+                        }
+                        .accessibilityLabel("Add a glass of water")
+                    }
+
+                    HStack(alignment: .center, spacing: 12) {
+                        ZStack {
+                            Circle()
+                                .stroke(Color.blue.opacity(0.15), lineWidth: 5)
+                                .frame(width: 44, height: 44)
+                            Circle()
+                                .trim(from: 0, to: min(1.0, Double(waterGlasses) / 8.0))
+                                .stroke(Color.blue, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                                .rotationEffect(.degrees(-90))
+                                .frame(width: 44, height: 44)
+                            Text("\(waterGlasses)")
+                                .font(.caption.bold())
+                                .foregroundStyle(.blue)
+                        }
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(waterGlasses * 250) ml")
+                                .font(.subheadline.bold())
+                            Text("Goal: 2,000 ml")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .padding(14)
+                .frame(maxWidth: .infinity)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "heart.fill")
+                            .foregroundStyle(Color(red: 0.90, green: 0.28, blue: 0.42))
+                        Text("Vitals")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text("72 bpm")
+                            .font(.caption.bold())
+                            .foregroundStyle(Color(red: 0.90, green: 0.28, blue: 0.42))
+                    }
+
+                    HStack(alignment: .bottom, spacing: 4) {
+                        let heights: [CGFloat] = [12, 16, 14, 20, 18, 22, 19]
+                        ForEach(0..<heights.count, id: \.self) { index in
+                            RoundedRectangle(cornerRadius: 2)
+                                .fill(index == heights.count - 1
+                                      ? Color(red: 0.90, green: 0.28, blue: 0.42)
+                                      : Color(red: 0.90, green: 0.28, blue: 0.42).opacity(0.35))
+                                .frame(width: 5, height: heights[index])
+                        }
+
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("7.5h rest")
+                                .font(.caption2.bold())
+                                .foregroundStyle(.secondary)
+                            Text("Steady baseline")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .frame(height: 28)
+                }
+                .padding(14)
+                .frame(maxWidth: .infinity)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+            }
+        }
+    }
+
+    private var featureLinks: some View {
+        VStack(spacing: 10) {
+            Button { onOpenAssistant?() } label: {
+                FeatureEntryCard(
+                    icon: "heart.text.clipboard.fill",
+                    title: "Ask MamAmie",
+                    detail: "Explore maternal-health guidance with sources",
+                    tint: Color("AccentColor")
+                )
+            }
+            .buttonStyle(.plain)
+
+            Button { onOpenFood?() } label: {
+                FeatureEntryCard(
+                    icon: "fork.knife.circle.fill",
+                    title: "Food & nutrition",
+                    detail: "Scan or log a meal",
+                    tint: Color("AccentColor")
+                )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
     private var checkInSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Today’s check-in")
@@ -140,6 +278,40 @@ struct HomeView: View {
     private var greetingText: String {
         guard let name = profile?.displayName, !name.isEmpty else { return "Good morning" }
         return "Good morning, \(name)"
+    }
+}
+
+private struct FeatureEntryCard: View {
+    let icon: String
+    let title: String
+    let detail: String
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundStyle(tint)
+                .frame(width: 44, height: 44)
+                .background(tint.opacity(0.12))
+                .clipShape(Circle())
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(15)
+        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 18))
     }
 }
 
