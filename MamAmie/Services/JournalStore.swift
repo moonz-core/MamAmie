@@ -38,6 +38,19 @@ final class JournalStore: ObservableObject {
     func clearError() {
         lastErrorMessage = nil
     }
+
+    func reset() {
+        do {
+            try persistence.removeAll()
+            entries = []
+            medicationSchedules = []
+            doseLogs = []
+            rebuildIndexes()
+            lastErrorMessage = nil
+        } catch {
+            lastErrorMessage = "We couldn't clear your journal data. Please try again."
+        }
+    }
 }
 
 struct StoreSnapshot {

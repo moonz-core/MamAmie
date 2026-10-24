@@ -112,10 +112,8 @@ struct OnboardingFlowView: View {
             Text(store.saveErrorMessage ?? "Please try again.")
         }
         .onAppear {
-            if store.profile == nil {
-                step = .welcome
-                draft = OnboardingDraft(profile: nil)
-            }
+            step = .welcome
+            draft = OnboardingDraft(profile: store.profile)
         }
     }
 
