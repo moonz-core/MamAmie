@@ -29,7 +29,7 @@ struct AppTabView: View {
                 .tag(1)
 
             NavigationStack {
-                CalendarJournalView(store: journalStore)
+                CalendarJournalView(store: journalStore, onboardingStore: onboardingStore)
             }
             .tabItem {
                 Label("Calendar", systemImage: "calendar")
