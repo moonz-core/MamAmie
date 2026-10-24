@@ -243,13 +243,20 @@ struct FoodMealDetailView: View {
                     }
 
                     if !insight.suggestedSupplements.isEmpty {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 6) {
                             Text("Recommended Supplements to Buy:")
                                 .font(.caption.weight(.bold))
                                 .foregroundStyle(.purple)
                             ForEach(insight.suggestedSupplements) { supp in
-                                Text("• \(supp.supplementName): \(supp.dosageTip)")
-                                    .font(.caption2)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("• \(supp.supplementName): \(supp.dosageTip)")
+                                        .font(.caption.weight(.semibold))
+                                    if !supp.whyItIsGood.isEmpty {
+                                        Text(supp.whyItIsGood)
+                                            .font(.caption2)
+                                            .foregroundStyle(.pink)
+                                    }
+                                }
                             }
                         }
                     }

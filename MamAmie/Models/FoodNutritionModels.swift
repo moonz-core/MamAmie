@@ -64,6 +64,7 @@ struct MaternalSupplementSuggestion: Codable, Equatable, Identifiable {
     var supplementName: String
     var dosageTip: String
     var purpose: String
+    var whyItIsGood: String = ""
     var buyingAdvice: String
 }
 

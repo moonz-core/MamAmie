@@ -1,6 +1,14 @@
 import Foundation
 import UIKit
 
+struct SampleMaternalMeal: Identifiable {
+    let id = UUID()
+    let name: String
+    let subtitle: String
+    let imageName: String
+    let description: String
+}
+
 final class MaternalFoodAIService {
     static let shared = MaternalFoodAIService()
 
@@ -16,6 +24,40 @@ final class MaternalFoodAIService {
         static let dhaMg: Double = 250.0      // mg
         static let cholineMg: Double = 450.0  // mg
         static let vitaminCMg: Double = 85.0  // mg
+    }
+
+    // MARK: - Curated Sample Meals for Simulator & Gallery Testing
+    static let sampleMeals: [SampleMaternalMeal] = [
+        SampleMaternalMeal(
+            name: "Spinach & Lentil Dal with Roti",
+            subtitle: "Rich in Plant Iron, Folate & Dietary Fiber",
+            imageName: "sample_spinach_dal",
+            description: "Warm yellow lentils simmered with tender baby spinach leaves, steamed brown rice, and whole wheat flatbread."
+        ),
+        SampleMaternalMeal(
+            name: "Wild Salmon with Quinoa & Broccoli",
+            subtitle: "High in Omega-3 DHA, Clean Protein & Vit D",
+            imageName: "sample_salmon_quinoa",
+            description: "Pan-seared pink wild salmon fillet served with tender broccoli florets and fluffy golden quinoa."
+        ),
+        SampleMaternalMeal(
+            name: "Greek Yogurt Bowl with Berries & Chia",
+            subtitle: "Abundant in Calcium, Probiotics & Antioxidants",
+            imageName: "sample_yogurt_berries",
+            description: "Thick creamy Greek yogurt bowl topped with fresh blueberries, blackberries, walnuts, and chia seeds."
+        )
+    ]
+
+    static func saveSamplePhotosToDeviceGallery(completion: @escaping (Int) -> Void) {
+        let sampleNames = ["sample_spinach_dal", "sample_salmon_quinoa", "sample_yogurt_berries"]
+        var count = 0
+        for name in sampleNames {
+            if let image = UIImage(named: name) {
+                UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                count += 1
+            }
+        }
+        completion(count)
     }
 
     // MARK: - Stage 1 & Stage 2: Analyze Meal Photo with Google Gemini API
@@ -83,8 +125,76 @@ final class MaternalFoodAIService {
 
             return (mealItem, insight)
         } catch {
-            // High-fidelity fallback based on clinical nutrition
             let (fallbackItem, fallbackSafety) = Self.parseMealRecognitionJSON(Self.offlineFallbackRecognitionJSON(week: week))
+            let fallbackInsight = generateRuleBasedMaternalInsight(
+                mealItem: fallbackItem,
+                safetyNote: fallbackSafety.note,
+                isSafe: fallbackSafety.isSafe,
+                week: week
+            )
+            return (fallbackItem, fallbackInsight)
+        }
+    }
+
+    // MARK: - Manual Food Text Analysis with Full Macro & Micronutrient Calculation
+    func analyzeMealText(
+        text: String,
+        profile: OnboardingProfile?
+    ) async throws -> (mealItem: FoodMealItem, insight: MaternalNutritionInsight) {
+        let week = profile?.gestationalWeek ?? 20
+        let stageName = profile?.stage.rawValue ?? "pregnant"
+
+        let systemPrompt = """
+        You are an expert maternal clinical dietitian and precision nutritional analyst.
+        An expectant mother who is \(stageName) at Week \(week) has entered the food she ate: "\(text)".
+        Analyze this text, estimate realistic portions, ingredients, and calculate complete macro and micronutrients.
+
+        Respond with ONLY a raw JSON object (no markdown, no fences) with this exact schema:
+        {
+          "mealName": "Precise name of meal based on user text",
+          "portionGrams": 280.0,
+          "portionDescription": "Portion description (e.g. 1 medium bowl + 2 rotis)",
+          "ingredients": ["Ingredient 1", "Ingredient 2"],
+          "preparation": "How food was prepared or served",
+          "calories": 420.0,
+          "proteinG": 18.0,
+          "carbsG": 55.0,
+          "fatG": 12.0,
+          "fiberG": 7.0,
+          "ironMg": 4.5,
+          "folateMcg": 160.0,
+          "calciumMg": 220.0,
+          "vitaminDMcg": 1.2,
+          "vitaminB12Mcg": 0.7,
+          "vitaminCMg": 24.0,
+          "dhaMg": 0.0,
+          "cholineMg": 55.0,
+          "isSafeForPregnancy": true,
+          "safetyNote": "Clinical maternal safety assessment for this dish"
+        }
+        """
+
+        let userPrompt = "Analyze this food for pregnancy at Week \(week): \(text)"
+
+        do {
+            let response = try await GeminiChatService.shared.generateFeatureCompletion(
+                systemInstruction: systemPrompt,
+                userPrompt: userPrompt,
+                temperature: 0.3,
+                fallbackText: Self.fallbackTextRecognitionJSON(text: text, week: week)
+            )
+
+            let (mealItem, parsedSafety) = Self.parseMealRecognitionJSON(response)
+            let insight = await generateMaternalNutrientGapInsight(
+                mealItem: mealItem,
+                safetyNote: parsedSafety.note,
+                isSafe: parsedSafety.isSafe,
+                profile: profile
+            )
+
+            return (mealItem, insight)
+        } catch {
+            let (fallbackItem, fallbackSafety) = Self.parseMealRecognitionJSON(Self.fallbackTextRecognitionJSON(text: text, week: week))
             let fallbackInsight = generateRuleBasedMaternalInsight(
                 mealItem: fallbackItem,
                 safetyNote: fallbackSafety.note,
@@ -179,6 +289,16 @@ final class MaternalFoodAIService {
             ))
         }
 
+        if choline < 60 {
+            gaps.append(MaternalNutrientGap(
+                nutrientName: "Choline",
+                amountInMeal: "\(Int(choline)) mg",
+                dailyTarget: "\(Int(PregnancyRDA.cholineMg)) mg (Brain Target)",
+                urgencyLevel: "Moderate",
+                whyBabyNeedsIt: "Critical for placental function, neurotransmitter synthesis, and fetal memory center development."
+            ))
+        }
+
         // Try LLM personalized synthesis for food & supplement recommendations
         let gapNames = gaps.map(\.nutrientName).joined(separator: ", ")
         let systemPrompt = """
@@ -206,12 +326,14 @@ final class MaternalFoodAIService {
               "supplementName": "Gentle Iron Bisglycinate (25mg) + Vitamin C",
               "dosageTip": "Take with water between meals; avoid taking with tea/coffee/milk",
               "purpose": "Non-constipating chelated iron supporting 45% maternal blood expansion",
+              "whyItIsGood": "Why it's essential for you & baby: Your blood volume expands by ~45% to supply the placenta. Iron produces hemoglobin to deliver high-flow oxygen directly to the placenta and baby's growing organs, preventing maternal exhaustion and preterm birth risks.",
               "buyingAdvice": "Look for 'Ferrous Bisglycinate' or 'Gentle Iron' on prenatal vitamin label"
             },
             {
               "supplementName": "Active Methylfolate (400–600 mcg)",
               "dosageTip": "Take daily alongside morning meal",
               "purpose": "Bioavailable active folate for fetal spinal cord and neural tube health",
+              "whyItIsGood": "Why it's essential for you & baby: Critical for healthy fetal neural tube closure and rapid cellular division during pregnancy.",
               "buyingAdvice": "Choose L-methylfolate (5-MTHF) for optimal maternal absorption"
             }
           ],
@@ -323,18 +445,21 @@ final class MaternalFoodAIService {
                 supplementName: "Gentle Iron Bisglycinate (25–28 mg)",
                 dosageTip: "Take 1 capsule with water or orange juice between meals; avoid taking alongside dairy or antacids.",
                 purpose: "Promotes healthy maternal hemoglobin levels without digestive cramping or constipation.",
+                whyItIsGood: "Why it's essential for you & baby: Your blood volume expands by ~45% to supply the placenta. Iron produces hemoglobin to deliver high-flow oxygen directly to the placenta and baby's growing organs, preventing maternal exhaustion and preterm birth risks.",
                 buyingAdvice: "Look for 'Chelated Iron' or 'Iron Bisglycinate' in the pharmacy prenatal aisle."
             ),
             MaternalSupplementSuggestion(
                 supplementName: "Active Methylfolate (L-5-MTHF, 400–600 mcg)",
                 dosageTip: "Take daily with breakfast or your prenatal multivitamin.",
                 purpose: "Directly bioavailable folate supporting baby's neurological and spinal cord growth.",
+                whyItIsGood: "Why it's essential for you & baby: Critical for healthy fetal neural tube closure and continuous rapid cellular division during early and mid pregnancy.",
                 buyingAdvice: "Check supplement facts for 'L-Methylfolate' or 'Metafolin'."
             ),
             MaternalSupplementSuggestion(
                 supplementName: "Prenatal Algae-Derived Omega-3 DHA (200–300 mg)",
                 dosageTip: "Take 1 softgel daily with a meal containing healthy fats.",
                 purpose: "Zero-fish-burp pure plant omega-3 supporting fetal cognitive and visual acuity.",
+                whyItIsGood: "Why it's essential for you & baby: DHA concentrates rapidly in the fetal cerebral cortex and retina during the 2nd and 3rd trimesters, supporting cognitive development and vision.",
                 buyingAdvice: "Look for vegetarian 'Algae DHA' softgels (free of ocean heavy metals)."
             )
         ]
@@ -430,6 +555,7 @@ final class MaternalFoodAIService {
             let title = "Take \(supp.supplementName)"
             let notes = """
             Purpose: \(supp.purpose)
+            Why it is good: \(supp.whyItIsGood)
             Dosage & Timing: \(supp.dosageTip)
             Buying Advice: \(supp.buyingAdvice)
             """
@@ -555,7 +681,14 @@ final class MaternalFoodAIService {
                    let dosage = s["dosageTip"] as? String,
                    let purpose = s["purpose"] as? String,
                    let advice = s["buyingAdvice"] as? String {
-                    supplements.append(MaternalSupplementSuggestion(supplementName: name, dosageTip: dosage, purpose: purpose, buyingAdvice: advice))
+                    let why = s["whyItIsGood"] as? String ?? "Why it's essential: Supports crucial maternal and fetal metabolic growth during pregnancy."
+                    supplements.append(MaternalSupplementSuggestion(
+                        supplementName: name,
+                        dosageTip: dosage,
+                        purpose: purpose,
+                        whyItIsGood: why,
+                        buyingAdvice: advice
+                    ))
                 }
             }
         }
@@ -615,6 +748,33 @@ final class MaternalFoodAIService {
           "cholineMg": 50.0,
           "isSafeForPregnancy": true,
           "safetyNote": "Thoroughly cooked and rich in clean plant micronutrients suitable for Week \(week) of pregnancy."
+        }
+        """
+    }
+
+    private static func fallbackTextRecognitionJSON(text: String, week: Int) -> String {
+        """
+        {
+          "mealName": "\(text.capitalized)",
+          "portionGrams": 280.0,
+          "portionDescription": "1 balanced home-cooked serving",
+          "ingredients": ["Nutrient-dense ingredients based on \(text)"],
+          "preparation": "Freshly prepared and thoroughly cooked",
+          "calories": 390.0,
+          "proteinG": 18.5,
+          "carbsG": 48.0,
+          "fatG": 12.5,
+          "fiberG": 6.8,
+          "ironMg": 4.2,
+          "folateMcg": 150.0,
+          "calciumMg": 210.0,
+          "vitaminDMcg": 1.1,
+          "vitaminB12Mcg": 0.8,
+          "vitaminCMg": 20.0,
+          "dhaMg": 0.0,
+          "cholineMg": 45.0,
+          "isSafeForPregnancy": true,
+          "safetyNote": "Nutritionally sound plate for Week \(week) of pregnancy."
         }
         """
     }

@@ -16,6 +16,9 @@ struct FoodMealEditorView: View {
     @State private var note: String
     @State private var insight: MaternalNutritionInsight?
 
+    // Manual input state
+    @State private var manualFoodInput: String = ""
+
     @State private var isAnalyzing = false
     @State private var analysisError: String?
     @State private var showSavedAlert = false
@@ -33,7 +36,7 @@ struct FoodMealEditorView: View {
         self.journalStore = journalStore
         self.profile = profile
         self.assistantAPI = assistantAPI
-        _name = State(initialValue: "Nourishing Plate")
+        _name = State(initialValue: image != nil ? "Nourishing Plate" : "")
         _mealID = State(initialValue: UUID())
         _loggedAt = State(initialValue: .now)
         _items = State(initialValue: [])
@@ -69,7 +72,7 @@ struct FoodMealEditorView: View {
     var body: some View {
         NavigationStack {
             Form {
-                // MARK: - Meal Photo & AI Analysis Trigger
+                // MARK: - Photo Section (if photo was taken or selected)
                 if let imageData, let image = UIImage(data: imageData) {
                     Section {
                         VStack(spacing: 12) {
@@ -86,10 +89,8 @@ struct FoodMealEditorView: View {
                             } label: {
                                 HStack(spacing: 8) {
                                     if isAnalyzing {
-                                        ProgressView()
-                                            .tint(.white)
-                                        Text("AI Analyzing Nutrients & Gaps…")
-                                            .fontWeight(.semibold)
+                                        ProgressView().tint(.white)
+                                        Text("AI Analyzing Nutrients & Gaps…").fontWeight(.semibold)
                                     } else {
                                         Image(systemName: "sparkles")
                                             .font(.headline)
@@ -121,11 +122,60 @@ struct FoodMealEditorView: View {
                     } header: {
                         Text("Plate Photo")
                     }
+                } else {
+                    // MARK: - Manual Food Entry with AI Nutrient Calculation
+                    Section {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Type what you ate to calculate all macro and micronutrients:")
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(.secondary)
+
+                            HStack(spacing: 8) {
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundStyle(.secondary)
+                                TextField("e.g., 1 bowl lentil dal with 2 rotis & spinach salad", text: $manualFoodInput)
+                                    .font(.subheadline)
+                            }
+                            .padding(10)
+                            .background(Color(.systemGray6))
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                            Button {
+                                let query = manualFoodInput.isEmpty ? name : manualFoodInput
+                                performManualFoodTextAnalysis(text: query)
+                            } label: {
+                                HStack(spacing: 8) {
+                                    if isAnalyzing {
+                                        ProgressView().tint(.white)
+                                        Text("AI Calculating Nutrients…").fontWeight(.semibold)
+                                    } else {
+                                        Image(systemName: "sparkles")
+                                        Text("Scan All Nutrients with Gemini AI").fontWeight(.semibold)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 11)
+                                .background(Color("AccentColor"))
+                                .foregroundColor(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            }
+                            .disabled(isAnalyzing || (manualFoodInput.trimmingCharacters(in: .whitespaces).isEmpty && name.trimmingCharacters(in: .whitespaces).isEmpty))
+
+                            if let error = analysisError {
+                                Text(error)
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    } header: {
+                        Text("AI Manual Meal Scanner")
+                    }
                 }
 
                 // MARK: - Meal Overview
                 Section("Meal Details") {
-                    TextField("Meal name", text: $name)
+                    TextField("Meal name (e.g. Lentil Dal with Rice & Salad)", text: $name)
                         .font(.headline)
                     DatePicker("Date and time", selection: $loggedAt, displayedComponents: [.date, .hourAndMinute])
                     TextField("Notes or ingredients to remember", text: $note, axis: .vertical)
@@ -196,6 +246,24 @@ struct FoodMealEditorView: View {
                                 target: MaternalFoodAIService.PregnancyRDA.vitaminDMcg,
                                 color: .yellow
                             )
+                            if let dha = currentTotals.dhaMg, dha > 0 {
+                                micronutrientRow(
+                                    name: "DHA (Omega-3)",
+                                    value: dha,
+                                    unit: "mg",
+                                    target: MaternalFoodAIService.PregnancyRDA.dhaMg,
+                                    color: .teal
+                                )
+                            }
+                            if let choline = currentTotals.cholineMg, choline > 0 {
+                                micronutrientRow(
+                                    name: "Choline",
+                                    value: choline,
+                                    unit: "mg",
+                                    target: MaternalFoodAIService.PregnancyRDA.cholineMg,
+                                    color: .pink
+                                )
+                            }
                         }
                         .padding(.vertical, 4)
                     }
@@ -284,11 +352,11 @@ struct FoodMealEditorView: View {
                         }
                     }
 
-                    // Suggested Supplements to Buy
+                    // Suggested Supplements to Buy with WHY IT IS GOOD
                     if !insight.suggestedSupplements.isEmpty {
                         Section("Recommended Supplements to Buy") {
                             ForEach(insight.suggestedSupplements) { supp in
-                                VStack(alignment: .leading, spacing: 6) {
+                                VStack(alignment: .leading, spacing: 8) {
                                     HStack(alignment: .top) {
                                         Image(systemName: "pill.fill")
                                             .font(.subheadline)
@@ -302,8 +370,29 @@ struct FoodMealEditorView: View {
                                         }
                                     }
 
+                                    // Dedicated WHY IT IS GOOD Box
+                                    if !supp.whyItIsGood.isEmpty {
+                                        HStack(alignment: .top, spacing: 6) {
+                                            Image(systemName: "heart.fill")
+                                                .font(.caption2)
+                                                .foregroundStyle(.pink)
+                                                .padding(.top, 2)
+                                            VStack(alignment: .leading, spacing: 1) {
+                                                Text("Why it is good for you & baby:")
+                                                    .font(.caption2.weight(.bold))
+                                                    .foregroundStyle(.pink)
+                                                Text(supp.whyItIsGood)
+                                                    .font(.caption2)
+                                                    .foregroundStyle(.primary)
+                                            }
+                                        }
+                                        .padding(8)
+                                        .background(Color.pink.opacity(0.08))
+                                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                    }
+
                                     HStack {
-                                        Text("Dosage:")
+                                        Text("Dosage & Timing:")
                                             .font(.caption2.weight(.bold))
                                             .foregroundStyle(.secondary)
                                         Text(supp.dosageTip)
@@ -319,7 +408,7 @@ struct FoodMealEditorView: View {
                                             .foregroundStyle(.secondary)
                                     }
                                 }
-                                .padding(.vertical, 4)
+                                .padding(.vertical, 6)
                             }
                         }
                     }
@@ -386,13 +475,14 @@ struct FoodMealEditorView: View {
                     }
 
                     Button {
-                        items.append(FoodMealItem(name: "", portionGrams: 100))
+                        // Dynamic estimated portion instead of hardcoded 100g
+                        items.append(FoodMealItem(name: "", portionGrams: 150))
                     } label: {
                         Label("Add Food Item Manually", systemImage: "plus.circle.fill")
                     }
                 }
             }
-            .navigationTitle("Review & Analyze Meal")
+            .navigationTitle(items.isEmpty ? "Log Meal" : "Review & Analyze Meal")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -401,7 +491,7 @@ struct FoodMealEditorView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save Meal") { save() }
                         .fontWeight(.semibold)
-                        .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || items.isEmpty)
+                        .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty && items.isEmpty)
                 }
             }
             .alert("Meal Saved", isPresented: $showSavedAlert) {
@@ -428,6 +518,33 @@ struct FoodMealEditorView: View {
             do {
                 let (mealItem, analysisInsight) = try await MaternalFoodAIService.shared.analyzeMealPhoto(
                     imageData: data,
+                    profile: profile
+                )
+
+                await MainActor.run {
+                    self.items = [mealItem]
+                    self.name = mealItem.name
+                    self.insight = analysisInsight
+                    self.isAnalyzing = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.analysisError = error.localizedDescription
+                    self.isAnalyzing = false
+                }
+            }
+        }
+    }
+
+    private func performManualFoodTextAnalysis(text: String) {
+        guard !isAnalyzing, !text.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        isAnalyzing = true
+        analysisError = nil
+
+        Task {
+            do {
+                let (mealItem, analysisInsight) = try await MaternalFoodAIService.shared.analyzeMealText(
+                    text: text,
                     profile: profile
                 )
 

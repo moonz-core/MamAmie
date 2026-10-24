@@ -1,0 +1,13 @@
+{
+  "images" : [
+    {
+      "filename" : "yogurt_berries.jpg",
+      "idiom" : "universal",
+      "scale" : "1x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
