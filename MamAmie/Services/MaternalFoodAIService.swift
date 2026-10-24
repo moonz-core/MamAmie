@@ -119,6 +119,7 @@ final class MaternalFoodAIService {
         if iron >= 4.0 { strengths.append("Solid Iron content (\(String(format: "%.1f", iron))mg) to support blood volume") }
         if folate >= 120 { strengths.append("Good Folate (\(Int(folate))mcg) for baby's neural tube development") }
         if calcium >= 200 { strengths.append("High Calcium (\(Int(calcium))mg) supporting fetal bone and tooth density") }
+        if choline >= 80 { strengths.append("Valuable Choline (\(Int(choline))mg) for fetal brain architecture") }
         if (nutrients.fibreG ?? 0) >= 5 { strengths.append("Abundant Dietary Fiber (\(String(format: "%.1f", nutrients.fibreG ?? 0))g) preventing gestational constipation") }
         if (nutrients.vitaminCMg ?? 0) >= 20 { strengths.append("Vitamin C (\(Int(nutrients.vitaminCMg ?? 0))mg) boosting non-heme iron absorption") }
 
@@ -403,7 +404,7 @@ final class MaternalFoodAIService {
             suggestedFoods: insight.suggestedFoods.map { "\($0.foodName) (\($0.richIn))" }
         )
 
-        let entry = store.createEntry(
+        let entry = CalendarEntry(
             title: "Meal: \(meal.name)",
             category: .food,
             dayKey: dayKey,
@@ -411,6 +412,7 @@ final class MaternalFoodAIService {
             notes: summaryNotes,
             food: foodDetails
         )
+        store.upsertEntry(entry)
 
         return entry
     }
@@ -431,7 +433,7 @@ final class MaternalFoodAIService {
             Dosage & Timing: \(supp.dosageTip)
             Buying Advice: \(supp.buyingAdvice)
             """
-            _ = store.createEntry(
+            let entry = CalendarEntry(
                 title: title,
                 category: .task,
                 dayKey: dayKey,
@@ -439,6 +441,7 @@ final class MaternalFoodAIService {
                 notes: notes,
                 task: TaskDetails(completed: false)
             )
+            store.upsertEntry(entry)
         }
 
         // Add food recommendation checkpoint task
@@ -449,7 +452,7 @@ final class MaternalFoodAIService {
             Portion Tip: \(food.portionTip)
             Recommended by AI Maternal Nutritionist to cover dietary gaps.
             """
-            _ = store.createEntry(
+            let entry = CalendarEntry(
                 title: title,
                 category: .task,
                 dayKey: dayKey,
@@ -457,6 +460,7 @@ final class MaternalFoodAIService {
                 notes: notes,
                 task: TaskDetails(completed: false)
             )
+            store.upsertEntry(entry)
         }
     }
 
