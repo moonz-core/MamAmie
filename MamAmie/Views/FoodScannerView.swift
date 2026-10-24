@@ -22,78 +22,19 @@ struct FoodScannerView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("FOOD & NUTRITION")
-                            .font(.caption.weight(.bold)).tracking(1.2)
-                            .foregroundStyle(Color("AccentColor"))
-                        Text("Understand every bite.")
-                            .font(.largeTitle.bold()).foregroundStyle(Color("AccentColor"))
-                        Text("Keep a thoughtful food diary and see what is known about your meals.")
-                            .font(.subheadline).foregroundStyle(.secondary)
-                    }
-
-                    Button { showPhotoOptions = true } label: {
-                        HStack(spacing: 14) {
-                            Image(systemName: "camera.viewfinder").font(.title2)
-                                .frame(width: 48, height: 48).background(.white.opacity(0.18)).clipShape(Circle())
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Scan your meal").font(.headline)
-                                Text("Take or choose a food photo").font(.caption).opacity(0.9)
-                            }
-                            Spacer()
-                            Image(systemName: "arrow.right").font(.headline)
-                        }
-                        .foregroundStyle(.white).padding(18)
-                        .background(Color("AccentColor"), in: RoundedRectangle(cornerRadius: 20))
-                    }.buttonStyle(.plain)
-
-                    Button { photo = nil; showEditor = true } label: {
-                        Label("Enter a meal manually", systemImage: "square.and.pencil")
-                            .font(.subheadline.weight(.semibold)).foregroundStyle(Color("AccentColor"))
-                            .frame(maxWidth: .infinity).padding(15)
-                            .background(Color("AccentColor").opacity(0.08), in: RoundedRectangle(cornerRadius: 15))
-                    }.buttonStyle(.plain)
-
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Today’s food diary").font(.headline)
-                            Text("\(todayMeals.count) \(todayMeals.count == 1 ? "meal" : "meals") logged")
-                                .font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Button("Daily summary") { showDashboard = true }
-                            .font(.caption.weight(.semibold)).foregroundStyle(Color("AccentColor"))
-                    }
+                    headerSection
+                    actionButtons
+                    diarySummaryRow
 
                     if let latest = store.meals.first {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("RECENT MEAL").font(.caption2.weight(.bold)).tracking(1).foregroundStyle(.secondary)
-                            NavigationLink {
-                                FoodMealDetailView(meal: latest, store: store)
-                            } label: {
-                                HStack(spacing: 12) {
-                                    mealThumbnail(latest.imageData)
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(latest.name).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
-                                        Text(latest.loggedAt, style: .date).font(.caption).foregroundStyle(.secondary)
-                                    }
-                                    Spacer()
-                                    Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
-                                }.padding(12).background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
-                            }.buttonStyle(.plain)
-                        }
+                        recentMealSection(latest)
                     }
 
                     if todayMeals.isEmpty {
-                        HStack(spacing: 12) {
-                            Image(systemName: "leaf").foregroundStyle(Color("AccentColor"))
-                            Text("Your diary is just getting started. Add meals as you go; an incomplete log is not a measure of your nutrition.")
-                                .font(.caption).foregroundStyle(.secondary)
-                        }.padding(14).background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
+                        emptyDiaryMessage
                     }
 
-                    Text("Photo analysis uses the configured MamAmie AI provider after sign-in. Results are estimates; review foods and portions before saving.")
-                        .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    footerDisclaimer
                 }.padding(20)
             }
             .background(Color(.systemBackground))
@@ -152,6 +93,90 @@ struct FoodScannerView: View {
                 Button("OK", role: .cancel) { store.errorMessage = nil }
             } message: { Text(store.errorMessage ?? "") }
         }
+    }
+
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("FOOD & NUTRITION")
+                .font(.caption.weight(.bold)).tracking(1.2)
+                .foregroundStyle(Color("AccentColor"))
+            Text("Understand every bite.")
+                .font(.largeTitle.bold()).foregroundStyle(Color("AccentColor"))
+            Text("Keep a thoughtful food diary and see what is known about your meals.")
+                .font(.subheadline).foregroundStyle(.secondary)
+        }
+    }
+
+    private var actionButtons: some View {
+        VStack(spacing: 12) {
+            Button { showPhotoOptions = true } label: {
+                HStack(spacing: 14) {
+                    Image(systemName: "camera.viewfinder").font(.title2)
+                        .frame(width: 48, height: 48).background(.white.opacity(0.18)).clipShape(Circle())
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Scan your meal").font(.headline)
+                        Text("Take or choose a food photo").font(.caption).opacity(0.9)
+                    }
+                    Spacer()
+                    Image(systemName: "arrow.right").font(.headline)
+                }
+                .foregroundStyle(.white).padding(18)
+                .background(Color("AccentColor"), in: RoundedRectangle(cornerRadius: 20))
+            }.buttonStyle(.plain)
+
+            Button { photo = nil; showEditor = true } label: {
+                Label("Enter a meal manually", systemImage: "square.and.pencil")
+                    .font(.subheadline.weight(.semibold)).foregroundStyle(Color("AccentColor"))
+                    .frame(maxWidth: .infinity).padding(15)
+                    .background(Color("AccentColor").opacity(0.08), in: RoundedRectangle(cornerRadius: 15))
+            }.buttonStyle(.plain)
+        }
+    }
+
+    private var diarySummaryRow: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Today’s food diary").font(.headline)
+                Text("\(todayMeals.count) \(todayMeals.count == 1 ? "meal" : "meals") logged")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button("Daily summary") { showDashboard = true }
+                .font(.caption.weight(.semibold)).foregroundStyle(Color("AccentColor"))
+        }
+    }
+
+    @ViewBuilder
+    private func recentMealSection(_ latest: FoodMeal) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("RECENT MEAL").font(.caption2.weight(.bold)).tracking(1).foregroundStyle(.secondary)
+            NavigationLink {
+                FoodMealDetailView(meal: latest, store: store, assistantAPI: assistantAPI)
+            } label: {
+                HStack(spacing: 12) {
+                    mealThumbnail(latest.imageData)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(latest.name).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
+                        Text(latest.loggedAt, style: .date).font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
+                }.padding(12).background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
+            }.buttonStyle(.plain)
+        }
+    }
+
+    private var emptyDiaryMessage: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "leaf").foregroundStyle(Color("AccentColor"))
+            Text("Your diary is just getting started. Add meals as you go; an incomplete log is not a measure of your nutrition.")
+                .font(.caption).foregroundStyle(.secondary)
+        }.padding(14).background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var footerDisclaimer: some View {
+        Text("Photo analysis uses the configured MamAmie AI provider after sign-in. Results are estimates; review foods and portions before saving.")
+            .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
     }
 
     @ViewBuilder private func mealThumbnail(_ data: Data?) -> some View {
