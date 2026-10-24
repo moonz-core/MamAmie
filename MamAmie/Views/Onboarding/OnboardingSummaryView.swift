@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OnboardingSummaryView: View {
-    let draft: OnboardingDraft
+    @Binding var draft: OnboardingDraft
     let onFinish: () -> Void
     let onBack: () -> Void
 
@@ -10,36 +10,79 @@ struct OnboardingSummaryView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: 20) {
             OnboardingBackButton(action: onBack)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("You are all set")
                     .font(.largeTitle.bold())
-                Text("Review your answers before entering MamAmie. You can change them later from Profile.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            if let profile {
-                VStack(spacing: 12) {
-                    OnboardingSummaryRow(title: "Your journey", value: profile.stageSummary, icon: profile.stage.iconName)
-                    OnboardingSummaryRow(title: "Pregnancy dates", value: profile.dateSummary, icon: "calendar")
-                    OnboardingSummaryRow(
-                        title: "Name",
-                        value: profile.displayName.isEmpty ? "Not added" : profile.displayName,
-                        icon: "person.fill"
-                    )
-                }
-            }
-
-            OnboardingCard {
-                Label("A gentle boundary", systemImage: "cross.case.fill")
-                    .font(.headline)
                     .foregroundStyle(Color("AccentColor"))
-                Text("MamAmie organizes what you choose to record. It does not diagnose symptoms, prescribe medication, or replace your healthcare professional.")
+
+                Text("Review your choices before entering MamAmie. You can change them anytime in Profile.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+            }
+
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 10) {
+                    if let profile {
+                        OnboardingSummaryRow(
+                            title: "Name",
+                            value: profile.displayName.isEmpty ? "Not specified" : profile.displayName,
+                            icon: "person.fill"
+                        )
+
+                        OnboardingSummaryRow(
+                            title: "Your journey",
+                            value: profile.stageSummary,
+                            icon: profile.stage.iconName
+                        )
+
+                        OnboardingSummaryRow(
+                            title: stageDetailTitle(profile.stage),
+                            value: profile.stageDetailSummary,
+                            icon: stageDetailIcon(profile.stage)
+                        )
+
+                        OnboardingSummaryRow(
+                            title: "Dietary preference",
+                            value: profile.dietaryPreference?.title ?? "None specified",
+                            icon: profile.dietaryPreference?.iconName ?? "fork.knife"
+                        )
+
+                        if !profile.healthConditionsAndAllergies.isEmpty {
+                            OnboardingSummaryRow(
+                                title: "Health & allergies",
+                                value: profile.healthConditionsAndAllergies,
+                                icon: "cross.case.fill"
+                            )
+                        }
+
+                        OnboardingSummaryRow(
+                            title: "Apple Health",
+                            value: profile.connectedAppleHealth ? "Connected" : "Not connected (can add later)",
+                            icon: "applewatch"
+                        )
+
+                        OnboardingSummaryRow(
+                            title: "Active reminders",
+                            value: remindersSummary(profile.selectedReminders),
+                            icon: "bell.badge.fill"
+                        )
+                    }
+
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("A gentle medical boundary", systemImage: "hand.raised.shield.fill")
+                                .font(.headline)
+                                .foregroundStyle(Color("AccentColor"))
+
+                            Text("MamAmie organizes what you choose to record. It does not diagnose symptoms, prescribe medication, or replace your healthcare provider.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
             }
 
             Spacer()
@@ -53,6 +96,33 @@ struct OnboardingSummaryView: View {
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 20)
+        .onAppear {
+            draft.acceptedPrivacy = true
+        }
+    }
+
+    private func stageDetailTitle(_ stage: OnboardingStage) -> String {
+        switch stage {
+        case .pregnant: return "Pregnancy timeline"
+        case .planning: return "Cycle tracking"
+        case .postpartum: return "Postpartum details"
+        }
+    }
+
+    private func stageDetailIcon(_ stage: OnboardingStage) -> String {
+        switch stage {
+        case .pregnant: return "calendar"
+        case .planning: return "calendar.badge.clock"
+        case .postpartum: return "heart.circle.fill"
+        }
+    }
+
+    private func remindersSummary(_ reminders: [OnboardingReminderType]) -> String {
+        if reminders.isEmpty { return "None selected" }
+        if reminders.count == OnboardingReminderType.allCases.count {
+            return "All reminders enabled"
+        }
+        return "\(reminders.count) reminder categories active"
     }
 }
 
@@ -65,7 +135,7 @@ private struct OnboardingSummaryRow: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .foregroundStyle(Color("AccentColor"))
-                .frame(width: 34, height: 34)
+                .frame(width: 36, height: 36)
                 .background(Color("AccentColor").opacity(0.12))
                 .clipShape(Circle())
 

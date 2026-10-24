@@ -22,7 +22,7 @@ struct OnboardingProgressView: View {
                         .fill(Color.primary.opacity(0.10))
                     Capsule()
                         .fill(Color("AccentColor"))
-                        .frame(width: proxy.size.width * CGFloat(currentStep) / CGFloat(totalSteps))
+                        .frame(width: proxy.size.width * CGFloat(min(currentStep, totalSteps)) / CGFloat(totalSteps))
                 }
             }
             .frame(height: 6)
@@ -56,6 +56,13 @@ struct OnboardingPrimaryButton: View {
     let isDisabled: Bool
     let action: () -> Void
 
+    init(title: String, systemImage: String = "arrow.right", isDisabled: Bool = false, action: @escaping () -> Void) {
+        self.title = title
+        self.systemImage = systemImage
+        self.isDisabled = isDisabled
+        self.action = action
+    }
+
     var body: some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
@@ -69,15 +76,128 @@ struct OnboardingPrimaryButton: View {
     }
 }
 
+struct OnboardingSkipButton: View {
+    var title: String = "Skip for now"
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 struct OnboardingBackButton: View {
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Label("Back", systemImage: "chevron.left")
+                .font(.subheadline.weight(.medium))
         }
         .buttonStyle(.plain)
         .foregroundStyle(.secondary)
+    }
+}
+
+struct OnboardingSelectableCard: View {
+    let title: String
+    var subtitle: String? = nil
+    var icon: String? = nil
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                if let icon {
+                    Image(systemName: icon)
+                        .font(.title3)
+                        .foregroundStyle(isSelected ? Color("AccentColor") : .secondary)
+                        .frame(width: 40, height: 40)
+                        .background(isSelected ? Color("AccentColor").opacity(0.12) : Color(.tertiarySystemFill))
+                        .clipShape(Circle())
+                }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+
+                Spacer()
+
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(isSelected ? Color("AccentColor") : Color(.tertiaryLabel))
+            }
+            .padding(14)
+            .background(isSelected ? Color("AccentColor").opacity(0.08) : Color(.secondarySystemBackground))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(isSelected ? Color("AccentColor").opacity(0.35) : Color.clear, lineWidth: 1.5)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct OnboardingMultiSelectCard: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(isSelected ? Color("AccentColor") : .secondary)
+                    .frame(width: 40, height: 40)
+                    .background(isSelected ? Color("AccentColor").opacity(0.12) : Color(.tertiarySystemFill))
+                    .clipShape(Circle())
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                }
+
+                Spacer()
+
+                Image(systemName: isSelected ? "checkmark.square.fill" : "square")
+                    .font(.title3)
+                    .foregroundStyle(isSelected ? Color("AccentColor") : Color(.tertiaryLabel))
+            }
+            .padding(14)
+            .background(isSelected ? Color("AccentColor").opacity(0.08) : Color(.secondarySystemBackground))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(isSelected ? Color("AccentColor").opacity(0.35) : Color.clear, lineWidth: 1.5)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+        .buttonStyle(.plain)
     }
 }
 

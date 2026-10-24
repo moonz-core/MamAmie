@@ -25,14 +25,67 @@ struct OnboardingFlowView: View {
                 switch step {
                 case .welcome:
                     OnboardingWelcomeView(onContinue: goForward)
+
+                case .name:
+                    OnboardingNameView(
+                        name: $draft.displayName,
+                        onContinue: goForward,
+                        onBack: goBack,
+                        onSkip: goForward
+                    )
+
                 case .stage:
-                    OnboardingStageView(stage: $draft.stage, onContinue: goForward, onBack: goBack)
+                    OnboardingStageView(
+                        stage: $draft.stage,
+                        onContinue: goForward,
+                        onBack: goBack
+                    )
+
                 case .dates:
-                    OnboardingDatesView(draft: $draft, onContinue: goForward, onBack: goBack)
-                case .personalization:
-                    OnboardingPersonalizationView(draft: $draft, onContinue: goForward, onBack: goBack)
+                    OnboardingDatesView(
+                        draft: $draft,
+                        onContinue: goForward,
+                        onBack: goBack
+                    )
+
+                case .healthAndAllergies:
+                    OnboardingHealthConditionsView(
+                        healthNotes: $draft.healthConditionsAndAllergies,
+                        onContinue: goForward,
+                        onBack: goBack,
+                        onSkip: goForward
+                    )
+
+                case .diet:
+                    OnboardingDietView(
+                        selectedDiet: $draft.dietaryPreference,
+                        onContinue: goForward,
+                        onBack: goBack,
+                        onSkip: goForward
+                    )
+
+                case .appleHealth:
+                    OnboardingAppleHealthView(
+                        isConnected: $draft.connectedAppleHealth,
+                        onContinue: goForward,
+                        onBack: goBack,
+                        onSkip: goForward
+                    )
+
+                case .reminders:
+                    OnboardingRemindersView(
+                        selectedReminders: $draft.selectedReminders,
+                        onContinue: goForward,
+                        onBack: goBack,
+                        onSkip: goForward
+                    )
+
                 case .summary:
-                    OnboardingSummaryView(draft: draft, onFinish: finish, onBack: goBack)
+                    OnboardingSummaryView(
+                        draft: $draft,
+                        onFinish: finish,
+                        onBack: goBack
+                    )
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -69,6 +122,7 @@ struct OnboardingFlowView: View {
     }
 
     private func finish() {
+        draft.acceptedPrivacy = true
         guard let profile = draft.makeProfile(), store.save(profile) else { return }
         onFinished()
     }
@@ -76,29 +130,41 @@ struct OnboardingFlowView: View {
 
 private enum OnboardingStep: Int, CaseIterable {
     case welcome
+    case name
     case stage
     case dates
-    case personalization
+    case healthAndAllergies
+    case diet
+    case appleHealth
+    case reminders
     case summary
 
-    static let totalSteps = 4
+    static let totalSteps = 8
 
     var progressNumber: Int {
         switch self {
         case .welcome: return 1
-        case .stage: return 1
-        case .dates: return 2
-        case .personalization: return 3
-        case .summary: return 4
+        case .name: return 1
+        case .stage: return 2
+        case .dates: return 3
+        case .healthAndAllergies: return 4
+        case .diet: return 5
+        case .appleHealth: return 6
+        case .reminders: return 7
+        case .summary: return 8
         }
     }
 
     var next: OnboardingStep? {
         switch self {
-        case .welcome: return .stage
+        case .welcome: return .name
+        case .name: return .stage
         case .stage: return .dates
-        case .dates: return .personalization
-        case .personalization: return .summary
+        case .dates: return .healthAndAllergies
+        case .healthAndAllergies: return .diet
+        case .diet: return .appleHealth
+        case .appleHealth: return .reminders
+        case .reminders: return .summary
         case .summary: return nil
         }
     }
@@ -106,10 +172,14 @@ private enum OnboardingStep: Int, CaseIterable {
     var previous: OnboardingStep? {
         switch self {
         case .welcome: return nil
-        case .stage: return .welcome
+        case .name: return .welcome
+        case .stage: return .name
         case .dates: return .stage
-        case .personalization: return .dates
-        case .summary: return .personalization
+        case .healthAndAllergies: return .dates
+        case .diet: return .healthAndAllergies
+        case .appleHealth: return .diet
+        case .reminders: return .appleHealth
+        case .summary: return .reminders
         }
     }
 }

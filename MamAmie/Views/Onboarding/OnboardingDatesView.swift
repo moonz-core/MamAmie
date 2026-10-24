@@ -8,66 +8,33 @@ struct OnboardingDatesView: View {
     @State private var datePickerTarget: DatePickerTarget?
     @State private var datePickerInitialDate = Date()
 
-    private var requiresDate: Bool {
-        draft.stage == .pregnant && draft.datingMethod != .notSet
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             OnboardingBackButton(action: onBack)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Add pregnancy dates")
-                    .font(.largeTitle.bold())
-                Text("Reliable dates let MamAmie show an estimated week. You can skip this and add them later.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            if draft.stage == .pregnant {
-                VStack(spacing: 10) {
-                    ForEach(PregnancyDatingMethod.allCases) { method in
-                        DatingMethodRow(
-                            method: method,
-                            isSelected: draft.datingMethod == method
-                        ) {
-                            select(method)
-                        }
-                    }
-                }
-
-                if draft.datingMethod == .dueDate {
-                    DateSelectionRow(
-                        title: "Due date",
-                        value: draft.dueDate,
-                        action: { presentPicker(.dueDate, currentDate: draft.dueDate) }
-                    )
-                } else if draft.datingMethod == .lastPeriod {
-                    DateSelectionRow(
-                        title: "First day of last period",
-                        value: draft.lastPeriodDate,
-                        action: { presentPicker(.lastPeriod, currentDate: draft.lastPeriodDate) }
-                    )
-                }
-            } else {
-                OnboardingCard {
-                    Label("Pregnancy dates are optional", systemImage: "calendar.badge.clock")
-                        .font(.headline)
-                        .foregroundStyle(Color("AccentColor"))
-                    Text("You can use MamAmie for planning or postpartum support without entering a due date.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
+            switch draft.stage ?? .pregnant {
+            case .pregnant:
+                pregnantDatesSection
+            case .planning:
+                planningCycleSection
+            case .postpartum:
+                postpartumDatesSection
             }
 
             Spacer()
 
-            OnboardingPrimaryButton(
-                title: requiresDate ? "Continue" : "Continue without dates",
-                systemImage: "arrow.right",
-                isDisabled: requiresDate && selectedDate == nil,
-                action: onContinue
-            )
+            VStack(spacing: 12) {
+                OnboardingPrimaryButton(
+                    title: primaryButtonTitle,
+                    systemImage: "arrow.right",
+                    isDisabled: false,
+                    action: onContinue
+                )
+
+                if shouldShowSkipButton {
+                    OnboardingSkipButton(title: "Skip for now", action: onContinue)
+                }
+            }
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 20)
@@ -82,16 +49,139 @@ struct OnboardingDatesView: View {
                     draft.dueDate = date
                 case .lastPeriod:
                     draft.lastPeriodDate = date
+                case .childbirthDate:
+                    draft.childbirthDate = date
                 }
             }
         }
     }
 
-    private var selectedDate: Date? {
-        switch draft.datingMethod {
-        case .dueDate: return draft.dueDate
-        case .lastPeriod: return draft.lastPeriodDate
-        case .notSet: return nil
+    // MARK: - Pregnant View
+    private var pregnantDatesSection: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Pregnancy information")
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(Color("AccentColor"))
+                Text("An estimated due date or last period date helps MamAmie show gestational week progress. Skip if you're not sure.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            VStack(spacing: 10) {
+                ForEach(PregnancyDatingMethod.allCases) { method in
+                    DatingMethodRow(
+                        method: method,
+                        isSelected: draft.datingMethod == method
+                    ) {
+                        select(method)
+                    }
+                }
+            }
+
+            if draft.datingMethod == .dueDate {
+                DateSelectionRow(
+                    title: "Due date",
+                    value: draft.dueDate,
+                    action: { presentPicker(.dueDate, currentDate: draft.dueDate) }
+                )
+            } else if draft.datingMethod == .lastPeriod {
+                DateSelectionRow(
+                    title: "First day of last period",
+                    value: draft.lastPeriodDate,
+                    action: { presentPicker(.lastPeriod, currentDate: draft.lastPeriodDate) }
+                )
+            }
+        }
+    }
+
+    // MARK: - Planning View
+    private var planningCycleSection: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Menstrual cycle tracking")
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(Color("AccentColor"))
+                Text("Would you like to track your menstrual cycle in MamAmie to help with pre-pregnancy preparation?")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            VStack(spacing: 12) {
+                OnboardingSelectableCard(
+                    title: "Yes, track my cycle",
+                    subtitle: "Log your periods, fertile windows, and cycle patterns in the calendar.",
+                    icon: "calendar.badge.clock",
+                    isSelected: draft.trackCycle
+                ) {
+                    draft.trackCycle = true
+                }
+
+                OnboardingSelectableCard(
+                    title: "Not right now / Maybe later",
+                    subtitle: "Focus on general pre-pregnancy wellness without cycle logs. You can enable this anytime.",
+                    icon: "sparkles",
+                    isSelected: !draft.trackCycle
+                ) {
+                    draft.trackCycle = false
+                }
+            }
+        }
+    }
+
+    // MARK: - Postpartum View
+    private var postpartumDatesSection: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Postpartum recovery")
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(Color("AccentColor"))
+                Text("Entering your date of childbirth helps us tailor your postpartum recovery weeks. Skip if you prefer.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            DateSelectionRow(
+                title: "Date of childbirth",
+                value: draft.childbirthDate,
+                action: { presentPicker(.childbirthDate, currentDate: draft.childbirthDate) }
+            )
+
+            if draft.childbirthDate != nil {
+                Button {
+                    draft.childbirthDate = nil
+                } label: {
+                    Text("Clear date")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var primaryButtonTitle: String {
+        switch draft.stage ?? .pregnant {
+        case .pregnant:
+            if draft.datingMethod == .notSet {
+                return "Continue without dates"
+            }
+            return "Continue"
+        case .planning:
+            return "Continue"
+        case .postpartum:
+            return draft.childbirthDate == nil ? "Continue without date" : "Continue"
+        }
+    }
+
+    private var shouldShowSkipButton: Bool {
+        switch draft.stage ?? .pregnant {
+        case .pregnant:
+            return draft.datingMethod != .notSet && draft.resolvedDueDate == nil
+        case .planning:
+            return false
+        case .postpartum:
+            return draft.childbirthDate == nil
         }
     }
 
@@ -139,6 +229,7 @@ private struct DatingMethodRow: View {
 private enum DatePickerTarget: String, Identifiable {
     case dueDate
     case lastPeriod
+    case childbirthDate
 
     var id: String { rawValue }
 
@@ -146,6 +237,7 @@ private enum DatePickerTarget: String, Identifiable {
         switch self {
         case .dueDate: return "Due date"
         case .lastPeriod: return "First day of last period"
+        case .childbirthDate: return "Date of childbirth"
         }
     }
 
@@ -163,6 +255,9 @@ private enum DatePickerTarget: String, Identifiable {
             return earliest...latest
         case .lastPeriod:
             let earliest = calendar.date(byAdding: .day, value: -320, to: today) ?? today
+            return earliest...today
+        case .childbirthDate:
+            let earliest = calendar.date(byAdding: .year, value: -2, to: today) ?? today
             return earliest...today
         }
     }
