@@ -125,8 +125,16 @@ public struct HealthMetricDetailView: View {
     private var chartCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("\(metric.shortTitle) Trends (\(selectedScope.rawValue))")
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(metric.shortTitle) Trends (\(selectedScope.rawValue))")
+                        .font(.headline)
+
+                    if let first = trendPoints.first?.date, let last = trendPoints.last?.date {
+                        Text(formattedDateRange(from: first, to: last))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
 
                 Spacer()
 
@@ -171,14 +179,14 @@ public struct HealthMetricDetailView: View {
             ForEach(trendPoints) { pt in
                 if metric == .activity || metric == .sleep {
                     BarMark(
-                        x: .value("Date", pt.label),
+                        x: .value("Date", pt.date, unit: selectedScope == .day ? .hour : .day),
                         y: .value("Value", pt.value)
                     )
                     .foregroundStyle(metric.iconTintColor.gradient)
                     .cornerRadius(6)
                 } else {
                     AreaMark(
-                        x: .value("Date", pt.label),
+                        x: .value("Date", pt.date),
                         y: .value("Value", pt.value)
                     )
                     .foregroundStyle(
@@ -190,14 +198,14 @@ public struct HealthMetricDetailView: View {
                     )
 
                     LineMark(
-                        x: .value("Date", pt.label),
+                        x: .value("Date", pt.date),
                         y: .value("Value", pt.value)
                     )
                     .foregroundStyle(metric.iconTintColor)
                     .lineStyle(StrokeStyle(lineWidth: 3))
 
                     PointMark(
-                        x: .value("Date", pt.label),
+                        x: .value("Date", pt.date),
                         y: .value("Value", pt.value)
                     )
                     .foregroundStyle(metric.iconTintColor)
@@ -208,9 +216,47 @@ public struct HealthMetricDetailView: View {
             AxisMarks(position: .leading)
         }
         .chartXAxis {
-            AxisMarks(values: .automatic) { _ in
-                AxisValueLabel()
+            switch selectedScope {
+            case .day:
+                AxisMarks(values: .stride(by: .hour, count: 4)) { _ in
+                    AxisGridLine()
+                    AxisTick()
+                    AxisValueLabel(format: .dateTime.hour(.defaultDigits(amPM: .abbreviated)))
+                }
+            case .week:
+                AxisMarks(values: .stride(by: .day, count: 1)) { _ in
+                    AxisGridLine()
+                    AxisTick()
+                    AxisValueLabel(format: .dateTime.weekday(.abbreviated))
+                }
+            case .month:
+                AxisMarks(values: .stride(by: .day, count: 6)) { _ in
+                    AxisGridLine()
+                    AxisTick()
+                    AxisValueLabel(format: .dateTime.month(.abbreviated).day())
+                }
             }
+        }
+    }
+
+    private func formattedDateRange(from start: Date, to end: Date) -> String {
+        let formatter = DateFormatter()
+        switch selectedScope {
+        case .day:
+            formatter.dateFormat = "EEEE, MMM d, yyyy"
+            return formatter.string(from: end)
+        case .week:
+            formatter.dateFormat = "MMM d"
+            let startStr = formatter.string(from: start)
+            formatter.dateFormat = "MMM d, yyyy"
+            let endStr = formatter.string(from: end)
+            return "\(startStr) – \(endStr)"
+        case .month:
+            formatter.dateFormat = "MMM d"
+            let startStr = formatter.string(from: start)
+            formatter.dateFormat = "MMM d, yyyy"
+            let endStr = formatter.string(from: end)
+            return "\(startStr) – \(endStr)"
         }
     }
 

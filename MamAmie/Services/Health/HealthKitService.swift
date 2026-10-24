@@ -355,7 +355,14 @@ public final class HealthKitService: HealthKitServiceProtocol {
 
                     var points: [HealthTrendPoint] = []
                     let dayFormatter = DateFormatter()
-                    dayFormatter.dateFormat = scope == .day ? "h a" : "EEE"
+                    switch scope {
+                    case .day:
+                        dayFormatter.dateFormat = "h a"
+                    case .week:
+                        dayFormatter.dateFormat = "EEE"
+                    case .month:
+                        dayFormatter.dateFormat = "MMM d"
+                    }
 
                     collection?.enumerateStatistics(from: startDate, to: now) { stats, _ in
                         if let sum = stats.sumQuantity() {
@@ -440,7 +447,14 @@ public final class HealthKitService: HealthKitServiceProtocol {
 
                 var points: [HealthTrendPoint] = []
                 let labelFormatter = DateFormatter()
-                labelFormatter.dateFormat = scope == .day ? "h a" : "EEE"
+                switch scope {
+                case .day:
+                    labelFormatter.dateFormat = "h a"
+                case .week:
+                    labelFormatter.dateFormat = "EEE"
+                case .month:
+                    labelFormatter.dateFormat = "MMM d"
+                }
 
                 collection?.enumerateStatistics(from: startDate, to: endDate) { stats, _ in
                     if let avg = stats.averageQuantity() {

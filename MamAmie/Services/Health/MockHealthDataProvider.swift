@@ -125,15 +125,25 @@ public final class MockHealthDataProvider: HealthKitServiceProtocol {
         }
 
         let labelFormatter = DateFormatter()
-        labelFormatter.dateFormat = scope == .day ? "h a" : (scope == .week ? "EEE" : "d")
+        switch scope {
+        case .day:
+            labelFormatter.dateFormat = "h a"
+        case .week:
+            labelFormatter.dateFormat = "EEE"
+        case .month:
+            labelFormatter.dateFormat = "MMM d"
+        }
+
+        let startOfToday = calendar.startOfDay(for: now)
 
         for index in 0..<count {
             let offset = count - 1 - index
             let pointDate: Date
             if stepInterval == .hour {
-                pointDate = calendar.date(byAdding: .hour, value: -(offset * 2), to: now) ?? now
+                // Spaced 2 hours apart across today: 00:00, 02:00, ..., 22:00
+                pointDate = calendar.date(byAdding: .hour, value: index * 2, to: startOfToday) ?? now
             } else {
-                pointDate = calendar.date(byAdding: .day, value: -offset, to: now) ?? now
+                pointDate = calendar.date(byAdding: .day, value: -offset, to: startOfToday) ?? now
             }
 
             let noise = sin(Double(index) * 0.9) * variance
