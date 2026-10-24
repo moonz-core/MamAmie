@@ -146,6 +146,9 @@ struct AssistantView: View {
             } message: {
                 Text("This will remove all current messages and restart the conversation.")
             }
+            .onAppear {
+                gemini.refreshApiKey()
+            }
         }
     }
 
@@ -514,6 +517,17 @@ private struct GeminiApiKeySheet: View {
                     SecureField("Paste Gemini API Key", text: $keyInput)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
+
+                    if gemini.isLoadedFromEnvironment {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark.seal.fill")
+                                .foregroundStyle(.green)
+                            Text("Loaded from environment variable (GEMINI_API_KEY)")
+                                .font(.caption2.bold())
+                                .foregroundStyle(.green)
+                        }
+                        .padding(.vertical, 2)
+                    }
 
                     if let result = testResult {
                         HStack(spacing: 8) {

@@ -83,13 +83,54 @@ final class GeminiChatService: ObservableObject {
         UserDefaults.standard.removeObject(forKey: userDefaultsKey)
     }
 
+    private(set) var isLoadedFromEnvironment: Bool = false
+
+    func refreshApiKey() {
+        loadApiKey()
+    }
+
     private func loadApiKey() {
+        // 1. Process environment variables (Xcode Scheme, system environment, launch arguments)
+        let envVarNames = [
+            "GEMINI_API_KEY",
+            "GOOGLE_API_KEY",
+            "GEMINI_KEY",
+            "AI_KEY",
+            "GOOGLE_GEMINI_API_KEY"
+        ]
+        for name in envVarNames {
+            if let val = ProcessInfo.processInfo.environment[name],
+               !val.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                activeApiKey = val.trimmingCharacters(in: .whitespacesAndNewlines)
+                isLoadedFromEnvironment = true
+                return
+            }
+        }
+
+        // 2. Info.plist / Bundle variables
+        if let plistVal = Bundle.main.object(forInfoDictionaryKey: "GEMINI_API_KEY") as? String,
+           !plistVal.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            activeApiKey = plistVal.trimmingCharacters(in: .whitespacesAndNewlines)
+            isLoadedFromEnvironment = true
+            return
+        }
+
+        // 3. User-entered key stored in UserDefaults
         if let stored = UserDefaults.standard.string(forKey: userDefaultsKey),
            !stored.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             activeApiKey = stored.trimmingCharacters(in: .whitespacesAndNewlines)
-        } else if !APIConfiguration.geminiAPIKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            activeApiKey = APIConfiguration.geminiAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
+            isLoadedFromEnvironment = false
+            return
         }
+
+        // 4. Static configuration in APIConfiguration.swift
+        if !APIConfiguration.geminiAPIKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            activeApiKey = APIConfiguration.geminiAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
+            isLoadedFromEnvironment = false
+            return
+        }
+
+        isLoadedFromEnvironment = false
     }
 
     func clearHistory() {
