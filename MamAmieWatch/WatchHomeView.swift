@@ -140,7 +140,7 @@ struct WatchHomeView: View {
     }
 }
 
-private extension WatchAppointment {
+extension WatchAppointment {
     var dateText: String {
         guard let timeMinutes else { return date.formatted(date: .abbreviated, time: .omitted) }
         var components = Calendar.current.dateComponents([.year, .month, .day], from: date)
@@ -151,7 +151,7 @@ private extension WatchAppointment {
     }
 }
 
-private extension WatchMedication {
+extension WatchMedication {
     var dateText: String {
         guard let timeMinutes else { return scheduledDate.formatted(date: .abbreviated, time: .omitted) }
         var components = Calendar.current.dateComponents([.year, .month, .day], from: scheduledDate)
