@@ -372,6 +372,49 @@ public struct OnboardingProfile: Codable, Equatable {
         completedAt = (try? container.decodeIfPresent(Date.self, forKey: .completedAt)) ?? Date()
     }
 
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(displayName, forKey: .displayName)
+        try container.encodeIfPresent(dateOfBirth, forKey: .dateOfBirth)
+        try container.encode(country, forKey: .country)
+        try container.encode(preferredLanguage, forKey: .preferredLanguage)
+
+        try container.encode(stage, forKey: .stage)
+        try container.encode(datingMethod, forKey: .datingMethod)
+        try container.encodeIfPresent(dueDate, forKey: .dueDate)
+        try container.encodeIfPresent(lastPeriodDate, forKey: .lastPeriodDate)
+        try container.encode(trackCycle, forKey: .trackCycle)
+        try container.encodeIfPresent(childbirthDate, forKey: .childbirthDate)
+        try container.encode(clinicalCareStatus, forKey: .clinicalCareStatus)
+
+        try container.encodeIfPresent(isFirstPregnancy, forKey: .isFirstPregnancy)
+        try container.encodeIfPresent(totalPregnancies, forKey: .totalPregnancies)
+        try container.encodeIfPresent(previousBirths, forKey: .previousBirths)
+        try container.encode(multiplePregnancyType, forKey: .multiplePregnancyType)
+        try container.encode(previousComplicationsNotes, forKey: .previousComplicationsNotes)
+
+        try container.encode(medicalConditions, forKey: .medicalConditions)
+        try container.encode(medicalConditionsNotes, forKey: .medicalConditionsNotes)
+        try container.encode(allergies, forKey: .allergies)
+        try container.encode(allergiesNotes, forKey: .allergiesNotes)
+        try container.encode(medicationsAndSupplements, forKey: .medicationsAndSupplements)
+        try container.encode(clinicalInstructions, forKey: .clinicalInstructions)
+
+        try container.encodeIfPresent(dietaryPreference, forKey: .dietaryPreference)
+        try container.encode(dietaryRestrictionsNotes, forKey: .dietaryRestrictionsNotes)
+        try container.encode(mealTrackingPreference, forKey: .mealTrackingPreference)
+        try container.encode(lifestyleTrackingPriorities, forKey: .lifestyleTrackingPriorities)
+
+        try container.encode(connectedDevices, forKey: .connectedDevices)
+        try container.encode(connectedAppleHealth, forKey: .connectedAppleHealth)
+        try container.encode(measurementsOfInterest, forKey: .measurementsOfInterest)
+
+        try container.encode(selectedReminders, forKey: .selectedReminders)
+        try container.encode(privacyAcknowledgedAt, forKey: .privacyAcknowledgedAt)
+        try container.encode(completedAt, forKey: .completedAt)
+        try container.encode(healthConditionsAndAllergies, forKey: .healthConditionsAndAllergies)
+    }
+
     public var age: Int? {
         guard let dateOfBirth else { return nil }
         let now = Date()
