@@ -116,7 +116,7 @@ struct WatchHomeView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(12)
-                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
             }
         }
     }
@@ -134,7 +134,7 @@ struct WatchHomeView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(12)
-                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
             }
         }
     }
@@ -179,7 +179,7 @@ struct WatchActionCard: View {
             Image(systemName: "chevron.right").font(.caption2.weight(.bold)).foregroundStyle(.tertiary)
         }
         .padding(11)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14))
+        .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14))
         .contentShape(RoundedRectangle(cornerRadius: 14))
     }
 }
