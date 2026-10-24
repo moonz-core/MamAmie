@@ -123,9 +123,10 @@ final class GeminiChatService: ObservableObject {
             return
         }
 
-        // 4. Static configuration in APIConfiguration.swift
-        if !APIConfiguration.geminiAPIKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            activeApiKey = APIConfiguration.geminiAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        // 4. Default built-in key (automatically active out of the box for all users)
+        let defaultKey = APIConfiguration.defaultGeminiAPIKey
+        if !defaultKey.isEmpty {
+            activeApiKey = defaultKey
             isLoadedFromEnvironment = false
             return
         }
@@ -383,8 +384,8 @@ final class GeminiChatService: ObservableObject {
         conversationHistory: [GeminiChatMessage]
     ) async throws -> String {
         let candidateModels = [
-            "gemini-2.5-flash",
             "gemini-flash-latest",
+            "gemini-2.5-flash",
             "gemini-1.5-flash",
             "gemini-2.0-flash",
             "gemini-pro-latest"

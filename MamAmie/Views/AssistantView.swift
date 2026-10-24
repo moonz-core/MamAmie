@@ -31,11 +31,6 @@ struct AssistantView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(spacing: 16) {
-                            // Missing API Key Callout Banner
-                            if !gemini.hasApiKey {
-                                apiKeyBanner
-                            }
-
                             // Empty state prompts
                             if gemini.messages.count <= 1 {
                                 promptSuggestionsView
@@ -108,13 +103,8 @@ struct AssistantView: View {
                         }
                     } label: {
                         HStack(spacing: 4) {
-                            if gemini.hasApiKey {
-                                Image(systemName: "sparkles")
-                                    .foregroundStyle(Color("AccentColor"))
-                            } else {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(.orange)
-                            }
+                            Image(systemName: "sparkles")
+                                .foregroundStyle(Color("AccentColor"))
                             Image(systemName: "ellipsis.circle")
                         }
                     }
