@@ -102,6 +102,10 @@ struct OnboardingFlowView: View {
         } message: {
             Text(store.saveErrorMessage ?? "Please try again.")
         }
+        .onAppear {
+            step = .welcome
+            draft = OnboardingDraft(profile: store.profile)
+        }
     }
 
     private func goForward() {

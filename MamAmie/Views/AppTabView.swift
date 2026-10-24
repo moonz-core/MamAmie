@@ -6,6 +6,7 @@ struct AppTabView: View {
     @ObservedObject var foodDiaryStore: FoodDiaryStore
     @ObservedObject var assistantAPI: AssistantAPIClient
     let onEditOnboarding: () -> Void
+    var onClearData: (() -> Void)? = nil
     @State private var selectedTab = 0
 
     var body: some View {
@@ -60,9 +61,13 @@ struct AppTabView: View {
                 profile: onboardingStore.profile,
                 onEditOnboarding: onEditOnboarding,
                 onClearData: {
-                    journalStore.reset()
-                    foodDiaryStore.reset()
-                    onboardingStore.reset()
+                    if let onClearData {
+                        onClearData()
+                    } else {
+                        journalStore.reset()
+                        foodDiaryStore.reset()
+                        onboardingStore.reset()
+                    }
                 }
             )
             .tabItem {

@@ -18,7 +18,7 @@ struct ProfileView: View {
                     dataManagementCard
 
                     Button(action: onEditOnboarding) {
-                        Label("Review onboarding answers", systemImage: "pencil")
+                        Label("Review onboarding questions", systemImage: "pencil")
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
@@ -36,12 +36,12 @@ struct ProfileView: View {
                 isPresented: $showClearConfirmation,
                 titleVisibility: .visible
             ) {
-                Button("Clear all data", role: .destructive) {
+                Button("Clear data & retake onboarding", role: .destructive) {
                     onClearData?()
                 }
                 Button("Cancel", role: .cancel) { }
             } message: {
-                Text("This will permanently delete your profile, onboarding answers, calendar entries, medication schedules, and food diary from this device. You will be returned to the initial welcome screen.")
+                Text("This will permanently delete your profile, onboarding answers, calendar entries, medication schedules, and food diary. You will immediately be taken back to Question 1 of the onboarding questions.")
             }
         }
     }

@@ -7,6 +7,7 @@ struct ContentView: View {
     @ObservedObject var assistantAPI: AssistantAPIClient
     @ObservedObject var watchBridge: WatchConnectivityBridge
     @State private var showingOnboarding = false
+    @State private var onboardingSessionID = UUID()
 
     init(
         onboardingStore: OnboardingStore,
@@ -30,13 +31,26 @@ struct ContentView: View {
                     journalStore: journalStore,
                     foodDiaryStore: foodDiaryStore,
                     assistantAPI: assistantAPI,
-                    onEditOnboarding: { showingOnboarding = true }
+                    onEditOnboarding: {
+                        onboardingSessionID = UUID()
+                        showingOnboarding = true
+                    },
+                    onClearData: {
+                        journalStore.reset()
+                        foodDiaryStore.reset()
+                        onboardingStore.reset()
+                        showingOnboarding = false
+                        onboardingSessionID = UUID()
+                    }
                 )
             } else {
                 OnboardingFlowView(
                     store: onboardingStore,
-                    onFinished: { showingOnboarding = false }
+                    onFinished: {
+                        showingOnboarding = false
+                    }
                 )
+                .id(onboardingSessionID)
             }
         }
         .tint(Color("AccentColor"))
