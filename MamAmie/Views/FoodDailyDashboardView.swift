@@ -98,7 +98,7 @@ struct FoodDailyDashboardView: View {
                     } else {
                         ForEach(dayMeals) { meal in
                             NavigationLink {
-                                FoodMealDetailView(meal: meal, store: store)
+                                FoodMealDetailView(meal: meal, store: store, assistantAPI: assistantAPI)
                             } label: {
                                 HStack(spacing: 12) {
                                     if let data = meal.imageData, let image = UIImage(data: data) {
@@ -192,6 +192,7 @@ struct FoodDailyDashboardView: View {
 struct FoodMealDetailView: View {
     @State var meal: FoodMeal
     @ObservedObject var store: FoodDiaryStore
+    @ObservedObject var assistantAPI: AssistantAPIClient
     @Environment(\.dismiss) private var dismiss
     @State private var showEditor = false
     @State private var confirmDelete = false

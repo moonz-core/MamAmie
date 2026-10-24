@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 import HealthKit
 
-public enum HealthMetricType: String, CaseIterable, Identifiable {
+public enum HealthMetricType: String, CaseIterable, Identifiable, Sendable {
     case heartRate = "heart_rate"
     case bloodOxygen = "blood_oxygen"
     case bloodPressure = "blood_pressure"

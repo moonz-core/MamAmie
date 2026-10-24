@@ -4,9 +4,9 @@ import Foundation
 /// Observable domain store for the calendar journal.
 /// Query indexes are maintained by the store so calendar rendering stays lightweight.
 final class JournalStore: ObservableObject {
-    @Published internal(set) var entries: [CalendarEntry] = []
-    @Published internal(set) var medicationSchedules: [MedicationSchedule] = []
-    @Published internal(set) var doseLogs: [MedicationDoseLog] = []
+    @Published var entries: [CalendarEntry] = []
+    @Published var medicationSchedules: [MedicationSchedule] = []
+    @Published var doseLogs: [MedicationDoseLog] = []
     @Published var lastErrorMessage: String?
 
     let persistence: JournalPersistence

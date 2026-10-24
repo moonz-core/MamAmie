@@ -64,7 +64,7 @@ public final class HealthKitService: HealthKitServiceProtocol {
     }
 
     public func fetchLatestReading(for metric: HealthMetricType) async throws -> HealthReading? {
-        guard let healthStore = healthStore else { return nil }
+        guard healthStore != nil else { return nil }
 
         switch metric {
         case .heartRate:
@@ -104,7 +104,7 @@ public final class HealthKitService: HealthKitServiceProtocol {
     }
 
     public func fetchRestingHeartRate() async throws -> HealthReading? {
-        guard let healthStore = healthStore,
+        guard healthStore != nil,
               let type = HKQuantityType.quantityType(forIdentifier: .restingHeartRate) else {
             return nil
         }
