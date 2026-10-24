@@ -56,6 +56,21 @@ public enum HealthMetricType: String, CaseIterable, Identifiable {
         }
     }
 
+    public func formattedValue(_ value: Double) -> String {
+        switch self {
+        case .bloodOxygen:
+            return String(format: "%.0f", value <= 1.0 ? value * 100.0 : value)
+        case .sleep:
+            return String(format: "%.1f", value)
+        case .activity:
+            return NumberFormatter.localizedString(from: NSNumber(value: Int(value)), number: .decimal)
+        case .wristTemperature:
+            return String(format: "%.1f", value)
+        default:
+            return String(format: "%.0f", value)
+        }
+    }
+
     public var iconName: String {
         switch self {
         case .heartRate: return "heart.fill"

@@ -29,7 +29,7 @@ class UserProfile(Base, UUIDMixin, TimestampMixin):
     current_stage: Mapped[str] = mapped_column(String(32), default="pregnant", nullable=False) # planning, pregnant, postpartum
     language_code: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
     timezone: Mapped[str] = mapped_column(String(64), default="Asia/Kolkata", nullable=False)
-    
+
     # Optional preferences
     diet_preferences: Mapped[Optional[dict]] = mapped_column(JSON, default=dict, nullable=True)
     food_allergies: Mapped[Optional[list]] = mapped_column(JSON, default=list, nullable=True)

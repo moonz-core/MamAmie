@@ -83,4 +83,3 @@ async def auth_headers(client: AsyncClient) -> dict:
     )
     token = login_resp.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
-

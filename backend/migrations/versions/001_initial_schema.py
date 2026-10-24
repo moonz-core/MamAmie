@@ -1,7 +1,7 @@
 """Initial database schema for MamAmie
 
 Revision ID: 001_initial_schema
-Revises: 
+Revises:
 Create Date: 2026-10-24 00:00:00.000000
 
 """

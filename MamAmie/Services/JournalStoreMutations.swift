@@ -105,19 +105,27 @@ extension JournalStore {
     }
 
     @discardableResult
-    func logDose(for entry: CalendarEntry, status: DoseStatus, notes: String = "") -> Bool {
+    func logDose(
+        for entry: CalendarEntry,
+        status: DoseStatus,
+        notes: String = "",
+        id: UUID = UUID(),
+        actualLoggedAt: Date = Date(),
+        dayKey: String? = nil
+    ) -> Bool {
         guard let medicationID = entry.medicationID,
               medicationSchedulesByID[medicationID] != nil else {
             lastErrorMessage = "This medication schedule is no longer available."
             return false
         }
+        if doseLogs.contains(where: { $0.id == id }) { return true }
 
         let log = MedicationDoseLog(
-            id: UUID(),
+            id: id,
             medicationID: medicationID,
-            dayKey: entry.dayKey,
+            dayKey: dayKey ?? entry.dayKey,
             scheduledTimeMinutes: entry.timeMinutes,
-            actualLoggedAt: Date(),
+            actualLoggedAt: actualLoggedAt,
             status: status,
             notes: notes
         )
