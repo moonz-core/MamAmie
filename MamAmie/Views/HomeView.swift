@@ -13,6 +13,7 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     greeting
                     journeyCard
+                    stageResourcesCard
                     connectedHealthCard
                     wellnessSnapshot
                     featureLinks
@@ -33,16 +34,25 @@ struct HomeView: View {
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(.secondary)
 
-            Text("Your pregnancy, supported.")
+            Text(greetingTitle)
                 .font(.largeTitle.bold())
                 .foregroundStyle(Color("AccentColor"))
+        }
+    }
+
+    private var greetingTitle: String {
+        switch profile?.stage {
+        case .pregnant: return "Your pregnancy, supported."
+        case .planning: return "Preparing for pregnancy."
+        case .postpartum: return "Postpartum recovery & care."
+        case .none: return "Your journey, supported."
         }
     }
 
     private var journeyCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Label("Your journey", systemImage: "figure.and.child.holdinghands")
+                Label("Your journey", systemImage: profile?.stage.iconName ?? "heart.fill")
                     .font(.headline)
                     .foregroundStyle(Color("AccentColor"))
 
@@ -53,25 +63,131 @@ struct HomeView: View {
                     .foregroundStyle(.secondary)
             }
 
-            if let profile, let week = profile.gestationalWeek {
-                ProgressView(value: Double(week), total: 40)
-                    .tint(Color("AccentColor"))
-                Text("Week \(week) · \(profile.dateSummary)")
+            switch profile?.stage {
+            case .pregnant:
+                if let profile, let week = profile.gestationalWeek {
+                    ProgressView(value: Double(min(week, 40)), total: 40)
+                        .tint(Color("AccentColor"))
+                    Text("Week \(week) of 40 · \(profile.dateSummary)")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.primary)
+                } else {
+                    Text(profile?.dateSummary ?? "Add your pregnancy dates in Profile to view gestational progress.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Text("Every day is a new step. Stay hydrated and check in with your body today.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-            } else {
-                Text(profile?.dateSummary ?? "Your personal journey will take shape here.")
+
+            case .planning:
+                VStack(alignment: .leading, spacing: 8) {
+                    if profile?.trackCycle == true {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(Color("AccentColor"))
+                            Text("Cycle tracking active")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(Color("AccentColor"))
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color("AccentColor").opacity(0.12))
+                        .clipShape(Capsule())
+
+                        Text("Track your periods and symptom patterns in the Calendar tab to monitor your cycles.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Pre-pregnancy preparation: Focus on balanced nutrition, restful sleep, and gentle daily habits.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+            case .postpartum:
+                VStack(alignment: .leading, spacing: 8) {
+                    if let childbirthDate = profile?.childbirthDate {
+                        let days = Calendar.current.dateComponents([.day], from: childbirthDate, to: Date()).day ?? 0
+                        let weeks = max(1, days / 7)
+                        Text("Week \(weeks) Postpartum · Gentle Recovery")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        Text("Childbirth: \(childbirthDate.formatted(date: .long, time: .omitted))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Postpartum recovery support: Take each day at your own pace.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Text("Prioritize your physical healing, emotional wellbeing, and gentle nourishment alongside your newborn.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+            case .none:
+                Text("Complete onboarding to personalize your journey timeline.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-
-            Text("Every day is a new step. Take a moment to check in with yourself today.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
         }
         .padding(20)
         .background(Color("AccentColor").opacity(0.10))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var stageResourcesCard: some View {
+        Group {
+            switch profile?.stage {
+            case .planning:
+                HStack(spacing: 14) {
+                    Image(systemName: "sparkles")
+                        .font(.title2)
+                        .foregroundStyle(Color("AccentColor"))
+                        .frame(width: 44, height: 44)
+                        .background(Color("AccentColor").opacity(0.12))
+                        .clipShape(Circle())
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Pre-Pregnancy Guidance")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Folic acid, cycle awareness, and holistic wellbeing tips.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+                .padding(16)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+
+            case .postpartum:
+                HStack(spacing: 14) {
+                    Image(systemName: "figure.and.child.holdinghands")
+                        .font(.title2)
+                        .foregroundStyle(Color("AccentColor"))
+                        .frame(width: 44, height: 44)
+                        .background(Color("AccentColor").opacity(0.12))
+                        .clipShape(Circle())
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Postpartum & Newborn Care")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Healing milestones, feeding support, and sleep restoration.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+                .padding(16)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+
+            default:
+                EmptyView()
+            }
+        }
     }
 
     private var connectedHealthCard: some View {
@@ -90,16 +206,28 @@ struct HomeView: View {
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.primary)
 
-                        Text("Apple Watch")
-                            .font(.caption2.weight(.bold))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color("AccentColor").opacity(0.12))
-                            .foregroundStyle(Color("AccentColor"))
-                            .clipShape(Capsule())
+                        if profile?.connectedAppleHealth == true {
+                            Text("Active Sync")
+                                .font(.caption2.weight(.bold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.green.opacity(0.15))
+                                .foregroundStyle(.green)
+                                .clipShape(Capsule())
+                        } else {
+                            Text("Apple Watch")
+                                .font(.caption2.weight(.bold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color("AccentColor").opacity(0.12))
+                                .foregroundStyle(Color("AccentColor"))
+                                .clipShape(Capsule())
+                        }
                     }
 
-                    Text("View heart rate, rest, and sleep trends")
+                    Text(profile?.connectedAppleHealth == true
+                         ? "View heart rate, rest, and sleep trends"
+                         : "Connect Apple Health or smartwatch anytime")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -244,7 +372,7 @@ struct HomeView: View {
                 FeatureEntryCard(
                     icon: "fork.knife.circle.fill",
                     title: "Food & nutrition",
-                    detail: "Scan or log a meal",
+                    detail: profile?.dietaryPreference != nil ? "Diet: \(profile!.dietaryPreference!.title)" : "Scan or log a meal",
                     tint: Color("AccentColor")
                 )
             }
@@ -268,7 +396,7 @@ struct HomeView: View {
             Text("A gentle reminder")
                 .font(.headline)
 
-            Text("There is no one right way to experience pregnancy. Listen to your body and reach out to your care team whenever you need support.")
+            Text(reminderText)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -276,6 +404,19 @@ struct HomeView: View {
         .padding(20)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var reminderText: String {
+        switch profile?.stage {
+        case .pregnant:
+            return "There is no one right way to experience pregnancy. Listen to your body and reach out to your care team whenever you need support."
+        case .planning:
+            return "Preparing for pregnancy is a gradual, personal journey. Nurture your daily wellness, balanced nutrition, and peaceful rest."
+        case .postpartum:
+            return "Postpartum healing takes time and gentle patience. Allow yourself to rest, bond with your baby, and ask for support whenever you need it."
+        case .none:
+            return "Take each day one step at a time. Listen to your body and check in whenever you need support."
+        }
     }
 
     private var greetingText: String {

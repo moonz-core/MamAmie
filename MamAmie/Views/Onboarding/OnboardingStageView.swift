@@ -1,5 +1,64 @@
 import SwiftUI
 
+struct OnboardingNameView: View {
+    @Binding var name: String
+    let onContinue: () -> Void
+    let onBack: () -> Void
+    let onSkip: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            OnboardingBackButton(action: onBack)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("What should we call you?")
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(Color("AccentColor"))
+
+                Text("Enter your name or preferred nickname for a warm, personalized experience. This is completely optional.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            OnboardingCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Your name")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+
+                    TextField("e.g. Maya (optional)", text: $name)
+                        .textContentType(.givenName)
+                        .autocorrectionDisabled()
+                        .padding(14)
+                        .background(Color(.systemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(Color(.separator), lineWidth: 1)
+                        )
+                }
+            }
+
+            Spacer()
+
+            VStack(spacing: 12) {
+                OnboardingPrimaryButton(
+                    title: "Continue",
+                    systemImage: "arrow.right",
+                    isDisabled: false,
+                    action: onContinue
+                )
+
+                if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    OnboardingSkipButton(title: "Skip for now", action: onSkip)
+                }
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 20)
+    }
+}
+
 struct OnboardingStageView: View {
     @Binding var stage: OnboardingStage?
     let onContinue: () -> Void
@@ -10,9 +69,11 @@ struct OnboardingStageView: View {
             OnboardingBackButton(action: onBack)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Where are you in your journey?")
+                Text("Which stage of your journey are you in?")
                     .font(.largeTitle.bold())
-                Text("This helps MamAmie show relevant context without making assumptions about you.")
+                    .foregroundStyle(Color("AccentColor"))
+
+                Text("We tailor your questions, guidance, and daily timeline to where you are right now.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }

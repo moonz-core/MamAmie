@@ -10,6 +10,7 @@ struct ProfileView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     profileHeader
                     journeyCard
+                    preferencesCard
                     privacyCard
 
                     Button(action: onEditOnboarding) {
@@ -60,7 +61,7 @@ struct ProfileView: View {
             if let profile {
                 Text(profile.stageSummary)
                     .font(.title3.bold())
-                Text(profile.dateSummary)
+                Text(profile.stageDetailSummary)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
@@ -75,12 +76,52 @@ struct ProfileView: View {
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
+    private var preferencesCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label("Preferences & Connected Devices", systemImage: "slider.horizontal.3")
+                .font(.headline)
+                .foregroundStyle(Color("AccentColor"))
+
+            VStack(spacing: 10) {
+                ProfileDetailRow(
+                    title: "Dietary preference",
+                    value: profile?.dietaryPreference?.title ?? "None specified",
+                    icon: profile?.dietaryPreference?.iconName ?? "fork.knife"
+                )
+
+                if let notes = profile?.healthConditionsAndAllergies, !notes.isEmpty {
+                    ProfileDetailRow(
+                        title: "Health & allergies",
+                        value: notes,
+                        icon: "cross.case.fill"
+                    )
+                }
+
+                ProfileDetailRow(
+                    title: "Apple Health & Watch",
+                    value: profile?.connectedAppleHealth == true ? "Connected" : "Not connected",
+                    icon: "applewatch"
+                )
+
+                ProfileDetailRow(
+                    title: "Active reminders",
+                    value: profile?.selectedReminders.isEmpty == false ? "\(profile!.selectedReminders.count) categories active" : "None active",
+                    icon: "bell.badge.fill"
+                )
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
     private var privacyCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             Label("Privacy first", systemImage: "lock.shield.fill")
                 .font(.headline)
                 .foregroundStyle(Color("AccentColor"))
-            Text("Onboarding answers are stored locally using the app's device storage. You can review or update them from this screen.")
+            Text("Onboarding answers are stored locally using the app's device storage. You can review or update them anytime from this screen.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -88,5 +129,32 @@ struct ProfileView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+}
+
+private struct ProfileDetailRow: View {
+    let title: String
+    let value: String
+    let icon: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundStyle(Color("AccentColor"))
+                .frame(width: 32, height: 32)
+                .background(Color("AccentColor").opacity(0.12))
+                .clipShape(Circle())
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(value)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+            }
+
+            Spacer()
+        }
     }
 }
