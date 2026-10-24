@@ -4,6 +4,7 @@ struct AppTabView: View {
     @ObservedObject var onboardingStore: OnboardingStore
     @ObservedObject var journalStore: JournalStore
     @ObservedObject var foodDiaryStore: FoodDiaryStore
+    @ObservedObject var assistantAPI: AssistantAPIClient
     let onEditOnboarding: () -> Void
     @State private var selectedTab = 0
 
@@ -34,7 +35,7 @@ struct AppTabView: View {
             }
             .tag(2)
 
-            FoodScannerView(store: foodDiaryStore)
+            FoodScannerView(store: foodDiaryStore, assistantAPI: assistantAPI)
                 .tabItem {
                     Label("Food", systemImage: "fork.knife")
                 }
@@ -49,7 +50,7 @@ struct AppTabView: View {
             }
             .tag(3)
 
-            AssistantView()
+            AssistantView(api: assistantAPI)
                 .tabItem {
                     Label("Ask", systemImage: "heart.text.clipboard")
                 }

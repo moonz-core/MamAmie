@@ -82,7 +82,9 @@ class FoodImageAnalysisResponse(BaseModel):
     estimated_fat_g: float
     estimated_iron_mg: float
     estimated_folate_mcg: float
-    maternal_safety_note: str
+    estimated_calcium_mg: Optional[float] = None
+    estimated_fibre_g: Optional[float] = None
+    maternal_safety_note: str = "Nutrition values are estimates; review ingredients and portions yourself."
     is_estimate: bool = True
 
 

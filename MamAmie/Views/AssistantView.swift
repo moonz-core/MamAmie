@@ -9,7 +9,7 @@ private struct AssistantChatMessage: Identifiable {
 }
 
 struct AssistantView: View {
-    @StateObject private var api = AssistantAPIClient()
+    @ObservedObject var api: AssistantAPIClient
     @State private var isCreatingAccount = false
     @State private var fullName = ""
     @State private var email = ""

@@ -4,6 +4,7 @@ import UIKit
 
 struct FoodScannerView: View {
     @ObservedObject var store: FoodDiaryStore
+    @ObservedObject var assistantAPI: AssistantAPIClient
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var photo: UIImage?
     @State private var showCamera = false
@@ -91,7 +92,7 @@ struct FoodScannerView: View {
                         }.padding(14).background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 16))
                     }
 
-                    Text("Photo recognition and a verified food-composition database are not connected yet. Photos stay on this device; you can identify and edit foods yourself.")
+                    Text("Photo analysis uses the configured MamAmie AI provider after sign-in. Results are estimates; review foods and portions before saving.")
                         .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 }.padding(20)
             }
@@ -131,9 +132,9 @@ struct FoodScannerView: View {
                     .ignoresSafeArea()
             }
             .sheet(isPresented: $showEditor) {
-                FoodMealEditorView(store: store, image: photo)
+                FoodMealEditorView(store: store, image: photo, assistantAPI: assistantAPI)
             }
-            .sheet(isPresented: $showDashboard) { FoodDailyDashboardView(store: store) }
+            .sheet(isPresented: $showDashboard) { FoodDailyDashboardView(store: store, assistantAPI: assistantAPI) }
             .alert("Camera unavailable", isPresented: $showCameraUnavailable) {
                 Button("OK", role: .cancel) { }
             } message: { Text("Use photo library or enter the meal manually on this device.") }

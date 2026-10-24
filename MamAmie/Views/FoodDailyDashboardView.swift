@@ -3,6 +3,7 @@ import UIKit
 
 struct FoodDailyDashboardView: View {
     @ObservedObject var store: FoodDiaryStore
+    @ObservedObject var assistantAPI: AssistantAPIClient
     @Environment(\.dismiss) private var dismiss
     @State private var day = Date.now
 
@@ -240,7 +241,7 @@ struct FoodMealDetailView: View {
         }
         .navigationTitle(meal.name).navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showEditor) {
-            FoodMealEditorView(store: store, meal: meal)
+            FoodMealEditorView(store: store, meal: meal, assistantAPI: assistantAPI)
         }
         .confirmationDialog("Delete this meal?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete meal", role: .destructive) { store.delete(meal); dismiss() }
