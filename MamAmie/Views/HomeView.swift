@@ -181,46 +181,49 @@ struct HomeView: View {
                 .background(Color(.secondarySystemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 18))
 
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Image(systemName: "heart.fill")
-                            .foregroundStyle(Color(red: 0.90, green: 0.28, blue: 0.42))
-                        Text("Vitals")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text("72 bpm")
-                            .font(.caption.bold())
-                            .foregroundStyle(Color(red: 0.90, green: 0.28, blue: 0.42))
-                    }
-
-                    HStack(alignment: .bottom, spacing: 4) {
-                        let heights: [CGFloat] = [12, 16, 14, 20, 18, 22, 19]
-                        ForEach(0..<heights.count, id: \.self) { index in
-                            RoundedRectangle(cornerRadius: 2)
-                                .fill(index == heights.count - 1
-                                      ? Color(red: 0.90, green: 0.28, blue: 0.42)
-                                      : Color(red: 0.90, green: 0.28, blue: 0.42).opacity(0.35))
-                                .frame(width: 5, height: heights[index])
+                Button(action: onOpenHealth) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "heart.fill")
+                                .foregroundStyle(Color(red: 0.90, green: 0.28, blue: 0.42))
+                            Text("Vitals")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Text("72 bpm")
+                                .font(.caption.bold())
+                                .foregroundStyle(Color(red: 0.90, green: 0.28, blue: 0.42))
                         }
 
-                        Spacer()
+                        HStack(alignment: .bottom, spacing: 4) {
+                            let heights: [CGFloat] = [12, 16, 14, 20, 18, 22, 19]
+                            ForEach(0..<heights.count, id: \.self) { index in
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(index == heights.count - 1
+                                          ? Color(red: 0.90, green: 0.28, blue: 0.42)
+                                          : Color(red: 0.90, green: 0.28, blue: 0.42).opacity(0.35))
+                                    .frame(width: 5, height: heights[index])
+                            }
 
-                        VStack(alignment: .trailing, spacing: 2) {
-                            Text("7.5h rest")
-                                .font(.caption2.bold())
-                                .foregroundStyle(.secondary)
-                            Text("Steady baseline")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                            Spacer()
+
+                            VStack(alignment: .trailing, spacing: 2) {
+                                Text("7.5h rest")
+                                    .font(.caption2.bold())
+                                    .foregroundStyle(.secondary)
+                                Text("Steady baseline")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
+                        .frame(height: 28)
                     }
-                    .frame(height: 28)
+                    .padding(14)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
                 }
-                .padding(14)
-                .frame(maxWidth: .infinity)
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .buttonStyle(.plain)
             }
         }
     }
