@@ -444,6 +444,34 @@ final class MaternalSchedulePlanner {
             conditionTags: ["walking"]
         ),
         MaternalClinicalMilestone(
+            id: "maternal_wellness_yoga",
+            weekNumber: 10,
+            title: "Weekly Prenatal Yoga & Hip-Opening Stretches",
+            category: .task,
+            clinicalPurpose: "Gentle Cat-Cow, Malasana deep squats, and butterfly stretches to loosen pelvic ligaments, maintain flexibility, and encourage optimal anterior fetal positioning.",
+            questionsForDoctor: ["Which stretching poses are best for easing my round ligament tension?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 600, // 10:00 AM
+            allowableWeekWindow: 8...41,
+            conditionTags: ["yoga"]
+        ),
+        MaternalClinicalMilestone(
+            id: "maternal_wellness_vit_d",
+            weekNumber: 13,
+            title: "Bi-Weekly Morning Sunlight & Vitamin D Routine (15–20 min)",
+            category: .task,
+            clinicalPurpose: "Natural sunlight stimulates endogenous Vitamin D synthesis, essential for fetal bone and tooth mineralization and balancing maternal circadian rhythms.",
+            questionsForDoctor: ["Should I have my serum 25-hydroxyvitamin D levels tested alongside routine labs?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 510, // 8:30 AM
+            allowableWeekWindow: 4...41,
+            conditionTags: ["sunlight"]
+        ),
+        MaternalClinicalMilestone(
             id: "maternal_wellness_hydration",
             weekNumber: 14,
             title: "Daily Hydration & Electrolyte Target (2.5 Liters)",
@@ -458,6 +486,20 @@ final class MaternalSchedulePlanner {
             conditionTags: ["hydration"]
         ),
         MaternalClinicalMilestone(
+            id: "maternal_wellness_magnesium",
+            weekNumber: 16,
+            title: "Warm Magnesium (Epsom Salt) Soak for Leg Cramps",
+            category: .task,
+            clinicalPurpose: "A soothing warm magnesium soak relaxes tense calf muscles and arches, relieving nighttime leg cramps (charley horses) and ease sacroiliac joint discomfort.",
+            questionsForDoctor: ["Are warm magnesium foot soaks completely safe for my pregnancy stage?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 1230, // 8:30 PM
+            allowableWeekWindow: 14...41,
+            conditionTags: ["magnesium"]
+        ),
+        MaternalClinicalMilestone(
             id: "maternal_wellness_kegels",
             weekNumber: 18,
             title: "Daily Pelvic Floor (Kegel) & Gentle Core Care",
@@ -470,6 +512,34 @@ final class MaternalSchedulePlanner {
             defaultTimeMinutes: 1140, // 7:00 PM
             allowableWeekWindow: 12...41,
             conditionTags: ["kegels"]
+        ),
+        MaternalClinicalMilestone(
+            id: "maternal_wellness_side_sleep",
+            weekNumber: 20,
+            title: "Left-Side Sleeping Posture & Pillow Alignment Check",
+            category: .task,
+            clinicalPurpose: "ACOG guideline: sleeping on the left side with a supportive knee pillow keeps the heavy uterus from compressing the inferior vena cava, optimizing placental blood flow.",
+            questionsForDoctor: ["What pillow placement do you recommend to alleviate hip and lower back pain during sleep?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 1320, // 10:00 PM
+            allowableWeekWindow: 18...41,
+            conditionTags: ["sleep"]
+        ),
+        MaternalClinicalMilestone(
+            id: "maternal_wellness_leg_elevation",
+            weekNumber: 24,
+            title: "15-Minute Leg Elevation for Swelling Relief",
+            category: .task,
+            clinicalPurpose: "Resting with feet elevated above heart level facilitates venous return, relieves fluid pooling in the feet and ankles, and prevents varicose vein strain.",
+            questionsForDoctor: ["Is my ankle swelling within expected physiological limits?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 1020, // 5:00 PM
+            allowableWeekWindow: 20...41,
+            conditionTags: ["swelling"]
         ),
         MaternalClinicalMilestone(
             id: "maternal_wellness_kick_counts",
@@ -488,7 +558,7 @@ final class MaternalSchedulePlanner {
         MaternalClinicalMilestone(
             id: "maternal_wellness_perineal_massage",
             weekNumber: 34,
-            title: "Perineal Massage & Labor Prep Stretching",
+            title: "Bi-Weekly Perineal Massage & Labor Prep Stretching",
             category: .task,
             clinicalPurpose: "Gentle perineal massage starting at 34-35 weeks increases tissue elasticity and reduces the risk of perineal tears during vaginal delivery.",
             questionsForDoctor: ["Do you recommend perineal massage with sweet almond or olive oil?"],

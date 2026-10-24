@@ -64,6 +64,12 @@ struct CalendarJournalView: View {
                     dayKey: selectedDayKey
                 )
 
+                // MARK: - Daily Checkpoints
+                DayCheckpointsView(
+                    store: store,
+                    dayKey: selectedDayKey
+                )
+
                 // MARK: - Day Timeline View
                 DayTimelineView(
                     store: store,
