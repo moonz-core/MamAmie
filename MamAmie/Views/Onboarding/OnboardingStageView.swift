@@ -71,7 +71,7 @@ private struct StageOptionRow: View {
 
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
-                    .foregroundStyle(isSelected ? Color("AccentColor") : .tertiary)
+                    .foregroundStyle(isSelected ? Color("AccentColor") : Color(.tertiaryLabel))
             }
             .padding(16)
             .background(isSelected ? Color("AccentColor").opacity(0.10) : Color(.secondarySystemBackground))

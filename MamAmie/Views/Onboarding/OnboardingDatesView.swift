@@ -116,7 +116,7 @@ private struct DatingMethodRow: View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(isSelected ? Color("AccentColor") : .tertiary)
+                    .foregroundStyle(isSelected ? Color("AccentColor") : Color(.tertiaryLabel))
                 VStack(alignment: .leading, spacing: 3) {
                     Text(method.title)
                         .font(.subheadline.weight(.semibold))

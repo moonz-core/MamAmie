@@ -101,7 +101,7 @@ struct DateSelectionRow: View {
                         .foregroundStyle(.primary)
                     Text(value?.formatted(date: .long, time: .omitted) ?? "Choose a date")
                         .font(.caption)
-                        .foregroundStyle(value == nil ? Color("AccentColor") : .secondary)
+                        .foregroundStyle(value == nil ? Color("AccentColor") : Color(.secondaryLabel))
                 }
 
                 Spacer()
