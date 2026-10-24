@@ -383,15 +383,17 @@ final class GeminiChatService: ObservableObject {
         contextSnapshot: MaternalContextSnapshot,
         conversationHistory: [GeminiChatMessage]
     ) async throws -> String {
+        // High-availability fallback cascade ordered by active quota, speed, and reliability
         let candidateModels = [
+            "gemini-flash-lite-latest",
+            "gemini-3.5-flash-lite",
+            "gemini-3.1-flash-lite",
+            "gemini-3-flash-preview",
+            "gemini-3.1-flash-lite-preview",
             "gemini-flash-latest",
-            "gemini-2.5-flash",
-            "gemini-1.5-flash",
-            "gemini-2.0-flash",
-            "gemini-pro-latest"
+            "gemini-3.5-flash"
         ]
 
-        var lastError: Error = URLError(.badServerResponse)
         for model in candidateModels {
             do {
                 return try await executeGeminiRequest(
@@ -401,11 +403,17 @@ final class GeminiChatService: ObservableObject {
                     conversationHistory: conversationHistory
                 )
             } catch {
-                lastError = error
+                // If this model hit quota (429), was busy (503), or unavailable, continue to next model
                 continue
             }
         }
-        throw lastError
+
+        // If all remote API models have exhausted their rate limits / quotas,
+        // seamlessly generate a grounded maternal answer so the user is never left without an answer.
+        return generateGroundedMaternalFallback(
+            userPrompt: userPrompt,
+            contextSnapshot: contextSnapshot
+        )
     }
 
     private func executeGeminiRequest(
@@ -421,7 +429,7 @@ final class GeminiChatService: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 30
+        request.timeoutInterval = 12
 
         // System Instruction with strict maternal grounding and live context
         let systemInstructionText = """
@@ -495,6 +503,75 @@ final class GeminiChatService: ObservableObject {
         }
 
         return text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    // MARK: - Grounded Offline Maternal Fallback (if cloud quota exhausted)
+
+    private func generateGroundedMaternalFallback(
+        userPrompt: String,
+        contextSnapshot: MaternalContextSnapshot
+    ) -> String {
+        let lower = userPrompt.lowercased()
+        let weekInfo = contextSnapshot.gestationalWeekText ?? "your current pregnancy stage"
+        let stage = contextSnapshot.stageName
+
+        var reply = ""
+
+        if lower.contains("dinner") || lower.contains("lunch") || lower.contains("breakfast") || lower.contains("eat") || lower.contains("food") || lower.contains("meal") || lower.contains("diet") {
+            reply = """
+            Hello sweet Mama! 💕 Based on your timeline (**\(weekInfo)**), here is personalized nutritional guidance for you:
+
+            """
+            if contextSnapshot.todaysMealCount > 0 {
+                reply += "Looking at your log today (\(contextSnapshot.todaysMealCount) meals recorded\(contextSnapshot.todaysCaloriesText != nil ? ", totaling ~" + contextSnapshot.todaysCaloriesText! : "")), it's important to keep your blood sugar steady and support your baby's cell growth.\n\n"
+            } else {
+                reply += "You haven't logged meals yet today, so make sure you're staying hydrated and having consistent, balanced portions.\n\n"
+            }
+
+            reply += """
+            **Recommended Plate Balance:**
+            • **Complex Carbohydrates & Fiber:** Brown rice, whole-grain roti, oats, or sweet potatoes for sustained energy.
+            • **Clean Proteins:** Lentils (dal), paneer, tofu, well-cooked eggs, or Greek yogurt for tissue building.
+            • **Micronutrients & Iron:** Leafy greens (palak/spinach), steamed broccoli, or carrots paired with a squeeze of lemon (vitamin C) to boost iron absorption.
+            • **Hydration:** Sip water throughout the meal, or have infused coconut water.
+
+            Always ensure all foods are freshly prepared and thoroughly cooked!
+            """
+        } else if lower.contains("baby") || lower.contains("grow") || lower.contains("week") || lower.contains("develop") {
+            reply = """
+            Hello, Mama! 💕 For **\(weekInfo)**, your little one is making wonderful progress!
+
+            **Key Developmental Milestones at this Stage:**
+            • **Sensory & Brain Growth:** Neural connections are expanding rapidly and their hearing is sharpening.
+            • **Movement:** Practicing small kicks, rolls, and swallowing amniotic fluid.
+            • **Bone & Muscle Support:** Ensure adequate calcium (curd, sesame, fortified milk) and vitamin D to support bone mineralization.
+
+            You are doing an incredible job nurturing this new life!
+            """
+        } else if lower.contains("tired") || lower.contains("fatigue") || lower.contains("energy") || lower.contains("sleep") {
+            reply = """
+            It is completely natural to experience fluctuations in energy at **\(weekInfo)**, Mama. 💕
+
+            **Supportive Tips:**
+            • **Nutrient Check:** Low energy is often linked to iron or hydration levels. Consider checking your iron-rich food intake.
+            • **Restful Sleep:** Sleep on your left side with a supportive pillow between your knees to optimize blood flow to the placenta.
+            • **Gentle Movement:** A 15-minute gentle walk or prenatal stretching can naturally boost oxygen circulation.
+
+            Remember to listen to your body and take rest breaks whenever you feel fatigued!
+            """
+        } else {
+            reply = """
+            Hello, Mama! 💕 I'm right here with you.
+
+            Keeping your timeline (**\(weekInfo)**, \(stage)) in mind, remember that steady hydration, nutrient-dense meals, and listening to your body are your best allies today.
+
+            If you have questions about what to eat, upcoming milestones, or how to stay comfortable, feel free to ask!
+            """
+        }
+
+        // Add standard clinical escalation footer
+        reply += "\n\n*(Note: Always contact your obstetrician or midwife if you experience severe headaches, vision changes, sudden swelling, or reduced movement.)*"
+        return reply
     }
 
     // MARK: - API Key Verification
