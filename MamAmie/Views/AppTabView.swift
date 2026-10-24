@@ -51,11 +51,15 @@ struct AppTabView: View {
             }
             .tag(3)
 
-            AssistantView(api: assistantAPI)
-                .tabItem {
-                    Label("Ask", systemImage: "heart.text.clipboard")
-                }
-                .tag(6)
+            AssistantView(
+                api: assistantAPI,
+                onboardingStore: onboardingStore,
+                foodDiaryStore: foodDiaryStore
+            )
+            .tabItem {
+                Label("Ask", systemImage: "sparkles.bubble")
+            }
+            .tag(6)
 
             ProfileView(
                 profile: onboardingStore.profile,
