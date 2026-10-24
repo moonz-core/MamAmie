@@ -29,14 +29,26 @@ struct HomeView: View {
     }
 
     private var greeting: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(greetingText)
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.secondary)
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(greetingText)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
 
-            Text(greetingTitle)
-                .font(.largeTitle.bold())
-                .foregroundStyle(Color("AccentColor"))
+                Text(greetingTitle)
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(Color("AccentColor"))
+            }
+
+            Spacer(minLength: 12)
+
+            Image("AppLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 58, height: 58)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color("AccentColor").opacity(0.18), lineWidth: 1.5))
+                .shadow(color: Color("AccentColor").opacity(0.12), radius: 6, x: 0, y: 2)
         }
     }
 

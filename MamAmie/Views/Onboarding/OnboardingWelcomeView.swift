@@ -9,14 +9,21 @@ struct OnboardingWelcomeView: View {
 
             ZStack {
                 Circle()
-                    .fill(Color("AccentColor").opacity(0.12))
-                    .frame(width: 110, height: 110)
+                    .fill(Color("AccentColor").opacity(0.10))
+                    .frame(width: 140, height: 140)
 
-                Image(systemName: "heart.circle.fill")
-                    .font(.system(size: 80))
-                    .foregroundStyle(Color("AccentColor"))
+                Circle()
+                    .stroke(Color("AccentColor").opacity(0.25), lineWidth: 2)
+                    .frame(width: 140, height: 140)
+
+                Image("AppLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120, height: 120)
+                    .clipShape(Circle())
+                    .shadow(color: Color("AccentColor").opacity(0.18), radius: 10, x: 0, y: 4)
             }
-            .accessibilityHidden(true)
+            .accessibilityLabel("MamAmie Logo")
 
             VStack(spacing: 12) {
                 Text("Welcome to MamAmie AI")
