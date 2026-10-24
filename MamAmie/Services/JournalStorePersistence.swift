@@ -48,4 +48,13 @@ extension JournalStore {
         doseLogs = snapshot.doseLogs
         rebuildIndexes()
     }
+
+    func reset() {
+        entries = []
+        medicationSchedules = []
+        doseLogs = []
+        rebuildIndexes()
+        persistence.deleteData()
+        lastErrorMessage = nil
+    }
 }

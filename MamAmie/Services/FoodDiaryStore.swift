@@ -58,6 +58,12 @@ final class FoodDiaryStore: ObservableObject {
         meals.filter { calendar.isDate($0.loggedAt, inSameDayAs: date) }
     }
 
+    func reset() {
+        meals = []
+        try? FileManager.default.removeItem(at: fileURL)
+        errorMessage = nil
+    }
+
     private func persist(_ updated: [FoodMeal]) {
         do {
             let data = try JSONEncoder().encode(updated)
