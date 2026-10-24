@@ -58,6 +58,12 @@ struct CalendarJournalView: View {
                     selectedDate: $selectedDate
                 )
 
+                // MARK: - Daily Mood Tracker
+                DayMoodTrackerView(
+                    store: store,
+                    dayKey: selectedDayKey
+                )
+
                 // MARK: - Day Timeline View
                 DayTimelineView(
                     store: store,

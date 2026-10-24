@@ -89,6 +89,7 @@
 		G10000000000000000000004 /* GeminiChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = G20000000000000000000004 /* GeminiChatService.swift */; };
 		J10000000000000000000001 /* MaternalSchedulePlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000001 /* MaternalSchedulePlanner.swift */; };
 		J10000000000000000000002 /* ClinicalCarePlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000002 /* ClinicalCarePlanView.swift */; };
+		J10000000000000000000003 /* DayMoodTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000003 /* DayMoodTrackerView.swift */; };
 		H10000000000000000000001 /* MaternalVisualCharts.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000000000000000000001 /* MaternalVisualCharts.swift */; };
 		H10000000000000000000002 /* MaternalAIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000000000000000000002 /* MaternalAIView.swift */; };
 		D10000000000000000000001 /* MamAmieWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000001 /* MamAmieWatchApp.swift */; };
@@ -192,6 +193,7 @@
 		G20000000000000000000004 /* GeminiChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiChatService.swift; sourceTree = "<group>"; };
 		J20000000000000000000001 /* MaternalSchedulePlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaternalSchedulePlanner.swift; sourceTree = "<group>"; };
 		J20000000000000000000002 /* ClinicalCarePlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicalCarePlanView.swift; sourceTree = "<group>"; };
+		J20000000000000000000003 /* DayMoodTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayMoodTrackerView.swift; sourceTree = "<group>"; };
 		H20000000000000000000001 /* MaternalVisualCharts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AI/MaternalVisualCharts.swift"; sourceTree = "<group>"; };
 		H20000000000000000000002 /* MaternalAIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AI/MaternalAIView.swift"; sourceTree = "<group>"; };
 		E20000000000000000000000 /* MamAmieWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MamAmieWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -348,6 +350,7 @@
 			children = (
 				B20000000000000000000003 /* CalendarJournalView.swift */,
 				J20000000000000000000002 /* ClinicalCarePlanView.swift */,
+				J20000000000000000000003 /* DayMoodTrackerView.swift */,
 				C20000000000000000000010 /* CalendarHeaderView.swift */,
 				C20000000000000000000011 /* CalendarCategoryStyle.swift */,
 				C20000000000000000000012 /* MonthCalendarView.swift */,
@@ -574,6 +577,7 @@
 				G10000000000000000000004 /* GeminiChatService.swift in Sources */,
 				J10000000000000000000001 /* MaternalSchedulePlanner.swift in Sources */,
 				J10000000000000000000002 /* ClinicalCarePlanView.swift in Sources */,
+				J10000000000000000000003 /* DayMoodTrackerView.swift in Sources */,
 				H10000000000000000000001 /* MaternalVisualCharts.swift in Sources */,
 				H10000000000000000000002 /* MaternalAIView.swift in Sources */,
 				D10000000000000000000006 /* WatchCompanionPayload.swift in iOS Sources */,

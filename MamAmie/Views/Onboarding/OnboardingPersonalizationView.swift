@@ -224,7 +224,13 @@ struct OnboardingScreen5NutritionView: View {
     let onSkip: () -> Void
 
     private let lifestyleOptions = [
-        "Hydration tracking", "Sleep monitoring", "Activity & step counting", "Mindful rest & breathing"
+        "Daily gentle walking (20–30 min)",
+        "Hydration goal (2.5L / day)",
+        "Pelvic floor & Kegels",
+        "Kick counts (Week 28+)",
+        "Prenatal yoga & stretching",
+        "Mindful rest & breathing",
+        "Sleep monitoring"
     ]
 
     var body: some View {

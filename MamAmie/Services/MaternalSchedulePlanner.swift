@@ -426,6 +426,95 @@ final class MaternalSchedulePlanner {
         )
     ]
 
+    // MARK: - Optional Wellness, Movement & Daily Habit Milestones
+
+    static let wellnessMilestones: [MaternalClinicalMilestone] = [
+        MaternalClinicalMilestone(
+            id: "maternal_wellness_walking",
+            weekNumber: 12,
+            title: "Daily Gentle Prenatal Walking Routine (20–30 min)",
+            category: .task,
+            clinicalPurpose: "ACOG recommends 150 minutes of moderate activity weekly. Regular walking stimulates pelvic blood flow, manages blood glucose, improves sleep, and eases lower back tension.",
+            questionsForDoctor: ["Are there any heart rate or exertion limits I should follow for walking?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 480, // 8:00 AM
+            allowableWeekWindow: 4...41,
+            conditionTags: ["walking"]
+        ),
+        MaternalClinicalMilestone(
+            id: "maternal_wellness_hydration",
+            weekNumber: 14,
+            title: "Daily Hydration & Electrolyte Target (2.5 Liters)",
+            category: .task,
+            clinicalPurpose: "Ensures healthy amniotic fluid volume, supports 45% maternal blood volume expansion, and prevents dehydration-induced Braxton Hicks contractions.",
+            questionsForDoctor: ["How much water and electrolyte intake do you recommend for my stage?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 540, // 9:00 AM
+            allowableWeekWindow: 4...41,
+            conditionTags: ["hydration"]
+        ),
+        MaternalClinicalMilestone(
+            id: "maternal_wellness_kegels",
+            weekNumber: 18,
+            title: "Daily Pelvic Floor (Kegel) & Gentle Core Care",
+            category: .task,
+            clinicalPurpose: "Gentle pelvic floor contractions (3 sets of 10 daily) to support bladder control, enhance pelvic floor endurance for labor, and accelerate postpartum recovery.",
+            questionsForDoctor: ["Can you verify that I am contracting the correct pelvic floor muscles?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 1140, // 7:00 PM
+            allowableWeekWindow: 12...41,
+            conditionTags: ["kegels"]
+        ),
+        MaternalClinicalMilestone(
+            id: "maternal_wellness_kick_counts",
+            weekNumber: 28,
+            title: "Daily Fetal Kick Counting Session (10 movements in 2h)",
+            category: .task,
+            clinicalPurpose: "ACOG standard third-trimester monitoring: count 10 distinct fetal movements (kicks, rolls, flutters) during baby's active window each evening.",
+            questionsForDoctor: ["What should I do if I notice a noticeable decrease in movement patterns?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 1200, // 8:00 PM
+            allowableWeekWindow: 28...41,
+            conditionTags: ["kick_counts"]
+        ),
+        MaternalClinicalMilestone(
+            id: "maternal_wellness_perineal_massage",
+            weekNumber: 34,
+            title: "Perineal Massage & Labor Prep Stretching",
+            category: .task,
+            clinicalPurpose: "Gentle perineal massage starting at 34-35 weeks increases tissue elasticity and reduces the risk of perineal tears during vaginal delivery.",
+            questionsForDoctor: ["Do you recommend perineal massage with sweet almond or olive oil?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 1260, // 9:00 PM
+            allowableWeekWindow: 34...41,
+            conditionTags: ["labor_prep"]
+        ),
+        MaternalClinicalMilestone(
+            id: "maternal_wellness_hospital_bag",
+            weekNumber: 35,
+            title: "Pack Hospital Bag & Newborn Essentials",
+            category: .task,
+            clinicalPurpose: "Prepare labor comfort items, infant car seat, maternity medical records, postpartum supplies, and baby's homecoming outfit.",
+            questionsForDoctor: ["What specific documentation or supplies does your maternity ward require upon arrival?"],
+            isSonography: false,
+            isBloodTest: false,
+            isHospitalVisit: false,
+            defaultTimeMinutes: 600, // 10:00 AM
+            allowableWeekWindow: 34...38,
+            conditionTags: ["hospital_bag"]
+        )
+    ]
+
     // MARK: - Schedule Generator
 
     func generateEntries(for profile: OnboardingProfile) -> [CalendarEntry] {
@@ -453,7 +542,10 @@ final class MaternalSchedulePlanner {
         var entries: [CalendarEntry] = []
         let now = Date()
 
-        for milestone in Self.allMilestones {
+        // Combine clinical care milestones and optional wellness routines
+        let combinedMilestones = Self.allMilestones + Self.wellnessMilestones
+
+        for milestone in combinedMilestones {
             // Calculate target date: pregnancyStartDate + (weekNumber * 7) days
             guard let milestoneDate = calendar.date(byAdding: .day, value: milestone.weekNumber * 7, to: pregnancyStartDate) else {
                 continue
