@@ -378,23 +378,119 @@ final class GeminiChatService: ObservableObject {
 
     // MARK: - Gemini REST API Call
 
+    // MARK: - Multi-Model Fallback Cascade Configuration
+
+    static let candidateModels = [
+        "gemini-flash-lite-latest",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3-flash-preview",
+        "gemini-3.1-flash-lite-preview",
+        "gemini-flash-latest",
+        "gemini-3.5-flash"
+    ]
+
+    // MARK: - Generic LLM Request Engine for Any Feature
+
+    /// Reusable LLM completion method that can be called by any feature in MamAmie
+    /// (e.g. meal analysis, symptom triage, journal insights, wearable health analysis).
+    /// Shares the same centralized API key and multi-model fallback cascade automatically.
+    func generateFeatureCompletion(
+        systemInstruction: String,
+        userPrompt: String,
+        temperature: Double = 0.7,
+        fallbackText: String? = nil
+    ) async throws -> String {
+        var lastError: Error = URLError(.badServerResponse)
+
+        for model in Self.candidateModels {
+            do {
+                return try await executeGenericGeminiRequest(
+                    model: model,
+                    systemInstruction: systemInstruction,
+                    userPrompt: userPrompt,
+                    temperature: temperature
+                )
+            } catch {
+                lastError = error
+                continue
+            }
+        }
+
+        if let fallback = fallbackText {
+            return fallback
+        }
+        throw lastError
+    }
+
+    private func executeGenericGeminiRequest(
+        model: String,
+        systemInstruction: String,
+        userPrompt: String,
+        temperature: Double
+    ) async throws -> String {
+        guard let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/\(model):generateContent?key=\(activeApiKey)") else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 12
+
+        let payload: [String: Any] = [
+            "systemInstruction": [
+                "parts": [["text": systemInstruction]]
+            ],
+            "contents": [
+                [
+                    "role": "user",
+                    "parts": [["text": userPrompt]]
+                ]
+            ],
+            "generationConfig": [
+                "temperature": temperature,
+                "topP": 0.95,
+                "maxOutputTokens": 1024
+            ]
+        ]
+
+        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        if httpResponse.statusCode != 200 {
+            if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let errorObj = errorJson["error"] as? [String: Any],
+               let errorMessage = errorObj["message"] as? String {
+                throw NSError(domain: "GeminiAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+            }
+            throw NSError(domain: "GeminiAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "Server returned HTTP \(httpResponse.statusCode)"])
+        }
+
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let candidates = json["candidates"] as? [[String: Any]],
+              let firstCandidate = candidates.first,
+              let content = firstCandidate["content"] as? [String: Any],
+              let parts = content["parts"] as? [[String: Any]],
+              let firstPart = parts.first,
+              let text = firstPart["text"] as? String else {
+            throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Malformed response format from Gemini API"])
+        }
+
+        return text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private func callGeminiAPI(
         userPrompt: String,
         contextSnapshot: MaternalContextSnapshot,
         conversationHistory: [GeminiChatMessage]
     ) async throws -> String {
-        // High-availability fallback cascade ordered by active quota, speed, and reliability
-        let candidateModels = [
-            "gemini-flash-lite-latest",
-            "gemini-3.5-flash-lite",
-            "gemini-3.1-flash-lite",
-            "gemini-3-flash-preview",
-            "gemini-3.1-flash-lite-preview",
-            "gemini-flash-latest",
-            "gemini-3.5-flash"
-        ]
-
-        for model in candidateModels {
+        for model in Self.candidateModels {
             do {
                 return try await executeGeminiRequest(
                     model: model,
