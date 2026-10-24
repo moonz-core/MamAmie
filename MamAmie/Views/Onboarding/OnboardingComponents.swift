@@ -7,12 +7,12 @@ struct OnboardingProgressView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Getting started")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                Text("Step \(currentStep) of \(totalSteps)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color("AccentColor"))
                 Spacer()
-                Text("\(currentStep) of \(totalSteps)")
-                    .font(.caption)
+                Text("25 Questions Total")
+                    .font(.caption2.weight(.medium))
                     .foregroundStyle(.secondary)
             }
 
@@ -234,3 +234,166 @@ struct DateSelectionRow: View {
         .buttonStyle(.plain)
     }
 }
+
+struct OnboardingSectionHeader: View {
+    var questionNumber: Int? = nil
+    var totalQuestions: Int = 25
+    let title: String
+    var subtitle: String? = nil
+    var isOptional: Bool = false
+    var isSkipped: Bool = false
+    var onSkip: (() -> Void)? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .center, spacing: 6) {
+                if let questionNumber {
+                    Text("Question \(questionNumber) of \(totalQuestions)")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(isSkipped ? Color.secondary : Color("AccentColor"))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(isSkipped ? Color(.tertiarySystemFill) : Color("AccentColor").opacity(0.12))
+                        .clipShape(Capsule())
+                }
+
+                if isOptional {
+                    Text("Optional")
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color(.tertiarySystemFill))
+                        .clipShape(Capsule())
+                }
+
+                Spacer()
+
+                if let onSkip {
+                    Button(action: onSkip) {
+                        HStack(spacing: 4) {
+                            if isSkipped {
+                                Image(systemName: "arrow.uturn.backward")
+                                    .font(.caption2)
+                                Text("Answer")
+                            } else {
+                                Image(systemName: "forward.fill")
+                                    .font(.caption2)
+                                Text("Skip question")
+                            }
+                        }
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(isSkipped ? Color("AccentColor") : .secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(isSkipped ? Color("AccentColor").opacity(0.12) : Color(.tertiarySystemFill))
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(isSkipped ? .secondary : .primary)
+
+            if let subtitle {
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if isSkipped {
+                HStack(spacing: 4) {
+                    Image(systemName: "slash.circle")
+                        .font(.caption2)
+                    Text("Skipped · You can answer this later")
+                        .font(.caption2)
+                }
+                .foregroundStyle(.secondary)
+                .padding(.top, 2)
+            }
+        }
+    }
+}
+
+struct OnboardingChip: View {
+    let title: String
+    var icon: String? = nil
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                if let icon {
+                    Image(systemName: icon)
+                        .font(.caption)
+                }
+                Text(title)
+                    .font(.caption.weight(.medium))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(isSelected ? Color("AccentColor").opacity(0.16) : Color(.secondarySystemBackground))
+            .foregroundStyle(isSelected ? Color("AccentColor") : Color.primary)
+            .overlay(
+                Capsule()
+                    .stroke(isSelected ? Color("AccentColor") : Color(.separator), lineWidth: 1)
+            )
+            .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct OnboardingNumberStepper: View {
+    let title: String
+    var subtitle: String? = nil
+    @Binding var value: Int
+    let range: ClosedRange<Int>
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Spacer()
+
+            HStack(spacing: 12) {
+                Button {
+                    if value > range.lowerBound { value -= 1 }
+                } label: {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(value > range.lowerBound ? Color("AccentColor") : Color(.tertiaryLabel))
+                }
+                .disabled(value <= range.lowerBound)
+
+                Text("\(value)")
+                    .font(.headline)
+                    .frame(minWidth: 24, alignment: .center)
+
+                Button {
+                    if value < range.upperBound { value += 1 }
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(value < range.upperBound ? Color("AccentColor") : Color(.tertiaryLabel))
+                }
+                .disabled(value >= range.upperBound)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 4)
+    }
+}
+

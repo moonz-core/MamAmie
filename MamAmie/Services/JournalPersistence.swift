@@ -75,6 +75,11 @@ final class JournalPersistence {
         try? Data(contentsOf: attachmentURL(for: reference))
     }
 
+    func deleteData() {
+        try? fileManager.removeItem(at: journalURL)
+        try? fileManager.removeItem(at: attachmentDirectory)
+    }
+
     private func ensureBaseDirectory() throws {
         try fileManager.createDirectory(
             at: journalURL.deletingLastPathComponent(),
