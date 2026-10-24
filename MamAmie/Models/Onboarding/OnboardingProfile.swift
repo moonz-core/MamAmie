@@ -500,6 +500,45 @@ public struct OnboardingDraft {
     public var selectedReminders: Set<OnboardingReminderType>
     public var acceptedPrivacy: Bool
 
+    // Tracking individual skipped questions (Questions 1 to 25)
+    public var skippedQuestions: Set<Int> = []
+
+    public mutating func toggleSkipQuestion(_ number: Int) {
+        if skippedQuestions.contains(number) {
+            skippedQuestions.remove(number)
+        } else {
+            skippedQuestions.insert(number)
+            switch number {
+            case 1: displayName = ""
+            case 2: dateOfBirth = nil
+            case 3: country = ""
+            case 4: preferredLanguage = "English"
+            case 5: if stage == nil { stage = .pregnant }
+            case 6: dueDate = nil; childbirthDate = nil; datingMethod = .notSet
+            case 7: lastPeriodDate = nil; datingMethod = .notSet
+            case 8: clinicalCareStatus = .unspecified
+            case 9: isFirstPregnancy = nil
+            case 10: totalPregnancies = 1
+            case 11: previousBirths = 0
+            case 12: multiplePregnancyType = .unsure
+            case 13: previousComplicationsNotes = ""
+            case 14: medicalConditions = ["None"]; medicalConditionsNotes = ""
+            case 15: allergies = ["None"]; allergiesNotes = ""
+            case 16: medicationsAndSupplements = ["None"]
+            case 17: clinicalInstructions = ""
+            case 18: dietaryPreference = nil
+            case 19: dietaryRestrictionsNotes = ""
+            case 20: mealTrackingPreference = .skip
+            case 21: lifestyleTrackingPriorities = []
+            case 22: connectedDevices = ["None / iPhone only"]
+            case 23: connectedAppleHealth = false
+            case 24: measurementsOfInterest = []
+            case 25: selectedReminders = []
+            default: break
+            }
+        }
+    }
+
     public init(profile: OnboardingProfile? = nil) {
         displayName = profile?.displayName ?? ""
         dateOfBirth = profile?.dateOfBirth

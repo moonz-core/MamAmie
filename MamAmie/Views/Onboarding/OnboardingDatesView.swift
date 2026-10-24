@@ -30,28 +30,33 @@ struct OnboardingScreen3HistoryView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 9,
                                 title: "Is this your first pregnancy?",
                                 subtitle: "Helps us avoid redundant questions.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(9),
+                                onSkip: { draft.toggleSkipQuestion(9) }
                             )
 
-                            HStack(spacing: 12) {
-                                OnboardingChip(
-                                    title: "Yes, first pregnancy",
-                                    icon: "sparkles",
-                                    isSelected: draft.isFirstPregnancy == true
-                                ) {
-                                    draft.isFirstPregnancy = true
-                                    draft.totalPregnancies = 1
-                                    draft.previousBirths = 0
-                                }
+                            if !draft.skippedQuestions.contains(9) {
+                                HStack(spacing: 12) {
+                                    OnboardingChip(
+                                        title: "Yes, first pregnancy",
+                                        icon: "sparkles",
+                                        isSelected: draft.isFirstPregnancy == true
+                                    ) {
+                                        draft.isFirstPregnancy = true
+                                        draft.totalPregnancies = 1
+                                        draft.previousBirths = 0
+                                    }
 
-                                OnboardingChip(
-                                    title: "No, previously pregnant",
-                                    icon: "arrow.counterclockwise",
-                                    isSelected: draft.isFirstPregnancy == false
-                                ) {
-                                    draft.isFirstPregnancy = false
+                                    OnboardingChip(
+                                        title: "No, previously pregnant",
+                                        icon: "arrow.counterclockwise",
+                                        isSelected: draft.isFirstPregnancy == false
+                                    ) {
+                                        draft.isFirstPregnancy = false
+                                    }
                                 }
                             }
                         }
@@ -62,26 +67,40 @@ struct OnboardingScreen3HistoryView: View {
                         OnboardingCard {
                             VStack(alignment: .leading, spacing: 14) {
                                 OnboardingSectionHeader(
-                                    title: "Past pregnancies & births",
-                                    subtitle: "Gravida & Para clinical context.",
-                                    isOptional: true
+                                    questionNumber: 10,
+                                    title: "Total pregnancies (Gravida)",
+                                    subtitle: "Including your current pregnancy",
+                                    isOptional: true,
+                                    isSkipped: draft.skippedQuestions.contains(10),
+                                    onSkip: { draft.toggleSkipQuestion(10) }
                                 )
 
-                                OnboardingNumberStepper(
-                                    title: "Total pregnancies",
-                                    subtitle: "Including your current pregnancy",
-                                    value: $draft.totalPregnancies,
-                                    range: 1...15
-                                )
+                                if !draft.skippedQuestions.contains(10) {
+                                    OnboardingNumberStepper(
+                                        title: "Total count",
+                                        value: $draft.totalPregnancies,
+                                        range: 1...15
+                                    )
+                                }
 
                                 Divider()
 
-                                OnboardingNumberStepper(
-                                    title: "Previous births",
+                                OnboardingSectionHeader(
+                                    questionNumber: 11,
+                                    title: "Previous births (Para)",
                                     subtitle: "Number of deliveries",
-                                    value: $draft.previousBirths,
-                                    range: 0...15
+                                    isOptional: true,
+                                    isSkipped: draft.skippedQuestions.contains(11),
+                                    onSkip: { draft.toggleSkipQuestion(11) }
                                 )
+
+                                if !draft.skippedQuestions.contains(11) {
+                                    OnboardingNumberStepper(
+                                        title: "Births count",
+                                        value: $draft.previousBirths,
+                                        range: 0...15
+                                    )
+                                }
                             }
                         }
                     }
@@ -91,18 +110,23 @@ struct OnboardingScreen3HistoryView: View {
                         OnboardingCard {
                             VStack(alignment: .leading, spacing: 10) {
                                 OnboardingSectionHeader(
+                                    questionNumber: 12,
                                     title: "Are you expecting one baby or multiples?",
                                     subtitle: "Multiple pregnancies involve distinct milestone tracking.",
-                                    isOptional: true
+                                    isOptional: true,
+                                    isSkipped: draft.skippedQuestions.contains(12),
+                                    onSkip: { draft.toggleSkipQuestion(12) }
                                 )
 
-                                FlowLayout(spacing: 8) {
-                                    ForEach(MultiplePregnancyType.allCases) { type in
-                                        OnboardingChip(
-                                            title: type.title,
-                                            isSelected: draft.multiplePregnancyType == type
-                                        ) {
-                                            draft.multiplePregnancyType = type
+                                if !draft.skippedQuestions.contains(12) {
+                                    FlowLayout(spacing: 8) {
+                                        ForEach(MultiplePregnancyType.allCases) { type in
+                                            OnboardingChip(
+                                                title: type.title,
+                                                isSelected: draft.multiplePregnancyType == type
+                                            ) {
+                                                draft.multiplePregnancyType = type
+                                            }
                                         }
                                     }
                                 }
@@ -114,27 +138,32 @@ struct OnboardingScreen3HistoryView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 13,
                                 title: "Previous complications or birth history",
                                 subtitle: "Sensitive & optional. Used only to tailor relevant health precautions.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(13),
+                                onSkip: { draft.toggleSkipQuestion(13) }
                             )
 
-                            FlowLayout(spacing: 8) {
-                                ForEach(commonComplications, id: \.self) { comp in
-                                    OnboardingChip(
-                                        title: comp,
-                                        isSelected: isComplicationSelected(comp)
-                                    ) {
-                                        toggleComplication(comp)
+                            if !draft.skippedQuestions.contains(13) {
+                                FlowLayout(spacing: 8) {
+                                    ForEach(commonComplications, id: \.self) { comp in
+                                        OnboardingChip(
+                                            title: comp,
+                                            isSelected: isComplicationSelected(comp)
+                                        ) {
+                                            toggleComplication(comp)
+                                        }
                                     }
                                 }
-                            }
 
-                            TextField("Any specific notes (optional)", text: $draft.previousComplicationsNotes)
-                                .padding(10)
-                                .background(Color(.systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                                TextField("Any specific notes (optional)", text: $draft.previousComplicationsNotes)
+                                    .padding(10)
+                                    .background(Color(.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                            }
                         }
                     }
 

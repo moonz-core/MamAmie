@@ -7,12 +7,12 @@ struct OnboardingProgressView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Getting started")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                Text("Step \(currentStep) of \(totalSteps)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color("AccentColor"))
                 Spacer()
-                Text("\(currentStep) of \(totalSteps)")
-                    .font(.caption)
+                Text("25 Questions Total")
+                    .font(.caption2.weight(.medium))
                     .foregroundStyle(.secondary)
             }
 
@@ -236,16 +236,26 @@ struct DateSelectionRow: View {
 }
 
 struct OnboardingSectionHeader: View {
+    var questionNumber: Int? = nil
+    var totalQuestions: Int = 25
     let title: String
     var subtitle: String? = nil
     var isOptional: Bool = false
+    var isSkipped: Bool = false
+    var onSkip: (() -> Void)? = nil
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            HStack {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .center, spacing: 6) {
+                if let questionNumber {
+                    Text("Question \(questionNumber) of \(totalQuestions)")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(isSkipped ? Color.secondary : Color("AccentColor"))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(isSkipped ? Color(.tertiarySystemFill) : Color("AccentColor").opacity(0.12))
+                        .clipShape(Capsule())
+                }
 
                 if isOptional {
                     Text("Optional")
@@ -256,12 +266,52 @@ struct OnboardingSectionHeader: View {
                         .background(Color(.tertiarySystemFill))
                         .clipShape(Capsule())
                 }
+
+                Spacer()
+
+                if let onSkip {
+                    Button(action: onSkip) {
+                        HStack(spacing: 4) {
+                            if isSkipped {
+                                Image(systemName: "arrow.uturn.backward")
+                                    .font(.caption2)
+                                Text("Answer")
+                            } else {
+                                Image(systemName: "forward.fill")
+                                    .font(.caption2)
+                                Text("Skip question")
+                            }
+                        }
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(isSkipped ? Color("AccentColor") : .secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(isSkipped ? Color("AccentColor").opacity(0.12) : Color(.tertiarySystemFill))
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
             }
+
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(isSkipped ? .secondary : .primary)
 
             if let subtitle {
                 Text(subtitle)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+
+            if isSkipped {
+                HStack(spacing: 4) {
+                    Image(systemName: "slash.circle")
+                        .font(.caption2)
+                    Text("Skipped · You can answer this later")
+                        .font(.caption2)
+                }
+                .foregroundStyle(.secondary)
+                .padding(.top, 2)
             }
         }
     }

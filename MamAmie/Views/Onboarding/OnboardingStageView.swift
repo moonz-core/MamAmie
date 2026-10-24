@@ -29,21 +29,26 @@ struct OnboardingScreen1AboutYouView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 8) {
                             OnboardingSectionHeader(
+                                questionNumber: 1,
                                 title: "What should we call you?",
                                 subtitle: "Choose a name or nickname for personalized greetings.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(1),
+                                onSkip: { draft.toggleSkipQuestion(1) }
                             )
 
-                            TextField("Your name or nickname", text: $draft.displayName)
-                                .textContentType(.givenName)
-                                .autocorrectionDisabled()
-                                .padding(12)
-                                .background(Color(.systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .stroke(Color(.separator), lineWidth: 1)
-                                )
+                            if !draft.skippedQuestions.contains(1) {
+                                TextField("Your name or nickname", text: $draft.displayName)
+                                    .textContentType(.givenName)
+                                    .autocorrectionDisabled()
+                                    .padding(12)
+                                    .background(Color(.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                            .stroke(Color(.separator), lineWidth: 1)
+                                    )
+                            }
                         }
                     }
 
@@ -51,44 +56,49 @@ struct OnboardingScreen1AboutYouView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 2,
                                 title: "Date of birth",
                                 subtitle: "Used only to calculate your age for health context.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(2),
+                                onSkip: { draft.toggleSkipQuestion(2) }
                             )
 
-                            HStack {
-                                DatePicker(
-                                    "Date of birth",
-                                    selection: Binding(
-                                        get: { draft.dateOfBirth ?? defaultBirthDate },
-                                        set: { draft.dateOfBirth = $0 }
-                                    ),
-                                    in: ...Date(),
-                                    displayedComponents: [.date]
-                                )
-                                .datePickerStyle(.compact)
-                                .labelsHidden()
+                            if !draft.skippedQuestions.contains(2) {
+                                HStack {
+                                    DatePicker(
+                                        "Date of birth",
+                                        selection: Binding(
+                                            get: { draft.dateOfBirth ?? defaultBirthDate },
+                                            set: { draft.dateOfBirth = $0 }
+                                        ),
+                                        in: ...Date(),
+                                        displayedComponents: [.date]
+                                    )
+                                    .datePickerStyle(.compact)
+                                    .labelsHidden()
 
-                                Spacer()
+                                    Spacer()
 
-                                if let age = draft.calculatedAge {
-                                    Text("\(age) years old")
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(Color("AccentColor"))
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 4)
-                                        .background(Color("AccentColor").opacity(0.12))
-                                        .clipShape(Capsule())
-                                }
-
-                                if draft.dateOfBirth != nil {
-                                    Button {
-                                        draft.dateOfBirth = nil
-                                    } label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundStyle(.secondary)
+                                    if let age = draft.calculatedAge {
+                                        Text("\(age) years old")
+                                            .font(.subheadline.weight(.semibold))
+                                            .foregroundStyle(Color("AccentColor"))
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 4)
+                                            .background(Color("AccentColor").opacity(0.12))
+                                            .clipShape(Capsule())
                                     }
-                                    .buttonStyle(.plain)
+
+                                    if draft.dateOfBirth != nil {
+                                        Button {
+                                            draft.dateOfBirth = nil
+                                        } label: {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .foregroundStyle(.secondary)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
                                 }
                             }
                         }
@@ -98,28 +108,33 @@ struct OnboardingScreen1AboutYouView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 3,
                                 title: "Country of residence",
                                 subtitle: "Helps tailor clinical guidelines and measurements.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(3),
+                                onSkip: { draft.toggleSkipQuestion(3) }
                             )
 
-                            FlowLayout(spacing: 8) {
-                                ForEach(commonCountries, id: \.self) { c in
-                                    OnboardingChip(
-                                        title: c,
-                                        isSelected: draft.country == c
-                                    ) {
-                                        draft.country = (draft.country == c ? "" : c)
+                            if !draft.skippedQuestions.contains(3) {
+                                FlowLayout(spacing: 8) {
+                                    ForEach(commonCountries, id: \.self) { c in
+                                        OnboardingChip(
+                                            title: c,
+                                            isSelected: draft.country == c
+                                        ) {
+                                            draft.country = (draft.country == c ? "" : c)
+                                        }
                                     }
                                 }
-                            }
 
-                            if draft.country == "Other" {
-                                TextField("Enter your country", text: $draft.country)
-                                    .padding(10)
-                                    .background(Color(.systemBackground))
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                                if draft.country == "Other" {
+                                    TextField("Enter your country", text: $draft.country)
+                                        .padding(10)
+                                        .background(Color(.systemBackground))
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                                }
                             }
                         }
                     }
@@ -128,18 +143,23 @@ struct OnboardingScreen1AboutYouView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 4,
                                 title: "Preferred language",
                                 subtitle: "Select your preferred language for advice and articles.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(4),
+                                onSkip: { draft.toggleSkipQuestion(4) }
                             )
 
-                            FlowLayout(spacing: 8) {
-                                ForEach(languages, id: \.self) { lang in
-                                    OnboardingChip(
-                                        title: lang,
-                                        isSelected: draft.preferredLanguage == lang
-                                    ) {
-                                        draft.preferredLanguage = lang
+                            if !draft.skippedQuestions.contains(4) {
+                                FlowLayout(spacing: 8) {
+                                    ForEach(languages, id: \.self) { lang in
+                                        OnboardingChip(
+                                            title: lang,
+                                            isSelected: draft.preferredLanguage == lang
+                                        ) {
+                                            draft.preferredLanguage = lang
+                                        }
                                     }
                                 }
                             }
@@ -216,20 +236,28 @@ struct OnboardingScreen2JourneyView: View {
                     titleSection
 
                     // Question 5: Journey Stage
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("CURRENT STAGE")
-                            .font(.caption2.weight(.bold))
-                            .tracking(1)
-                            .foregroundStyle(Color("AccentColor"))
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                questionNumber: 5,
+                                title: "Which stage of your journey are you in?",
+                                subtitle: "Personalizes all health advice and milestones.",
+                                isOptional: false,
+                                isSkipped: draft.skippedQuestions.contains(5),
+                                onSkip: { draft.toggleSkipQuestion(5) }
+                            )
 
-                        ForEach(OnboardingStage.allCases) { stage in
-                            OnboardingSelectableCard(
-                                title: stage.title,
-                                subtitle: stage.subtitle,
-                                icon: stage.iconName,
-                                isSelected: draft.stage == stage
-                            ) {
-                                draft.stage = stage
+                            if !draft.skippedQuestions.contains(5) {
+                                ForEach(OnboardingStage.allCases) { stage in
+                                    OnboardingSelectableCard(
+                                        title: stage.title,
+                                        subtitle: stage.subtitle,
+                                        icon: stage.iconName,
+                                        isSelected: draft.stage == stage
+                                    ) {
+                                        draft.stage = stage
+                                    }
+                                }
                             }
                         }
                     }
@@ -243,23 +271,28 @@ struct OnboardingScreen2JourneyView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
-                                title: "Are you currently receiving care?",
+                                questionNumber: 8,
+                                title: "Are you currently receiving clinical care?",
                                 subtitle: "Clinical care is vital for healthy outcomes. Select your care status.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(8),
+                                onSkip: { draft.toggleSkipQuestion(8) }
                             )
 
-                            VStack(spacing: 8) {
-                                ForEach([
-                                    ClinicalCareStatus.regularOBGYN,
-                                    ClinicalCareStatus.midwifeOrFamily,
-                                    ClinicalCareStatus.lookingForCare,
-                                    ClinicalCareStatus.notReceivingCare
-                                ]) { status in
-                                    OnboardingSelectableCard(
-                                        title: status.title,
-                                        isSelected: draft.clinicalCareStatus == status
-                                    ) {
-                                        draft.clinicalCareStatus = status
+                            if !draft.skippedQuestions.contains(8) {
+                                VStack(spacing: 8) {
+                                    ForEach([
+                                        ClinicalCareStatus.regularOBGYN,
+                                        ClinicalCareStatus.midwifeOrFamily,
+                                        ClinicalCareStatus.lookingForCare,
+                                        ClinicalCareStatus.notReceivingCare
+                                    ]) { status in
+                                        OnboardingSelectableCard(
+                                            title: status.title,
+                                            isSelected: draft.clinicalCareStatus == status
+                                        ) {
+                                            draft.clinicalCareStatus = status
+                                        }
                                     }
                                 }
                             }
@@ -316,85 +349,100 @@ struct OnboardingScreen2JourneyView: View {
                 switch stage {
                 case .pregnant:
                     OnboardingSectionHeader(
-                        title: "Pregnancy timeline",
+                        questionNumber: 6,
+                        title: "Estimated due date or last period",
                         subtitle: "Estimated dates let MamAmie calculate your gestational week.",
-                        isOptional: true
+                        isOptional: true,
+                        isSkipped: draft.skippedQuestions.contains(6),
+                        onSkip: { draft.toggleSkipQuestion(6) }
                     )
 
-                    VStack(spacing: 10) {
-                        ForEach(PregnancyDatingMethod.allCases) { method in
-                            Button {
-                                draft.datingMethod = method
-                                if method != .dueDate { draft.dueDate = nil }
-                                if method != .lastPeriod { draft.lastPeriodDate = nil }
-                            } label: {
-                                HStack(spacing: 10) {
-                                    Image(systemName: draft.datingMethod == method ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(draft.datingMethod == method ? Color("AccentColor") : Color(.tertiaryLabel))
-                                    Text(method.title)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.primary)
-                                    Spacer()
+                    if !draft.skippedQuestions.contains(6) {
+                        VStack(spacing: 10) {
+                            ForEach(PregnancyDatingMethod.allCases) { method in
+                                Button {
+                                    draft.datingMethod = method
+                                    if method != .dueDate { draft.dueDate = nil }
+                                    if method != .lastPeriod { draft.lastPeriodDate = nil }
+                                } label: {
+                                    HStack(spacing: 10) {
+                                        Image(systemName: draft.datingMethod == method ? "checkmark.circle.fill" : "circle")
+                                            .foregroundStyle(draft.datingMethod == method ? Color("AccentColor") : Color(.tertiaryLabel))
+                                        Text(method.title)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.primary)
+                                        Spacer()
+                                    }
+                                    .padding(10)
+                                    .background(Color(.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
                                 }
-                                .padding(10)
-                                .background(Color(.systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
-                        }
 
-                        if draft.datingMethod == .dueDate {
-                            DateSelectionRow(
-                                title: "Due date",
-                                value: draft.dueDate,
-                                action: { presentPicker(.dueDate, currentDate: draft.dueDate) }
-                            )
-                        } else if draft.datingMethod == .lastPeriod {
-                            DateSelectionRow(
-                                title: "First day of last period",
-                                value: draft.lastPeriodDate,
-                                action: { presentPicker(.lastPeriod, currentDate: draft.lastPeriodDate) }
-                            )
+                            if draft.datingMethod == .dueDate {
+                                DateSelectionRow(
+                                    title: "Due date",
+                                    value: draft.dueDate,
+                                    action: { presentPicker(.dueDate, currentDate: draft.dueDate) }
+                                )
+                            } else if draft.datingMethod == .lastPeriod {
+                                DateSelectionRow(
+                                    title: "First day of last period (LMP)",
+                                    value: draft.lastPeriodDate,
+                                    action: { presentPicker(.lastPeriod, currentDate: draft.lastPeriodDate) }
+                                )
+                            }
                         }
                     }
 
                 case .planning:
                     OnboardingSectionHeader(
+                        questionNumber: 6,
                         title: "Menstrual cycle tracking",
                         subtitle: "Would you like to track your cycles in MamAmie to identify fertile windows?",
-                        isOptional: true
+                        isOptional: true,
+                        isSkipped: draft.skippedQuestions.contains(6),
+                        onSkip: { draft.toggleSkipQuestion(6) }
                     )
 
-                    HStack(spacing: 10) {
-                        OnboardingChip(
-                            title: "Yes, track my cycle",
-                            icon: "calendar.badge.clock",
-                            isSelected: draft.trackCycle
-                        ) {
-                            draft.trackCycle = true
-                        }
+                    if !draft.skippedQuestions.contains(6) {
+                        HStack(spacing: 10) {
+                            OnboardingChip(
+                                title: "Yes, track my cycle",
+                                icon: "calendar.badge.clock",
+                                isSelected: draft.trackCycle
+                            ) {
+                                draft.trackCycle = true
+                            }
 
-                        OnboardingChip(
-                            title: "Not right now",
-                            icon: "sparkles",
-                            isSelected: !draft.trackCycle
-                        ) {
-                            draft.trackCycle = false
+                            OnboardingChip(
+                                title: "Not right now",
+                                icon: "sparkles",
+                                isSelected: !draft.trackCycle
+                            ) {
+                                draft.trackCycle = false
+                            }
                         }
                     }
 
                 case .postpartum:
                     OnboardingSectionHeader(
+                        questionNumber: 6,
                         title: "Date of childbirth",
                         subtitle: "Helps tailor postpartum recovery milestones and baby care prompts.",
-                        isOptional: true
+                        isOptional: true,
+                        isSkipped: draft.skippedQuestions.contains(6),
+                        onSkip: { draft.toggleSkipQuestion(6) }
                     )
 
-                    DateSelectionRow(
-                        title: "Date of birth",
-                        value: draft.childbirthDate,
-                        action: { presentPicker(.childbirthDate, currentDate: draft.childbirthDate) }
-                    )
+                    if !draft.skippedQuestions.contains(6) {
+                        DateSelectionRow(
+                            title: "Date of birth",
+                            value: draft.childbirthDate,
+                            action: { presentPicker(.childbirthDate, currentDate: draft.childbirthDate) }
+                        )
+                    }
                 }
             }
         }

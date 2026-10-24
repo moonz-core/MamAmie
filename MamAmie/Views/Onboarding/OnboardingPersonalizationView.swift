@@ -32,27 +32,32 @@ struct OnboardingScreen4HealthView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 14,
                                 title: "Existing medical conditions",
                                 subtitle: "Select any that apply to help personalize health insights.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(14),
+                                onSkip: { draft.toggleSkipQuestion(14) }
                             )
 
-                            FlowLayout(spacing: 8) {
-                                ForEach(conditionChips, id: \.self) { item in
-                                    OnboardingChip(
-                                        title: item,
-                                        isSelected: isSelected(item, in: draft.medicalConditions)
-                                    ) {
-                                        toggleItem(item, in: &draft.medicalConditions)
+                            if !draft.skippedQuestions.contains(14) {
+                                FlowLayout(spacing: 8) {
+                                    ForEach(conditionChips, id: \.self) { item in
+                                        OnboardingChip(
+                                            title: item,
+                                            isSelected: isSelected(item, in: draft.medicalConditions)
+                                        ) {
+                                            toggleItem(item, in: &draft.medicalConditions)
+                                        }
                                     }
                                 }
-                            }
 
-                            TextField("Other medical condition (optional)", text: $draft.medicalConditionsNotes)
-                                .padding(10)
-                                .background(Color(.systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                                TextField("Other medical condition (optional)", text: $draft.medicalConditionsNotes)
+                                    .padding(10)
+                                    .background(Color(.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                            }
                         }
                     }
 
@@ -60,27 +65,32 @@ struct OnboardingScreen4HealthView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 15,
                                 title: "Known allergies",
                                 subtitle: "Helps us screen food suggestions and wellness tips.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(15),
+                                onSkip: { draft.toggleSkipQuestion(15) }
                             )
 
-                            FlowLayout(spacing: 8) {
-                                ForEach(allergyChips, id: \.self) { item in
-                                    OnboardingChip(
-                                        title: item,
-                                        isSelected: isSelected(item, in: draft.allergies)
-                                    ) {
-                                        toggleItem(item, in: &draft.allergies)
+                            if !draft.skippedQuestions.contains(15) {
+                                FlowLayout(spacing: 8) {
+                                    ForEach(allergyChips, id: \.self) { item in
+                                        OnboardingChip(
+                                            title: item,
+                                            isSelected: isSelected(item, in: draft.allergies)
+                                        ) {
+                                            toggleItem(item, in: &draft.allergies)
+                                        }
                                     }
                                 }
-                            }
 
-                            TextField("Other allergy (optional)", text: $draft.allergiesNotes)
-                                .padding(10)
-                                .background(Color(.systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                                TextField("Other allergy (optional)", text: $draft.allergiesNotes)
+                                    .padding(10)
+                                    .background(Color(.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                            }
                         }
                     }
 
@@ -88,18 +98,23 @@ struct OnboardingScreen4HealthView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 16,
                                 title: "Current medicines or supplements",
                                 subtitle: "Keep track of supplements and vitamins you take daily.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(16),
+                                onSkip: { draft.toggleSkipQuestion(16) }
                             )
 
-                            FlowLayout(spacing: 8) {
-                                ForEach(medicationChips, id: \.self) { item in
-                                    OnboardingChip(
-                                        title: item,
-                                        isSelected: isSelected(item, in: draft.medicationsAndSupplements)
-                                    ) {
-                                        toggleItem(item, in: &draft.medicationsAndSupplements)
+                            if !draft.skippedQuestions.contains(16) {
+                                FlowLayout(spacing: 8) {
+                                    ForEach(medicationChips, id: \.self) { item in
+                                        OnboardingChip(
+                                            title: item,
+                                            isSelected: isSelected(item, in: draft.medicationsAndSupplements)
+                                        ) {
+                                            toggleItem(item, in: &draft.medicationsAndSupplements)
+                                        }
                                     }
                                 }
                             }
@@ -110,17 +125,22 @@ struct OnboardingScreen4HealthView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 8) {
                             OnboardingSectionHeader(
+                                questionNumber: 17,
                                 title: "Clinician-provided instructions",
                                 subtitle: "Special precautions or advice given by your healthcare provider.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(17),
+                                onSkip: { draft.toggleSkipQuestion(17) }
                             )
 
-                            TextField("e.g. Daily iron supplement, monitor resting heart rate (optional)", text: $draft.clinicalInstructions, axis: .vertical)
-                                .lineLimit(2...4)
-                                .padding(10)
-                                .background(Color(.systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                            if !draft.skippedQuestions.contains(17) {
+                                TextField("e.g. Daily iron supplement, monitor resting heart rate (optional)", text: $draft.clinicalInstructions, axis: .vertical)
+                                    .lineLimit(2...4)
+                                    .padding(10)
+                                    .background(Color(.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                            }
                         }
                     }
 
@@ -219,20 +239,25 @@ struct OnboardingScreen5NutritionView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 18,
                                 title: "Dietary preference",
                                 subtitle: "Tailors meal analysis and food diary insights.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(18),
+                                onSkip: { draft.toggleSkipQuestion(18) }
                             )
 
-                            VStack(spacing: 8) {
-                                ForEach(DietaryPreference.allCases) { diet in
-                                    OnboardingSelectableCard(
-                                        title: diet.title,
-                                        subtitle: diet.subtitle,
-                                        icon: diet.iconName,
-                                        isSelected: draft.dietaryPreference == diet
-                                    ) {
-                                        draft.dietaryPreference = diet
+                            if !draft.skippedQuestions.contains(18) {
+                                VStack(spacing: 8) {
+                                    ForEach(DietaryPreference.allCases) { diet in
+                                        OnboardingSelectableCard(
+                                            title: diet.title,
+                                            subtitle: diet.subtitle,
+                                            icon: diet.iconName,
+                                            isSelected: draft.dietaryPreference == diet
+                                        ) {
+                                            draft.dietaryPreference = diet
+                                        }
                                     }
                                 }
                             }
@@ -243,16 +268,21 @@ struct OnboardingScreen5NutritionView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 8) {
                             OnboardingSectionHeader(
+                                questionNumber: 19,
                                 title: "Specific dietary restrictions",
                                 subtitle: "e.g. Halal, Kosher, Nut-free, Low-sodium, No raw fish.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(19),
+                                onSkip: { draft.toggleSkipQuestion(19) }
                             )
 
-                            TextField("Enter any restrictions (optional)", text: $draft.dietaryRestrictionsNotes)
-                                .padding(10)
-                                .background(Color(.systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                            if !draft.skippedQuestions.contains(19) {
+                                TextField("Enter any restrictions (optional)", text: $draft.dietaryRestrictionsNotes)
+                                    .padding(10)
+                                    .background(Color(.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                            }
                         }
                     }
 
@@ -260,18 +290,23 @@ struct OnboardingScreen5NutritionView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 20,
                                 title: "Meal tracking method",
                                 subtitle: "Choose how you prefer to log food in MamAmie.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(20),
+                                onSkip: { draft.toggleSkipQuestion(20) }
                             )
 
-                            VStack(spacing: 8) {
-                                ForEach(MealTrackingPreference.allCases) { pref in
-                                    OnboardingSelectableCard(
-                                        title: pref.title,
-                                        isSelected: draft.mealTrackingPreference == pref
-                                    ) {
-                                        draft.mealTrackingPreference = pref
+                            if !draft.skippedQuestions.contains(20) {
+                                VStack(spacing: 8) {
+                                    ForEach(MealTrackingPreference.allCases) { pref in
+                                        OnboardingSelectableCard(
+                                            title: pref.title,
+                                            isSelected: draft.mealTrackingPreference == pref
+                                        ) {
+                                            draft.mealTrackingPreference = pref
+                                        }
                                     }
                                 }
                             }
@@ -282,21 +317,26 @@ struct OnboardingScreen5NutritionView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 21,
                                 title: "Wellness tracking priorities",
                                 subtitle: "Which daily habits would you like to track on your home screen?",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(21),
+                                onSkip: { draft.toggleSkipQuestion(21) }
                             )
 
-                            FlowLayout(spacing: 8) {
-                                ForEach(lifestyleOptions, id: \.self) { opt in
-                                    OnboardingChip(
-                                        title: opt,
-                                        isSelected: draft.lifestyleTrackingPriorities.contains(opt)
-                                    ) {
-                                        if draft.lifestyleTrackingPriorities.contains(opt) {
-                                            draft.lifestyleTrackingPriorities.remove(opt)
-                                        } else {
-                                            draft.lifestyleTrackingPriorities.insert(opt)
+                            if !draft.skippedQuestions.contains(21) {
+                                FlowLayout(spacing: 8) {
+                                    ForEach(lifestyleOptions, id: \.self) { opt in
+                                        OnboardingChip(
+                                            title: opt,
+                                            isSelected: draft.lifestyleTrackingPriorities.contains(opt)
+                                        ) {
+                                            if draft.lifestyleTrackingPriorities.contains(opt) {
+                                                draft.lifestyleTrackingPriorities.remove(opt)
+                                            } else {
+                                                draft.lifestyleTrackingPriorities.insert(opt)
+                                            }
                                         }
                                     }
                                 }
@@ -380,18 +420,23 @@ struct OnboardingScreen6ConnectedHealthView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 22,
                                 title: "Do you use a health tracker or wearable?",
                                 subtitle: "Select compatible devices you currently own.",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(22),
+                                onSkip: { draft.toggleSkipQuestion(22) }
                             )
 
-                            FlowLayout(spacing: 8) {
-                                ForEach(deviceOptions, id: \.self) { dev in
-                                    OnboardingChip(
-                                        title: dev,
-                                        isSelected: draft.connectedDevices.contains(dev)
-                                    ) {
-                                        toggleDevice(dev)
+                            if !draft.skippedQuestions.contains(22) {
+                                FlowLayout(spacing: 8) {
+                                    ForEach(deviceOptions, id: \.self) { dev in
+                                        OnboardingChip(
+                                            title: dev,
+                                            isSelected: draft.connectedDevices.contains(dev)
+                                        ) {
+                                            toggleDevice(dev)
+                                        }
                                     }
                                 }
                             }
@@ -401,54 +446,65 @@ struct OnboardingScreen6ConnectedHealthView: View {
                     // Question 23: Apple Health connection
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 12) {
-                            HStack(spacing: 12) {
-                                Image(systemName: "applewatch.radiowaves.left.and.right")
-                                    .font(.title2)
-                                    .foregroundStyle(Color("AccentColor"))
-                                    .frame(width: 44, height: 44)
-                                    .background(Color("AccentColor").opacity(0.12))
-                                    .clipShape(Circle())
+                            OnboardingSectionHeader(
+                                questionNumber: 23,
+                                title: "Connect Apple Health",
+                                subtitle: "Read-only access for vitals, sleep, and steps.",
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(23),
+                                onSkip: { draft.toggleSkipQuestion(23) }
+                            )
 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Apple Health Integration")
-                                        .font(.subheadline.weight(.semibold))
-                                    Text("Read-only access for vitals, sleep, and steps.")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
+                            if !draft.skippedQuestions.contains(23) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "applewatch.radiowaves.left.and.right")
+                                        .font(.title2)
+                                        .foregroundStyle(Color("AccentColor"))
+                                        .frame(width: 44, height: 44)
+                                        .background(Color("AccentColor").opacity(0.12))
+                                        .clipShape(Circle())
 
-                            if draft.connectedAppleHealth {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundStyle(.green)
-                                    Text("Apple Health Connected")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(.primary)
-                                }
-                                .padding(10)
-                                .frame(maxWidth: .infinity)
-                                .background(Color.green.opacity(0.12))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                            } else {
-                                Button {
-                                    connectHealthKit()
-                                } label: {
-                                    HStack(spacing: 8) {
-                                        if isConnecting {
-                                            ProgressView().tint(.white)
-                                        } else {
-                                            Image(systemName: "heart.fill")
-                                        }
-                                        Text(isConnecting ? "Connecting…" : "Connect Apple Health")
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Apple Health Integration")
+                                            .font(.subheadline.weight(.semibold))
+                                        Text("Read-only access for vitals, sleep, and steps.")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
                                     }
-                                    .font(.subheadline.weight(.semibold))
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
                                 }
-                                .buttonStyle(.borderedProminent)
-                                .tint(Color("AccentColor"))
-                                .disabled(isConnecting)
+
+                                if draft.connectedAppleHealth {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(.green)
+                                        Text("Apple Health Connected")
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(.primary)
+                                    }
+                                    .padding(10)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color.green.opacity(0.12))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                } else {
+                                    Button {
+                                        connectHealthKit()
+                                    } label: {
+                                        HStack(spacing: 8) {
+                                            if isConnecting {
+                                                ProgressView().tint(.white)
+                                            } else {
+                                                Image(systemName: "heart.fill")
+                                            }
+                                            Text(isConnecting ? "Connecting…" : "Connect Apple Health")
+                                        }
+                                        .font(.subheadline.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 12)
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .tint(Color("AccentColor"))
+                                    .disabled(isConnecting)
+                                }
                             }
                         }
                     }
@@ -457,21 +513,26 @@ struct OnboardingScreen6ConnectedHealthView: View {
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 10) {
                             OnboardingSectionHeader(
+                                questionNumber: 24,
                                 title: "Measurements of interest",
                                 subtitle: "Which health indicators are you most interested in following?",
-                                isOptional: true
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(24),
+                                onSkip: { draft.toggleSkipQuestion(24) }
                             )
 
-                            FlowLayout(spacing: 8) {
-                                ForEach(metricInterests, id: \.self) { metric in
-                                    OnboardingChip(
-                                        title: metric,
-                                        isSelected: draft.measurementsOfInterest.contains(metric)
-                                    ) {
-                                        if draft.measurementsOfInterest.contains(metric) {
-                                            draft.measurementsOfInterest.remove(metric)
-                                        } else {
-                                            draft.measurementsOfInterest.insert(metric)
+                            if !draft.skippedQuestions.contains(24) {
+                                FlowLayout(spacing: 8) {
+                                    ForEach(metricInterests, id: \.self) { metric in
+                                        OnboardingChip(
+                                            title: metric,
+                                            isSelected: draft.measurementsOfInterest.contains(metric)
+                                        ) {
+                                            if draft.measurementsOfInterest.contains(metric) {
+                                                draft.measurementsOfInterest.remove(metric)
+                                            } else {
+                                                draft.measurementsOfInterest.insert(metric)
+                                            }
                                         }
                                     }
                                 }
@@ -583,18 +644,33 @@ struct OnboardingScreen7RemindersView: View {
                     titleSection
 
                     // Question 25: Reminders Multi-select
-                    VStack(spacing: 10) {
-                        ForEach(OnboardingReminderType.allCases) { reminder in
-                            OnboardingMultiSelectCard(
-                                title: reminder.title,
-                                subtitle: reminder.subtitle,
-                                icon: reminder.iconName,
-                                isSelected: draft.selectedReminders.contains(reminder)
-                            ) {
-                                if draft.selectedReminders.contains(reminder) {
-                                    draft.selectedReminders.remove(reminder)
-                                } else {
-                                    draft.selectedReminders.insert(reminder)
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 12) {
+                            OnboardingSectionHeader(
+                                questionNumber: 25,
+                                title: "Reminders & care updates",
+                                subtitle: "Choose which notifications and weekly summaries you'd like to receive.",
+                                isOptional: true,
+                                isSkipped: draft.skippedQuestions.contains(25),
+                                onSkip: { draft.toggleSkipQuestion(25) }
+                            )
+
+                            if !draft.skippedQuestions.contains(25) {
+                                VStack(spacing: 10) {
+                                    ForEach(OnboardingReminderType.allCases) { reminder in
+                                        OnboardingMultiSelectCard(
+                                            title: reminder.title,
+                                            subtitle: reminder.subtitle,
+                                            icon: reminder.iconName,
+                                            isSelected: draft.selectedReminders.contains(reminder)
+                                        ) {
+                                            if draft.selectedReminders.contains(reminder) {
+                                                draft.selectedReminders.remove(reminder)
+                                            } else {
+                                                draft.selectedReminders.insert(reminder)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
