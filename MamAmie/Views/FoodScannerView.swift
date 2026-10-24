@@ -4,6 +4,8 @@ import UIKit
 
 struct FoodScannerView: View {
     @ObservedObject var store: FoodDiaryStore
+    var journalStore: JournalStore? = nil
+    var profile: OnboardingProfile? = nil
     @ObservedObject var assistantAPI: AssistantAPIClient
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var photo: UIImage?
@@ -73,7 +75,13 @@ struct FoodScannerView: View {
                     .ignoresSafeArea()
             }
             .sheet(isPresented: $showEditor) {
-                FoodMealEditorView(store: store, image: photo, assistantAPI: assistantAPI)
+                FoodMealEditorView(
+                    store: store,
+                    image: photo,
+                    journalStore: journalStore,
+                    profile: profile,
+                    assistantAPI: assistantAPI
+                )
             }
             .sheet(isPresented: $showDashboard) { FoodDailyDashboardView(store: store, assistantAPI: assistantAPI) }
             .alert("Camera unavailable", isPresented: $showCameraUnavailable) {

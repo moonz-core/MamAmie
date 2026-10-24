@@ -29,6 +29,17 @@ struct FoodDetails: Codable, Equatable {
     var meal: MealCategory = .other
     var ingredients: String = ""
     var portion: String = ""
+    var calories: Double? = nil
+    var proteinG: Double? = nil
+    var carbsG: Double? = nil
+    var fatG: Double? = nil
+    var fiberG: Double? = nil
+    var ironMg: Double? = nil
+    var folateMcg: Double? = nil
+    var calciumMg: Double? = nil
+    var vitaminDMcg: Double? = nil
+    var suggestedSupplements: [String] = []
+    var suggestedFoods: [String] = []
 }
 
 struct JournalDetails: Codable, Equatable {

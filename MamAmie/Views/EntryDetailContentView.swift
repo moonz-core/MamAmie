@@ -180,9 +180,110 @@ private struct FoodDetailsView: View {
                         DetailLineView(label: "Portion", value: food.portion)
                     }
                 }
+
+                // Nutrition Breakdown Card
+                if food.calories != nil || food.proteinG != nil {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Image(systemName: "sparkles")
+                                .foregroundStyle(Color("AccentColor"))
+                            Text("Nutritional Breakdown")
+                                .font(.subheadline.weight(.semibold))
+                        }
+
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                            if let cal = food.calories {
+                                nutrientPill(label: "Calories", value: "\(Int(cal)) kcal", color: .orange)
+                            }
+                            if let p = food.proteinG {
+                                nutrientPill(label: "Protein", value: "\(String(format: "%.1f", p)) g", color: .blue)
+                            }
+                            if let c = food.carbsG {
+                                nutrientPill(label: "Carbohydrates", value: "\(String(format: "%.1f", c)) g", color: .purple)
+                            }
+                            if let f = food.fatG {
+                                nutrientPill(label: "Fats", value: "\(String(format: "%.1f", f)) g", color: .mint)
+                            }
+                            if let iron = food.ironMg {
+                                nutrientPill(label: "Iron", value: "\(String(format: "%.1f", iron)) mg", color: .red)
+                            }
+                            if let fol = food.folateMcg {
+                                nutrientPill(label: "Folate", value: "\(Int(fol)) mcg", color: .green)
+                            }
+                            if let calc = food.calciumMg {
+                                nutrientPill(label: "Calcium", value: "\(Int(calc)) mg", color: .indigo)
+                            }
+                            if let d = food.vitaminDMcg {
+                                nutrientPill(label: "Vitamin D", value: "\(String(format: "%.1f", d)) mcg", color: .yellow)
+                            }
+                        }
+                    }
+                    .padding(14)
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+
+                // AI Recommended Supplements & Foods
+                if !food.suggestedSupplements.isEmpty || !food.suggestedFoods.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Image(systemName: "pill.fill")
+                                .foregroundStyle(.purple)
+                            Text("AI Recommended Supplements & Foods")
+                                .font(.subheadline.weight(.semibold))
+                        }
+
+                        if !food.suggestedSupplements.isEmpty {
+                            Text("Supplements to Buy:")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(.secondary)
+                            ForEach(food.suggestedSupplements, id: \.self) { supp in
+                                HStack(alignment: .top, spacing: 6) {
+                                    Text("•")
+                                        .foregroundStyle(.purple)
+                                    Text(supp)
+                                        .font(.caption)
+                                }
+                            }
+                        }
+
+                        if !food.suggestedFoods.isEmpty {
+                            Text("Recommended Next Meals/Snacks:")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(.secondary)
+                                .padding(.top, 4)
+                            ForEach(food.suggestedFoods, id: \.self) { item in
+                                HStack(alignment: .top, spacing: 6) {
+                                    Text("•")
+                                        .foregroundStyle(.green)
+                                    Text(item)
+                                        .font(.caption)
+                                }
+                            }
+                        }
+                    }
+                    .padding(14)
+                    .background(Color.purple.opacity(0.06))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
             }
             NotesCardView(notes: entry.notes)
         }
+    }
+
+    private func nutrientPill(label: String, value: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(8)
+        .background(color.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 

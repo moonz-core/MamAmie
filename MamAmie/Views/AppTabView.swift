@@ -36,7 +36,12 @@ struct AppTabView: View {
             }
             .tag(2)
 
-            FoodScannerView(store: foodDiaryStore, assistantAPI: assistantAPI)
+            FoodScannerView(
+                store: foodDiaryStore,
+                journalStore: journalStore,
+                profile: onboardingStore.profile,
+                assistantAPI: assistantAPI
+            )
                 .tabItem {
                     Label("Food", systemImage: "fork.knife")
                 }
