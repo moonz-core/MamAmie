@@ -27,7 +27,7 @@ def create_access_token(subject: Union[str, Any], expires_delta: Optional[timede
         expire = now + expires_delta
     else:
         expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    
+
     to_encode: Dict[str, Any] = {
         "sub": str(subject),
         "iat": now,

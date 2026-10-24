@@ -124,26 +124,13 @@ public final class MockHealthDataProvider: HealthKitServiceProtocol {
         case .wristTemperature: baseVal = 36.5; variance = 0.3
         }
 
-        let labelFormatter = DateFormatter()
-        switch scope {
-        case .day:
-            labelFormatter.dateFormat = "h a"
-        case .week:
-            labelFormatter.dateFormat = "EEE"
-        case .month:
-            labelFormatter.dateFormat = "MMM d"
-        }
-
-        let startOfToday = calendar.startOfDay(for: now)
-
         for index in 0..<count {
             let offset = count - 1 - index
             let pointDate: Date
             if stepInterval == .hour {
-                // Spaced 2 hours apart across today: 00:00, 02:00, ..., 22:00
-                pointDate = calendar.date(byAdding: .hour, value: index * 2, to: startOfToday) ?? now
+                pointDate = calendar.date(byAdding: .hour, value: -(offset * 2), to: now) ?? now
             } else {
-                pointDate = calendar.date(byAdding: .day, value: -offset, to: startOfToday) ?? now
+                pointDate = calendar.date(byAdding: .day, value: -offset, to: now) ?? now
             }
 
             let noise = sin(Double(index) * 0.9) * variance
@@ -157,7 +144,7 @@ public final class MockHealthDataProvider: HealthKitServiceProtocol {
                     secondaryValue: secVal,
                     minValue: val - (variance * 0.4),
                     maxValue: val + (variance * 0.4),
-                    label: labelFormatter.string(from: pointDate)
+                    label: HealthTrendFormatting.axisLabel(for: pointDate, scope: scope)
                 )
             )
         }

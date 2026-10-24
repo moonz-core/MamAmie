@@ -10,9 +10,26 @@ MamAmie is an iOS app for pregnant women, built with SwiftUI.
 
 The project uses iOS 16.0 as its minimum deployment target and has no external dependencies. The app's bundle identifier is `com.mamamie.app`; change it in the target's **Signing & Capabilities** settings before installing on a physical device or submitting to the App Store.
 
+## Onboarding
+
+The `feature/onboarding` branch adds a complete local onboarding flow for the iOS app. It covers:
+
+- Welcome and privacy explanation.
+- Journey stage selection: preparing for pregnancy, currently pregnant, or postpartum support.
+- Optional pregnancy dating using a clinician-provided due date or the first day of the last period.
+- Deterministic estimated due-date and gestational-week calculations when reliable dates are supplied.
+- Optional display name personalization.
+- Local privacy acknowledgment and a review screen before completion.
+- Persistence across launches using a Codable file in the app's private Application Support directory.
+- Launch gating so first-time users complete onboarding before the main tabs open.
+- Profile access to review and update onboarding answers.
+
+No authentication or remote onboarding API exists in this iOS branch, so answers are intentionally stored locally in the app sandbox. HealthKit permission is still requested contextually from Connected Health rather than during onboarding.
+
 ## Backend API & Cloud Services
 
 The MamAmie AI backend is deployed live on Render:
+
 * **Live API Base URL:** `https://mamamie.onrender.com/api/v1`
 * **Interactive OpenAPI (Swagger):** [https://mamamie.onrender.com/docs](https://mamamie.onrender.com/docs)
 * **Health Check Endpoint:** [https://mamamie.onrender.com/health](https://mamamie.onrender.com/health)
@@ -25,7 +42,7 @@ The project follows a focused, feature-oriented structure. Domain models live in
 
 ## Calendar & Pregnancy Journal
 
-The **Calendar** tab on the `feature/calendar` branch provides a local, date-based journal:
+The **Calendar** tab provides a local, date-based journal:
 
 - Month navigation, selectable days, today navigation, leap-year-safe date handling, and entry indicators.
 - Persistent create, edit, view, and delete flows for medication, appointments, tests/reports, symptoms, food, journal notes, photos, milestones, and tasks.
@@ -44,6 +61,8 @@ MamAmie provides a dedicated **Connected Health** section integrating with Apple
 ### Supported Health Measurements
 
 * **Heart Rate**: Latest heart rate, measurement timestamp, resting heart rate, and daily/weekly trend charts.
+* **Readable trend graphs**: Chart axes use real local `Date` values, with date labels for week/month views, time labels for day views, and timestamped readings below each graph.
+* **Pregnancy context comparison**: Detail screens show a clearly labeled, broad non-diagnostic pregnancy reference comparison beneath the graph when the user's stage is pregnancy-related. This is contextual information, not a medical target or diagnosis.
 * **Blood Oxygen (SpO2)**: Latest saturation percentage and historical trends when supported by hardware (Apple Watch Series 6+).
 * **Blood Pressure**: Systolic and diastolic records imported from authorized wireless BP monitors.
 * **Sleep Duration**: Sleep pattern and rest summaries across trimesters.

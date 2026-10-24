@@ -354,15 +354,6 @@ public final class HealthKitService: HealthKitServiceProtocol {
                     }
 
                     var points: [HealthTrendPoint] = []
-                    let dayFormatter = DateFormatter()
-                    switch scope {
-                    case .day:
-                        dayFormatter.dateFormat = "h a"
-                    case .week:
-                        dayFormatter.dateFormat = "EEE"
-                    case .month:
-                        dayFormatter.dateFormat = "MMM d"
-                    }
 
                     collection?.enumerateStatistics(from: startDate, to: now) { stats, _ in
                         if let sum = stats.sumQuantity() {
@@ -370,7 +361,7 @@ public final class HealthKitService: HealthKitServiceProtocol {
                             let point = HealthTrendPoint(
                                 date: stats.startDate,
                                 value: steps,
-                                label: dayFormatter.string(from: stats.startDate)
+                                label: HealthTrendFormatting.axisLabel(for: stats.startDate, scope: scope)
                             )
                             points.append(point)
                         }
@@ -446,15 +437,6 @@ public final class HealthKitService: HealthKitServiceProtocol {
                 }
 
                 var points: [HealthTrendPoint] = []
-                let labelFormatter = DateFormatter()
-                switch scope {
-                case .day:
-                    labelFormatter.dateFormat = "h a"
-                case .week:
-                    labelFormatter.dateFormat = "EEE"
-                case .month:
-                    labelFormatter.dateFormat = "MMM d"
-                }
 
                 collection?.enumerateStatistics(from: startDate, to: endDate) { stats, _ in
                     if let avg = stats.averageQuantity() {
@@ -470,7 +452,7 @@ public final class HealthKitService: HealthKitServiceProtocol {
                             value: val,
                             minValue: minVal,
                             maxValue: maxVal,
-                            label: labelFormatter.string(from: stats.startDate)
+                            label: HealthTrendFormatting.axisLabel(for: stats.startDate, scope: scope)
                         )
                         points.append(point)
                     }
