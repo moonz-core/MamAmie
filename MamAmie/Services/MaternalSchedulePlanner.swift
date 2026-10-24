@@ -577,7 +577,7 @@ final class MaternalSchedulePlanner {
         guard !generatedEntries.isEmpty else { return }
 
         // Find existing entries to preserve any user edits or completed statuses
-        var existingEntriesByID = store.entriesByID
+        let existingEntriesByID = store.entriesByID
 
         for generated in generatedEntries {
             if let existing = existingEntriesByID[generated.id] {
@@ -647,7 +647,7 @@ final class MaternalSchedulePlanner {
 
             // Check if still within safe clinical window (e.g., NT scan up to 13w6d)
             var withinWindow = true
-            if let milestone = milestone {
+            if milestone != nil {
                 // Approximate: if overdue by more than 14 days, window might be tight
                 withinWindow = daysOverdue <= 18
             }
@@ -680,7 +680,7 @@ final class MaternalSchedulePlanner {
         let newDate = targetDate ?? calendar.date(byAdding: .day, value: 2, to: Date()) ?? Date()
         let newDayKey = LocalDay.key(for: newDate)
 
-        let originalDayText = LocalDay.dateText(for: entry.dayKey, style: .medium)
+        let originalDayText = LocalDay.dateText(for: entry.dayKey, style: .abbreviated)
         updated.dayKey = newDayKey
         updated.modifiedAt = Date()
 

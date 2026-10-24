@@ -166,7 +166,7 @@ struct CalendarJournalView: View {
                             .foregroundStyle(.primary)
                             .lineLimit(1)
 
-                        Text("Scheduled for \(LocalDay.dateText(for: next.dayKey, style: .medium))")
+                        Text("Scheduled for \(LocalDay.dateText(for: next.dayKey, style: .abbreviated))")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     } else {

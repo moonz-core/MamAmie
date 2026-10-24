@@ -443,7 +443,7 @@ private struct MilestoneCareCard: View {
                         HStack(spacing: 6) {
                             Image(systemName: "calendar")
                                 .font(.caption2)
-                            Text(LocalDay.dateText(for: entry.dayKey, style: .medium))
+                            Text(LocalDay.dateText(for: entry.dayKey, style: .abbreviated))
                                 .font(.caption)
 
                             if let minutes = entry.timeMinutes {
