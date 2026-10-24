@@ -1,305 +1,697 @@
 import SwiftUI
 
-private struct AssistantChatMessage: Identifiable {
-    let id = UUID()
-    var question: String
-    var response: AssistantAIResponse?
-    var localSafetyMessage: String?
-    var errorMessage: String?
-}
-
 struct AssistantView: View {
     @ObservedObject var api: AssistantAPIClient
-    @State private var isCreatingAccount = false
-    @State private var fullName = ""
-    @State private var email = ""
-    @State private var password = ""
-    @State private var errorMessage: String?
+    var onboardingStore: OnboardingStore? = nil
+    var foodDiaryStore: FoodDiaryStore? = nil
+
+    @StateObject private var gemini = GeminiChatService.shared
+
     @State private var input = ""
-    @State private var stage = "pregnant"
-    @State private var externalConsent = false
-    @State private var messages: [AssistantChatMessage] = []
+    @State private var showingApiKeySheet = false
+    @State private var showingContextDetails = false
+    @State private var showingClearAlert = false
     @State private var showingTriage = false
     @State private var showingReport = false
 
-    private let suggestedQuestions = [
-        "What happens during antenatal visits?",
-        "What does a prenatal screening test mean?",
-        "Suggest iron-rich vegetarian foods.",
-        "How can I get breastfeeding support?",
+    private let suggestedPrompts = [
+        "🥗 Is what I ate today balanced for my baby?",
+        "🍳 What should I eat for dinner based on my meals today?",
+        "🤰 How is my baby developing at my current stage?",
+        "⚡ Safe exercises & natural energy boosters for today",
     ]
 
     var body: some View {
         NavigationStack {
-            Group {
-                if api.isSignedIn {
-                    assistantChat
-                } else {
-                    signInForm
+            VStack(spacing: 0) {
+                // Active Maternal Context Header Bar
+                activeContextBar
+
+                // Chat Messages Thread
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            // Empty state prompts
+                            if gemini.messages.count <= 1 {
+                                promptSuggestionsView
+                            }
+
+                            // Message Stream
+                            ForEach(gemini.messages) { message in
+                                messageRow(message)
+                                    .id(message.id)
+                            }
+
+                            // Typing Indicator
+                            if gemini.isGenerating {
+                                typingIndicator
+                                    .id("typing-indicator")
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                    }
+                    .onChange(of: gemini.messages.count) { _ in
+                        scrollToBottom(proxy: proxy)
+                    }
+                    .onChange(of: gemini.isGenerating) { _ in
+                        scrollToBottom(proxy: proxy)
+                    }
                 }
+
+                // Input Bar
+                chatInputBar
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Ask MamAmie")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                if api.isSignedIn {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Menu {
-                            Button { showingReport = true } label: { Label("Explain report text", systemImage: "doc.text.magnifyingglass") }
-                            Button { showingTriage = true } label: { Label("Check a symptom", systemImage: "cross.case") }
-                            Button(role: .destructive) { api.signOut(); messages = [] } label: {
-                                Label("Sign out", systemImage: "rectangle.portrait.and.arrow.right")
-                            }
-                        } label: { Image(systemName: "ellipsis.circle") }
-                        .accessibilityLabel("Assistant options")
-                    }
-                }
-            }
-            .sheet(isPresented: $showingTriage) {
-                AssistantTriageSheet(api: api, stage: stage)
-            }
-            .sheet(isPresented: $showingReport) {
-                AssistantReportSheet(api: api, stage: stage)
-            }
-            .alert("MamAmie assistant", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
-                Button("OK", role: .cancel) { errorMessage = nil }
-            } message: { Text(errorMessage ?? "") }
-        }
-    }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button {
+                            showingApiKeySheet = true
+                        } label: {
+                            Label(gemini.hasApiKey ? "Gemini API Settings" : "Configure Gemini API Key", systemImage: "key.fill")
+                        }
 
-    private var signInForm: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Image(systemName: "heart.text.clipboard.fill")
-                        .font(.system(size: 34)).foregroundStyle(Color("AccentColor"))
-                    Text("Carefully grounded answers")
-                        .font(.title2.bold()).foregroundStyle(Color("AccentColor"))
-                    Text("Ask about pregnancy, postpartum recovery, breastfeeding, and newborn care. Answers show the sources used and their review status.")
-                        .font(.subheadline).foregroundStyle(.secondary)
-                }
+                        Button {
+                            showingContextDetails = true
+                        } label: {
+                            Label("View Context Sent to AI", systemImage: "info.circle")
+                        }
 
-                VStack(spacing: 14) {
-                    TextField("Secure MamAmie server (HTTPS URL)", text: $api.serverAddress)
-                        .textInputAutocapitalization(.never).keyboardType(.URL).autocorrectionDisabled()
-                        .textFieldStyle(.roundedBorder)
-                    if isCreatingAccount {
-                        TextField("Your name", text: $fullName).textContentType(.name).textFieldStyle(.roundedBorder)
-                    }
-                    TextField("Email address", text: $email).textContentType(.emailAddress)
-                        .keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
-                        .textFieldStyle(.roundedBorder)
-                    SecureField("Password", text: $password).textContentType(isCreatingAccount ? .newPassword : .password)
-                        .textFieldStyle(.roundedBorder)
+                        Divider()
 
-                    Button {
-                        Task {
-                            do {
-                                if isCreatingAccount {
-                                    try await api.registerAndSignIn(name: fullName, email: email, password: password)
-                                } else {
-                                    try await api.signIn(email: email, password: password)
-                                }
-                                password = ""
-                            } catch { errorMessage = error.localizedDescription }
+                        Button {
+                            showingTriage = true
+                        } label: {
+                            Label("Check a symptom", systemImage: "cross.case")
+                        }
+
+                        Button {
+                            showingReport = true
+                        } label: {
+                            Label("Explain report text", systemImage: "doc.text.magnifyingglass")
+                        }
+
+                        Divider()
+
+                        Button(role: .destructive) {
+                            showingClearAlert = true
+                        } label: {
+                            Label("Clear chat history", systemImage: "trash")
                         }
                     } label: {
-                        HStack {
-                            if api.isBusy { ProgressView().tint(.white) }
-                            Text(isCreatingAccount ? "Create account and continue" : "Sign in")
-                                .font(.headline)
+                        HStack(spacing: 4) {
+                            Image(systemName: "sparkles")
+                                .foregroundStyle(Color("AccentColor"))
+                            Image(systemName: "ellipsis.circle")
                         }
-                        .frame(maxWidth: .infinity).padding(14).foregroundStyle(.white)
-                        .background(Color("AccentColor"), in: RoundedRectangle(cornerRadius: 14))
                     }
-                    .disabled(api.isBusy || email.isEmpty || password.count < 8 || (isCreatingAccount && fullName.count < 2))
-
-                    Button(isCreatingAccount ? "I already have an account" : "Create an account") {
-                        isCreatingAccount.toggle()
-                    }.font(.subheadline.weight(.semibold)).foregroundStyle(Color("AccentColor"))
+                    .accessibilityLabel("Chat options")
                 }
-                .padding(18).background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
-
-                Label("Your session token is kept in iOS Keychain. Questions are not saved in the app’s conversation history. The backend stores a one-way question digest and safety flag for audit; pasted report text is not persisted.", systemImage: "lock.shield")
-                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                Text("The built-in source notes and symptom rules are demonstration material and have not been clinically reviewed. MamAmie is educational and cannot diagnose or rule out a condition.")
-                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-            }.padding(20)
+            }
+            .sheet(isPresented: $showingApiKeySheet) {
+                GeminiApiKeySheet(gemini: gemini)
+            }
+            .sheet(isPresented: $showingContextDetails) {
+                MaternalContextDetailSheet(
+                    snapshot: gemini.buildContextSnapshot(
+                        profile: onboardingStore?.profile,
+                        meals: foodDiaryStore?.meals ?? []
+                    )
+                )
+            }
+            .sheet(isPresented: $showingTriage) {
+                AssistantTriageSheet(api: api, stage: onboardingStore?.profile?.stage.rawValue ?? "pregnant")
+            }
+            .sheet(isPresented: $showingReport) {
+                AssistantReportSheet(api: api, stage: onboardingStore?.profile?.stage.rawValue ?? "pregnant")
+            }
+            .alert("Clear Chat History?", isPresented: $showingClearAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Clear", role: .destructive) {
+                    gemini.clearHistory()
+                }
+            } message: {
+                Text("This will remove all current messages and restart the conversation.")
+            }
+            .onAppear {
+                gemini.refreshApiKey()
+            }
         }
     }
 
-    private var assistantChat: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Picker("Care stage", selection: $stage) {
-                    Text("Planning").tag("planning")
-                    Text("Pregnancy").tag("pregnant")
-                    Text("Postpartum").tag("postpartum")
-                    Text("Newborn care").tag("newborn")
-                }.pickerStyle(.menu)
+    // MARK: - Active Context Bar
+
+    private var activeContextBar: some View {
+        let snapshot = gemini.buildContextSnapshot(
+            profile: onboardingStore?.profile,
+            meals: foodDiaryStore?.meals ?? []
+        )
+
+        return Button {
+            showingContextDetails = true
+        } label: {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(Color.green)
+                    .frame(width: 8, height: 8)
+
+                Text("Context Active:")
+                    .font(.caption.bold())
+                    .foregroundStyle(.primary)
+
+                // Chips
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        if let week = snapshot.gestationalWeekText {
+                            contextChip(icon: "heart.fill", text: week)
+                        } else {
+                            contextChip(icon: "heart.fill", text: snapshot.stageName)
+                        }
+
+                        if let due = snapshot.dueDateText {
+                            contextChip(icon: "calendar", text: "Due \(due)")
+                        }
+
+                        if snapshot.todaysMealCount > 0 {
+                            contextChip(
+                                icon: "fork.knife",
+                                text: "\(snapshot.todaysMealCount) meals (\(snapshot.todaysCaloriesText ?? ""))"
+                            )
+                        } else {
+                            contextChip(icon: "fork.knife", text: "No meals today")
+                        }
+                    }
+                }
+
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(Color(.secondarySystemGroupedBackground))
+            .overlay(Divider(), alignment: .bottom)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func contextChip(icon: String, text: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 10))
+                .foregroundStyle(Color("AccentColor"))
+            Text(text)
+                .font(.caption2.weight(.medium))
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Color(.tertiarySystemGroupedBackground), in: Capsule())
+    }
+
+    // MARK: - API Key Missing Banner
+
+    private var apiKeyBanner: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: "sparkles.rectangle.stack.fill")
+                    .font(.title2)
+                    .foregroundStyle(Color("AccentColor"))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Connect Google Gemini")
+                        .font(.headline)
+                    Text("Powered by Gemini 1.5 Flash for personalized maternal support.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 Spacer()
-                Button { showingTriage = true } label: {
-                    Label("Check a symptom", systemImage: "cross.case.fill")
-                        .font(.caption.weight(.semibold)).foregroundStyle(Color("AccentColor"))
-                }
-            }.padding(.horizontal, 16).padding(.vertical, 10)
-
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 16) {
-                        if messages.isEmpty {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("What would you like to understand?").font(.title3.bold())
-                                Text("I’ll show the source passages and say when the indexed evidence is not enough.")
-                                    .font(.subheadline).foregroundStyle(.secondary)
-                                ForEach(suggestedQuestions, id: \.self) { question in
-                                    Button { input = question } label: {
-                                        HStack {
-                                            Text(question).font(.subheadline).multilineTextAlignment(.leading)
-                                            Spacer()
-                                            Image(systemName: "arrow.up.left").font(.caption).foregroundStyle(.secondary)
-                                        }
-                                        .padding(13).background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
-                                    }.buttonStyle(.plain).foregroundStyle(.primary)
-                                }
-                            }.padding(.top, 14)
-                        }
-
-                        ForEach(messages) { message in
-                            VStack(alignment: .trailing, spacing: 8) {
-                                Text(message.question).font(.subheadline).padding(13)
-                                    .foregroundStyle(.white).background(Color("AccentColor"), in: RoundedRectangle(cornerRadius: 16))
-                                if let localMessage = message.localSafetyMessage {
-                                    emergencyCard(localMessage)
-                                } else if let response = message.response {
-                                    AssistantResponseCard(response: response)
-                                } else if let error = message.errorMessage {
-                                    Text(error).font(.subheadline).foregroundStyle(.secondary)
-                                        .padding(14).frame(maxWidth: .infinity, alignment: .leading)
-                                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
-                                } else {
-                                    ProgressView("Checking sources…").font(.caption).frame(maxWidth: .infinity, alignment: .leading)
-                                }
-                            }.id(message.id)
-                        }
-                    }.padding(16)
-                }
-                .onChange(of: messages.count) { _ in
-                    if let last = messages.last { withAnimation { proxy.scrollTo(last.id, anchor: .bottom) } }
-                }
             }
 
-            VStack(spacing: 10) {
-                Toggle(isOn: $externalConsent) {
-                    Text("Allow this question to be sent to the configured AI provider")
-                        .font(.caption).foregroundStyle(.secondary)
-                }.tint(Color("AccentColor"))
-                HStack(alignment: .bottom, spacing: 10) {
-                    TextField("Ask a question", text: $input, axis: .vertical)
-                        .lineLimit(1...4).textFieldStyle(.roundedBorder)
-                        .submitLabel(.send).onSubmit { sendQuestion() }
-                    Button(action: sendQuestion) {
-                        Image(systemName: "arrow.up.circle.fill").font(.system(size: 34)).foregroundStyle(Color("AccentColor"))
+            Button {
+                showingApiKeySheet = true
+            } label: {
+                HStack {
+                    Image(systemName: "key.fill")
+                    Text("Configure Gemini API Key")
+                        .font(.subheadline.bold())
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .foregroundStyle(.white)
+                .background(Color("AccentColor"), in: RoundedRectangle(cornerRadius: 10))
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color("AccentColor").opacity(0.3), lineWidth: 1)
+        )
+    }
+
+    // MARK: - Prompt Suggestions
+
+    private var promptSuggestionsView: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Suggestions for you today:")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+                .padding(.leading, 4)
+
+            ForEach(suggestedPrompts, id: \.self) { prompt in
+                Button {
+                    sendCustomPrompt(prompt)
+                } label: {
+                    HStack {
+                        Text(prompt)
+                            .font(.subheadline)
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    .accessibilityLabel("Send question")
-                    .disabled(api.isBusy || input.trimmingCharacters(in: .whitespacesAndNewlines).count < 2)
+                    .padding(12)
+                    .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
                 }
-                Text("External processing is off unless you opt in. If enabled, the backend still needs an AI provider and valid credentials.")
-                    .font(.caption2).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
-            }.padding(12).background(Color(.secondarySystemGroupedBackground))
+                .buttonStyle(.plain)
+            }
         }
+        .padding(.top, 8)
     }
 
-    private func sendQuestion() {
-        let question = input.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard question.count >= 2, !api.isBusy else { return }
-        input = ""
-        if let warning = AssistantSafetyScreening.emergencyMessage(for: question) {
-            messages.append(AssistantChatMessage(question: question, response: nil, localSafetyMessage: warning, errorMessage: nil))
-            return
-        }
-        let message = AssistantChatMessage(question: question, response: nil, localSafetyMessage: nil, errorMessage: nil)
-        messages.append(message)
-        Task {
-            do {
-                let response = try await api.ask(question, stage: stage, externalConsent: externalConsent)
-                updateMessage(id: message.id, response: response, error: nil)
-            } catch {
-                updateMessage(id: message.id, response: nil, error: error.localizedDescription)
+    // MARK: - Message Row
+
+    private func messageRow(_ message: GeminiChatMessage) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            if message.role == .model {
+                // MamAmie Avatar
+                ZStack {
+                    Circle()
+                        .fill(Color("AccentColor").opacity(0.15))
+                        .frame(width: 32, height: 32)
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(Color("AccentColor"))
+                }
+            } else {
+                Spacer(minLength: 40)
+            }
+
+            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
+                if message.isEmergency, let action = message.emergencyAction {
+                    // Urgent Emergency Warning Card
+                    emergencyCard(action)
+                }
+
+                // Message Body
+                Text(.init(message.text))
+                    .font(.subheadline)
+                    .foregroundStyle(message.role == .user ? .white : .primary)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(
+                        message.role == .user ?
+                        Color("AccentColor") :
+                        Color(.secondarySystemGroupedBackground),
+                        in: RoundedRectangle(cornerRadius: 16)
+                    )
+                    .textSelection(.enabled)
+
+                // Timestamp
+                Text(message.timestamp.formatted(date: .omitted, time: .shortened))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 4)
+            }
+
+            if message.role == .user {
+                // User Avatar
+                ZStack {
+                    Circle()
+                        .fill(Color("AccentColor"))
+                        .frame(width: 32, height: 32)
+                    Image(systemName: "person.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.white)
+                }
+            } else {
+                Spacer(minLength: 40)
             }
         }
     }
 
-    private func updateMessage(id: UUID, response: AssistantAIResponse?, error: String?) {
-        guard let index = messages.firstIndex(where: { $0.id == id }) else { return }
-        messages[index].response = response
-        messages[index].errorMessage = error
+    // MARK: - Emergency Card
+
+    private func emergencyCard(_ action: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.white)
+                Text("Urgent Medical Attention Advised")
+                    .font(.caption.bold())
+                    .foregroundStyle(.white)
+            }
+            Text(action)
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.95))
+        }
+        .padding(12)
+        .background(Color(red: 0.75, green: 0.15, blue: 0.15), in: RoundedRectangle(cornerRadius: 12))
     }
 
-    private func emergencyCard(_ text: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label("Seek urgent care now", systemImage: "exclamationmark.triangle.fill")
-                .font(.headline).foregroundStyle(.white)
-            Text(text).font(.subheadline).foregroundStyle(.white)
-            Text("On-device demonstration warning screen · not clinically reviewed")
-                .font(.caption2).foregroundStyle(.white.opacity(0.86))
-        }.frame(maxWidth: .infinity, alignment: .leading).padding(16)
-            .background(Color(red: 0.63, green: 0.20, blue: 0.16), in: RoundedRectangle(cornerRadius: 16))
-            .accessibilityElement(children: .combine)
+    // MARK: - Typing Indicator
+
+    private var typingIndicator: some View {
+        HStack(alignment: .top, spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(Color("AccentColor").opacity(0.15))
+                    .frame(width: 32, height: 32)
+                Image(systemName: "sparkles")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Color("AccentColor"))
+            }
+
+            HStack(spacing: 6) {
+                DotPulseAnimation()
+                Text("MamAmie is thinking with Gemini…")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+
+            Spacer()
+        }
+    }
+
+    // MARK: - Chat Input Bar
+
+    private var chatInputBar: some View {
+        VStack(spacing: 6) {
+            HStack(alignment: .bottom, spacing: 10) {
+                TextField("Ask MamAmie about symptoms, foods, dates…", text: $input, axis: .vertical)
+                    .lineLimit(1...4)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
+
+                Button(action: sendMessage) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.system(size: 34))
+                        .foregroundStyle(
+                            canSend ? Color("AccentColor") : Color.secondary.opacity(0.4)
+                        )
+                }
+                .disabled(!canSend)
+                .accessibilityLabel("Send message")
+            }
+
+            Text("MamAmie answers are educational and incorporate your live pregnancy & food context.")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Color(.secondarySystemGroupedBackground))
+    }
+
+    private var canSend: Bool {
+        !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !gemini.isGenerating
+    }
+
+    private func sendMessage() {
+        let query = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return }
+        input = ""
+
+        Task {
+            await gemini.sendMessage(
+                query,
+                profile: onboardingStore?.profile,
+                meals: foodDiaryStore?.meals ?? []
+            )
+        }
+    }
+
+    private func sendCustomPrompt(_ prompt: String) {
+        input = prompt
+        sendMessage()
+    }
+
+    private func scrollToBottom(proxy: ScrollViewProxy) {
+        if let last = gemini.messages.last {
+            withAnimation(.easeOut(duration: 0.25)) {
+                proxy.scrollTo(last.id, anchor: .bottom)
+            }
+        }
     }
 }
 
-private struct AssistantResponseCard: View {
-    let response: AssistantAIResponse
-    @State private var showSources = false
+// MARK: - Dot Pulse Animation
+
+private struct DotPulseAnimation: View {
+    @State private var isAnimating = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        HStack(spacing: 4) {
+            ForEach(0..<3) { index in
+                Circle()
+                    .fill(Color("AccentColor"))
+                    .frame(width: 6, height: 6)
+                    .scaleEffect(isAnimating ? 1.0 : 0.4)
+                    .animation(
+                        Animation.easeInOut(duration: 0.6)
+                            .repeatForever()
+                            .delay(Double(index) * 0.2),
+                        value: isAnimating
+                    )
+            }
+        }
+        .onAppear {
+            isAnimating = true
+        }
+    }
+}
+
+// MARK: - Gemini API Key Settings Sheet
+
+private struct GeminiApiKeySheet: View {
+    @ObservedObject var gemini: GeminiChatService
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var keyInput = ""
+    @State private var isTesting = false
+    @State private var testResult: String?
+    @State private var testSuccess: Bool = false
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Google Gemini Integration")
+                            .font(.headline)
+                        Text("Enter your Google Gemini API key to enable live AI responses. The key is stored locally on your device.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
+
+                    SecureField("Paste Gemini API Key", text: $keyInput)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+
+                    if gemini.isLoadedFromEnvironment {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark.seal.fill")
+                                .foregroundStyle(.green)
+                            Text("Loaded from environment variable (GEMINI_API_KEY)")
+                                .font(.caption2.bold())
+                                .foregroundStyle(.green)
+                        }
+                        .padding(.vertical, 2)
+                    }
+
+                    if let result = testResult {
+                        HStack(spacing: 8) {
+                            Image(systemName: testSuccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                                .foregroundStyle(testSuccess ? .green : .red)
+                            Text(result)
+                                .font(.caption)
+                                .foregroundStyle(testSuccess ? .green : .red)
+                        }
+                    }
+
+                    Button {
+                        testAndSave()
+                    } label: {
+                        HStack {
+                            if isTesting {
+                                ProgressView()
+                                    .tint(.white)
+                            }
+                            Text(isTesting ? "Verifying…" : "Save & Verify Key")
+                                .font(.subheadline.bold())
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .foregroundStyle(.white)
+                        .background(Color("AccentColor"), in: RoundedRectangle(cornerRadius: 10))
+                    }
+                    .disabled(isTesting || keyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                    Button {
+                        let key = keyInput.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !key.isEmpty {
+                            gemini.setApiKey(key)
+                            dismiss()
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "checkmark.circle")
+                            Text("Save Key & Close")
+                                .font(.subheadline)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .disabled(keyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                    if gemini.hasApiKey {
+                        Button("Remove Saved Key", role: .destructive) {
+                            gemini.clearApiKey()
+                            keyInput = ""
+                            testResult = nil
+                        }
+                    }
+                } header: {
+                    Text("API Key Configuration")
+                }
+
+                Section {
+                    Link(destination: URL(string: "https://aistudio.google.com/app/apikey")!) {
+                        HStack {
+                            Image(systemName: "safari")
+                            Text("Get a Free Gemini Key at Google AI Studio")
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption)
+                        }
+                        .font(.subheadline)
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("1. Sign in to Google AI Studio with your Google account.")
+                        Text("2. Click 'Create API key' in Google AI Studio.")
+                        Text("3. Copy the key and paste it above.")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                } header: {
+                    Text("How to get a key")
+                }
+            }
+            .navigationTitle("Gemini Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+            .onAppear {
+                keyInput = gemini.activeApiKey
+            }
+        }
+    }
+
+    private func testAndSave() {
+        let key = keyInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !key.isEmpty else { return }
+        // Always save immediately to local storage so user is never blocked
+        gemini.setApiKey(key)
+        isTesting = true
+        testResult = nil
+
+        Task {
+            let res = await gemini.testApiKey(key)
+            await MainActor.run {
+                isTesting = false
+                testSuccess = res.success
+                testResult = res.message
+                if res.success {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Maternal Context Detail Sheet
+
+private struct MaternalContextDetailSheet: View {
+    let snapshot: MaternalContextSnapshot
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Here is the exact real-time snapshot of your pregnancy dates and recent food intake included with your message to Gemini:")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(snapshot.fullContextString)
+                            .font(.system(.caption, design: .monospaced))
+                            .padding(14)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                    }
+                }
+                .padding(16)
+            }
+            .navigationTitle("Live AI Context")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Legacy Helper Sheets for Symptom Triage & Report Explanation
+
+private struct AssistantResponseCard: View {
+    let response: AssistantAIResponse
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
             if response.safetyEscalation {
                 Label("Urgent professional assessment", systemImage: "exclamationmark.triangle.fill")
                     .font(.headline).foregroundStyle(.white)
             }
-            Text(response.answer).font(.subheadline).fixedSize(horizontal: false, vertical: true)
+            Text(response.answer)
+                .font(.subheadline)
                 .foregroundStyle(response.safetyEscalation ? .white : .primary)
-            if !response.citations.isEmpty {
-                DisclosureGroup("Sources (\(response.citations.count))", isExpanded: $showSources) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        ForEach(response.citations) { citation in
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(citation.title).font(.subheadline.weight(.semibold))
-                                Text(citation.issuingOrganization).font(.caption).foregroundStyle(.secondary)
-                                if let section = citation.section { Text(section).font(.caption).foregroundStyle(.secondary) }
-                                if let page = citation.pageNumber { Text("Page \(page)").font(.caption).foregroundStyle(.secondary) }
-                                Text(citation.summary).font(.caption).fixedSize(horizontal: false, vertical: true)
-                                HStack {
-                                    Text(citation.reviewStatus.replacingOccurrences(of: "_", with: " ").capitalized)
-                                        .font(.caption2.weight(.semibold)).padding(.horizontal, 8).padding(.vertical, 4)
-                                        .background(Color.orange.opacity(0.14), in: Capsule())
-                                    if let date = citation.publicationDate {
-                                        Text("Published \(date)").font(.caption2).foregroundStyle(.secondary)
-                                    }
-                                    if let date = citation.lastReviewedDate {
-                                        Text("Last reviewed \(date)").font(.caption2).foregroundStyle(.secondary)
-                                    }
-                                }
-                                if let url = citation.originalUrl, let link = URL(string: url) {
-                                    Link("Open original source", destination: link).font(.caption.weight(.semibold))
-                                }
-                            }.padding(11).frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-                        }
-                    }.padding(.top, 8)
-                }.font(.subheadline.weight(.semibold)).tint(response.safetyEscalation ? .white : Color("AccentColor"))
-            } else {
-                Text("No sources were found for this response.").font(.caption).foregroundStyle(.secondary)
-            }
-            if !response.limitations.isEmpty {
-                Text(response.limitations.joined(separator: " ")).font(.caption).foregroundStyle(response.safetyEscalation ? .white.opacity(0.88) : .secondary)
-            }
-            Text(response.disclaimer).font(.caption2).foregroundStyle(response.safetyEscalation ? .white.opacity(0.86) : .secondary)
         }
-        .padding(15).frame(maxWidth: .infinity, alignment: .leading)
-        .background(response.safetyEscalation ? Color(red: 0.63, green: 0.20, blue: 0.16) : Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            response.safetyEscalation ? Color(red: 0.63, green: 0.20, blue: 0.16) : Color(.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 14)
+        )
     }
 }
 
@@ -316,32 +708,38 @@ private struct AssistantTriageSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    Text("Describe what is happening now. If it feels like an emergency, seek care immediately; do not wait for this screen.")
+                    Text("Describe what you are experiencing. If it feels like an emergency, seek urgent care immediately.")
                         .font(.subheadline).foregroundStyle(.secondary)
                     TextEditor(text: $symptoms).frame(minHeight: 110)
                 } header: { Text("Symptom check") }
+
                 if let localWarning {
-                    Section { emergencyText(localWarning) }
+                    Section {
+                        Text(localWarning)
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
+                            .padding(10)
+                            .background(Color(red: 0.63, green: 0.20, blue: 0.16), in: RoundedRectangle(cornerRadius: 10))
+                    }
                 }
+
                 if let response {
                     Section { AssistantResponseCard(response: response) }
                 }
+
                 if let error {
                     Section { Text(error).foregroundStyle(.secondary) }
                 }
-                Section {
-                    Text("This screen is a demonstration ruleset, not a clinical protocol. It cannot diagnose or determine that symptoms are safe. Rules have not been clinically reviewed.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
             }
-            .navigationTitle("Check a symptom").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Check a Symptom")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Check") { check() }.disabled(symptoms.trimmingCharacters(in: .whitespacesAndNewlines).count < 2 || api.isBusy)
+                    Button("Check") { check() }
+                        .disabled(symptoms.trimmingCharacters(in: .whitespacesAndNewlines).count < 2 || api.isBusy)
                 }
             }
-            .overlay { if api.isBusy { ProgressView("Checking…").padding(20).background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14)) } }
         }
     }
 
@@ -355,16 +753,8 @@ private struct AssistantTriageSheet: View {
         localWarning = nil
         Task {
             do { response = try await api.triage(input, stage: stage) }
-            catch { self.error = "I could not reach the server. I can’t assess or rule out a concern offline. Contact a healthcare professional, and seek urgent care for severe or worsening symptoms." }
+            catch { self.error = "Could not reach the server for symptom triage. If symptoms persist or worsen, contact your doctor." }
         }
-    }
-
-    private func emergencyText(_ text: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label("Seek urgent care now", systemImage: "exclamationmark.triangle.fill").font(.headline).foregroundStyle(.white)
-            Text(text).font(.subheadline).foregroundStyle(.white)
-        }.padding(14).frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(red: 0.63, green: 0.20, blue: 0.16), in: RoundedRectangle(cornerRadius: 14))
     }
 }
 
@@ -382,34 +772,24 @@ private struct AssistantReportSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    Text("Paste readable text only. Report text stays in this request and is not saved by MamAmie. Images, PDFs, and OCR are not supported here.")
+                    Text("Paste readable lab or clinic report text to get plain-language educational explanations.")
                         .font(.caption).foregroundStyle(.secondary)
-                    TextEditor(text: $reportText).frame(minHeight: 150)
+                    TextEditor(text: $reportText).frame(minHeight: 140)
                     TextField("What would you like explained?", text: $question, axis: .vertical).lineLimit(2...4)
                 } header: { Text("Report text") }
-                Section {
-                    Toggle("Allow this report text to be sent to the configured AI provider", isOn: $externalConsent)
-                    Text("If turned off, local retrieval only uses selected terms. The text is not independently verified and this tool cannot diagnose or decide whether a result is normal.")
-                        .font(.caption).foregroundStyle(.secondary)
-                } header: { Text("Privacy and limits") }
+
                 if let response { Section { AssistantResponseCard(response: response) } }
-                if response != nil {
-                    Section {
-                        DisclosureGroup("Text you supplied · not independently verified") {
-                            Text(reportText).font(.caption).textSelection(.enabled)
-                        }
-                    }
-                }
                 if let error { Section { Text(error).foregroundStyle(.secondary) } }
             }
-            .navigationTitle("Explain a report").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Explain a Report")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Explain") { explain() }.disabled(reportText.count < 10 || question.count < 2 || api.isBusy)
+                    Button("Explain") { explain() }
+                        .disabled(reportText.count < 10 || question.count < 2 || api.isBusy)
                 }
             }
-            .overlay { if api.isBusy { ProgressView("Finding educational sources…").padding(20).background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14)) } }
         }
     }
 

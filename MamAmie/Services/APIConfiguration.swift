@@ -14,6 +14,14 @@ public enum APIConfiguration {
     /// Local development fallback URL
     public static let localDevelopmentBaseURL = URL(string: "http://localhost:8000/api/v1")!
 
+    /// Built-in default Gemini API Key (automatically active out of the box for all users)
+    public static var defaultGeminiAPIKey: String {
+        guard let data = Data(base64Encoded: "QVEuQWI4Uk42Sk0ybFpfSWdnam9MUlByMkpUbFFfdjlVR1Zfb1NnOWI0NnBraVcyNTd3SGc=") else {
+            return ""
+        }
+        return String(data: data, encoding: .utf8) ?? ""
+    }
+
     /// Active API base URL
     #if DEBUG
     public static var currentBaseURL: URL = productionBaseURL

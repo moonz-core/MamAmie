@@ -360,9 +360,9 @@ struct HomeView: View {
         VStack(spacing: 10) {
             Button { onOpenAssistant?() } label: {
                 FeatureEntryCard(
-                    icon: "heart.text.clipboard.fill",
-                    title: "Ask MamAmie",
-                    detail: "Explore maternal-health guidance with sources",
+                    icon: "sparkles.bubble.fill",
+                    title: "Ask MamAmie AI",
+                    detail: "Gemini-powered companion with your live dates & food",
                     tint: Color("AccentColor")
                 )
             }
