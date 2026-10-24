@@ -1,405 +1,664 @@
 import HealthKit
 import SwiftUI
 
-// MARK: - Q4: Health Conditions & Allergies
-struct OnboardingHealthConditionsView: View {
-    @Binding var healthNotes: String
+// MARK: - Screen 4: Your Health
+struct OnboardingScreen4HealthView: View {
+    @Binding var draft: OnboardingDraft
     let onContinue: () -> Void
     let onBack: () -> Void
     let onSkip: () -> Void
 
-    private let commonSuggestions = [
-        "None",
-        "Gestational Diabetes",
-        "Thyroid condition",
-        "Asthma",
-        "Lactose intolerance",
-        "Nut allergy",
-        "Gluten sensitivity",
-        "Penicillin allergy"
+    private let conditionChips = [
+        "None", "Gestational diabetes", "Thyroid condition", "Asthma", "High blood pressure", "PCOS", "Type 1 / 2 diabetes", "Autoimmune condition"
+    ]
+
+    private let allergyChips = [
+        "None", "Penicillin / Antibiotics", "Peanuts & Tree nuts", "Lactose / Dairy", "Gluten", "Latex", "Sulfa drugs", "Iodine"
+    ]
+
+    private let medicationChips = [
+        "Prenatal multivitamin", "Folic acid", "Iron supplement", "Calcium / Vitamin D", "Prescription medication", "None"
     ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            OnboardingBackButton(action: onBack)
+        VStack(alignment: .leading, spacing: 0) {
+            headerBar
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Health & allergies")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(Color("AccentColor"))
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 18) {
+                    titleSection
 
-                Text("Do you have any existing health conditions or allergies you'd like MamAmie to know about?")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+                    // Question 14: Existing medical conditions
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                title: "Existing medical conditions",
+                                subtitle: "Select any that apply to help personalize health insights.",
+                                isOptional: true
+                            )
 
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Common tags")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                            FlowLayout(spacing: 8) {
+                                ForEach(conditionChips, id: \.self) { item in
+                                    OnboardingChip(
+                                        title: item,
+                                        isSelected: isSelected(item, in: draft.medicalConditions)
+                                    ) {
+                                        toggleItem(item, in: &draft.medicalConditions)
+                                    }
+                                }
+                            }
 
-                FlowLayout(spacing: 8) {
-                    ForEach(commonSuggestions, id: \.self) { suggestion in
-                        Button {
-                            toggleSuggestion(suggestion)
-                        } label: {
-                            Text(suggestion)
-                                .font(.caption.weight(.medium))
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 7)
-                                .background(isTagSelected(suggestion) ? Color("AccentColor").opacity(0.15) : Color(.secondarySystemBackground))
-                                .foregroundStyle(isTagSelected(suggestion) ? Color("AccentColor") : Color.primary)
-                                .clipShape(Capsule())
+                            TextField("Other medical condition (optional)", text: $draft.medicalConditionsNotes)
+                                .padding(10)
+                                .background(Color(.systemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
                         }
-                        .buttonStyle(.plain)
                     }
+
+                    // Question 15: Known allergies
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                title: "Known allergies",
+                                subtitle: "Helps us screen food suggestions and wellness tips.",
+                                isOptional: true
+                            )
+
+                            FlowLayout(spacing: 8) {
+                                ForEach(allergyChips, id: \.self) { item in
+                                    OnboardingChip(
+                                        title: item,
+                                        isSelected: isSelected(item, in: draft.allergies)
+                                    ) {
+                                        toggleItem(item, in: &draft.allergies)
+                                    }
+                                }
+                            }
+
+                            TextField("Other allergy (optional)", text: $draft.allergiesNotes)
+                                .padding(10)
+                                .background(Color(.systemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                        }
+                    }
+
+                    // Question 16: Medications & supplements
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                title: "Current medicines or supplements",
+                                subtitle: "Keep track of supplements and vitamins you take daily.",
+                                isOptional: true
+                            )
+
+                            FlowLayout(spacing: 8) {
+                                ForEach(medicationChips, id: \.self) { item in
+                                    OnboardingChip(
+                                        title: item,
+                                        isSelected: isSelected(item, in: draft.medicationsAndSupplements)
+                                    ) {
+                                        toggleItem(item, in: &draft.medicationsAndSupplements)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Question 17: Clinician-provided instructions
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 8) {
+                            OnboardingSectionHeader(
+                                title: "Clinician-provided instructions",
+                                subtitle: "Special precautions or advice given by your healthcare provider.",
+                                isOptional: true
+                            )
+
+                            TextField("e.g. Daily iron supplement, monitor resting heart rate (optional)", text: $draft.clinicalInstructions, axis: .vertical)
+                                .lineLimit(2...4)
+                                .padding(10)
+                                .background(Color(.systemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                        }
+                    }
+
+                    // Safety boundary card
+                    OnboardingCard {
+                        HStack(spacing: 10) {
+                            Image(systemName: "hand.raised.shield")
+                                .foregroundStyle(Color("AccentColor"))
+                            Text("MamAmie stores your health answers privately on this device. We do not diagnose conditions or automatically classify pregnancies as high-risk.")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Spacer(minLength: 24)
                 }
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
             }
 
-            OnboardingCard {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Details (optional)")
-                        .font(.subheadline.weight(.semibold))
+            footerActions
+        }
+    }
 
-                    TextField("e.g. Mild asthma, seasonal pollen allergy (optional)", text: $healthNotes, axis: .vertical)
-                        .lineLimit(3...5)
-                        .padding(10)
-                        .background(Color(.systemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                }
-            }
-
-            OnboardingCard {
-                HStack(spacing: 10) {
-                    Image(systemName: "hand.raised.shield")
-                        .foregroundStyle(Color("AccentColor"))
-                    Text("MamAmie uses this only for personalized cautions. MamAmie never diagnoses medical conditions or prescribes medications.")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
+    private var headerBar: some View {
+        HStack {
+            OnboardingBackButton(action: onBack)
             Spacer()
-
-            VStack(spacing: 12) {
-                OnboardingPrimaryButton(
-                    title: "Continue",
-                    systemImage: "arrow.right",
-                    isDisabled: false,
-                    action: onContinue
-                )
-
-                if healthNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    OnboardingSkipButton(title: "Skip for now", action: onSkip)
-                }
-            }
         }
         .padding(.horizontal, 24)
-        .padding(.vertical, 20)
+        .padding(.top, 12)
     }
 
-    private func isTagSelected(_ tag: String) -> Bool {
-        if tag == "None" {
-            return healthNotes.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "none"
+    private var titleSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Your Health")
+                .font(.largeTitle.bold())
+                .foregroundStyle(Color("AccentColor"))
+            Text("Recording your health history helps MamAmie deliver thoughtful, relevant wellness insights.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
-        return healthNotes.localizedCaseInsensitiveContains(tag)
     }
 
-    private func toggleSuggestion(_ tag: String) {
-        if tag == "None" {
-            healthNotes = "None"
+    private var footerActions: some View {
+        VStack(spacing: 10) {
+            OnboardingPrimaryButton(
+                title: "Continue",
+                systemImage: "arrow.right",
+                isDisabled: false,
+                action: onContinue
+            )
+
+            OnboardingSkipButton(title: "Skip this section", action: onSkip)
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .background(Color(.systemBackground))
+    }
+
+    private func isSelected(_ item: String, in set: Set<String>) -> Bool {
+        set.contains(item)
+    }
+
+    private func toggleItem(_ item: String, in set: inout Set<String>) {
+        if item == "None" {
+            set = ["None"]
             return
         }
-        var current = healthNotes
-            .components(separatedBy: ",")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty && $0.lowercased() != "none" }
-
-        if let index = current.firstIndex(where: { $0.caseInsensitiveCompare(tag) == .orderedSame }) {
-            current.remove(at: index)
-        } else {
-            current.append(tag)
-        }
-        healthNotes = current.joined(separator: ", ")
+        set.remove("None")
+        if set.contains(item) { set.remove(item) }
+        else { set.insert(item) }
     }
 }
 
-// MARK: - Q5: Dietary Preference
-struct OnboardingDietView: View {
-    @Binding var selectedDiet: DietaryPreference?
+// MARK: - Screen 5: Nutrition and Lifestyle
+struct OnboardingScreen5NutritionView: View {
+    @Binding var draft: OnboardingDraft
     let onContinue: () -> Void
     let onBack: () -> Void
     let onSkip: () -> Void
 
+    private let lifestyleOptions = [
+        "Hydration tracking", "Sleep monitoring", "Activity & step counting", "Mindful rest & breathing"
+    ]
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            OnboardingBackButton(action: onBack)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Dietary preference")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(Color("AccentColor"))
-
-                Text("What best describes your dietary preference? This helps our food scanner and meal logs provide appropriate insights.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            headerBar
 
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 10) {
-                    ForEach(DietaryPreference.allCases) { diet in
-                        OnboardingSelectableCard(
-                            title: diet.title,
-                            subtitle: diet.subtitle,
-                            icon: diet.iconName,
-                            isSelected: selectedDiet == diet
-                        ) {
-                            selectedDiet = diet
+                VStack(alignment: .leading, spacing: 18) {
+                    titleSection
+
+                    // Question 18: Dietary preference
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                title: "Dietary preference",
+                                subtitle: "Tailors meal analysis and food diary insights.",
+                                isOptional: true
+                            )
+
+                            VStack(spacing: 8) {
+                                ForEach(DietaryPreference.allCases) { diet in
+                                    OnboardingSelectableCard(
+                                        title: diet.title,
+                                        subtitle: diet.subtitle,
+                                        icon: diet.iconName,
+                                        isSelected: draft.dietaryPreference == diet
+                                    ) {
+                                        draft.dietaryPreference = diet
+                                    }
+                                }
+                            }
                         }
                     }
+
+                    // Question 19: Food allergies or dietary restrictions
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 8) {
+                            OnboardingSectionHeader(
+                                title: "Specific dietary restrictions",
+                                subtitle: "e.g. Halal, Kosher, Nut-free, Low-sodium, No raw fish.",
+                                isOptional: true
+                            )
+
+                            TextField("Enter any restrictions (optional)", text: $draft.dietaryRestrictionsNotes)
+                                .padding(10)
+                                .background(Color(.systemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                        }
+                    }
+
+                    // Question 20: Meal tracking preference
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                title: "Meal tracking method",
+                                subtitle: "Choose how you prefer to log food in MamAmie.",
+                                isOptional: true
+                            )
+
+                            VStack(spacing: 8) {
+                                ForEach(MealTrackingPreference.allCases) { pref in
+                                    OnboardingSelectableCard(
+                                        title: pref.title,
+                                        isSelected: draft.mealTrackingPreference == pref
+                                    ) {
+                                        draft.mealTrackingPreference = pref
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Question 21: Lifestyle tracking priorities
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                title: "Wellness tracking priorities",
+                                subtitle: "Which daily habits would you like to track on your home screen?",
+                                isOptional: true
+                            )
+
+                            FlowLayout(spacing: 8) {
+                                ForEach(lifestyleOptions, id: \.self) { opt in
+                                    OnboardingChip(
+                                        title: opt,
+                                        isSelected: draft.lifestyleTrackingPriorities.contains(opt)
+                                    ) {
+                                        if draft.lifestyleTrackingPriorities.contains(opt) {
+                                            draft.lifestyleTrackingPriorities.remove(opt)
+                                        } else {
+                                            draft.lifestyleTrackingPriorities.insert(opt)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(minLength: 24)
                 }
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
             }
 
+            footerActions
+        }
+    }
+
+    private var headerBar: some View {
+        HStack {
+            OnboardingBackButton(action: onBack)
             Spacer()
-
-            VStack(spacing: 12) {
-                OnboardingPrimaryButton(
-                    title: "Continue",
-                    systemImage: "arrow.right",
-                    isDisabled: false,
-                    action: onContinue
-                )
-
-                if selectedDiet == nil {
-                    OnboardingSkipButton(title: "Skip for now", action: onSkip)
-                }
-            }
         }
         .padding(.horizontal, 24)
-        .padding(.vertical, 20)
+        .padding(.top, 12)
+    }
+
+    private var titleSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Nutrition & Lifestyle")
+                .font(.largeTitle.bold())
+                .foregroundStyle(Color("AccentColor"))
+            Text("Personalize food scanning, nutrient goals, and daily wellness habits.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var footerActions: some View {
+        VStack(spacing: 10) {
+            OnboardingPrimaryButton(
+                title: "Continue",
+                systemImage: "arrow.right",
+                isDisabled: false,
+                action: onContinue
+            )
+
+            OnboardingSkipButton(title: "Skip this section", action: onSkip)
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .background(Color(.systemBackground))
     }
 }
 
-// MARK: - Q6: Connect Smartwatch or Apple Health
-struct OnboardingAppleHealthView: View {
-    @Binding var isConnected: Bool
+// MARK: - Screen 6: Connected Health
+struct OnboardingScreen6ConnectedHealthView: View {
+    @Binding var draft: OnboardingDraft
     let onContinue: () -> Void
     let onBack: () -> Void
     let onSkip: () -> Void
 
     @State private var isConnecting = false
-    @State private var connectErrorMessage: String?
+
+    private let deviceOptions = [
+        "Apple Watch", "Other Smartwatch", "Fitness Tracker", "Blood Pressure Monitor", "Smart Scale", "None / iPhone only"
+    ]
+
+    private let metricInterests = [
+        "Heart rate", "Blood oxygen (SpO2)", "Blood pressure", "Sleep stages", "Activity & steps", "Heart-rate variability (HRV)", "Wrist temperature trends"
+    ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            OnboardingBackButton(action: onBack)
+        VStack(alignment: .leading, spacing: 0) {
+            headerBar
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Connected Health")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(Color("AccentColor"))
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 18) {
+                    titleSection
 
-                Text("Would you like to connect your smartwatch or Apple Health?")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+                    // Question 22: Connected devices used
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                title: "Do you use a health tracker or wearable?",
+                                subtitle: "Select compatible devices you currently own.",
+                                isOptional: true
+                            )
 
-            VStack(spacing: 14) {
-                OnboardingCard {
-                    HStack(spacing: 14) {
-                        Image(systemName: "applewatch.radiowaves.left.and.right")
-                            .font(.system(size: 34))
-                            .foregroundStyle(Color("AccentColor"))
-                            .frame(width: 52, height: 52)
-                            .background(Color("AccentColor").opacity(0.12))
-                            .clipShape(Circle())
+                            FlowLayout(spacing: 8) {
+                                ForEach(deviceOptions, id: \.self) { dev in
+                                    OnboardingChip(
+                                        title: dev,
+                                        isSelected: draft.connectedDevices.contains(dev)
+                                    ) {
+                                        toggleDevice(dev)
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Apple Watch & Health Data")
-                                .font(.headline)
-                            Text("Compatible devices may provide measurements such as heart rate, resting vitals, blood oxygen, sleep, and daily activity.")
-                                .font(.caption)
+                    // Question 23: Apple Health connection
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "applewatch.radiowaves.left.and.right")
+                                    .font(.title2)
+                                    .foregroundStyle(Color("AccentColor"))
+                                    .frame(width: 44, height: 44)
+                                    .background(Color("AccentColor").opacity(0.12))
+                                    .clipShape(Circle())
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Apple Health Integration")
+                                        .font(.subheadline.weight(.semibold))
+                                    Text("Read-only access for vitals, sleep, and steps.")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+
+                            if draft.connectedAppleHealth {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(.green)
+                                    Text("Apple Health Connected")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.primary)
+                                }
+                                .padding(10)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.green.opacity(0.12))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                            } else {
+                                Button {
+                                    connectHealthKit()
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        if isConnecting {
+                                            ProgressView().tint(.white)
+                                        } else {
+                                            Image(systemName: "heart.fill")
+                                        }
+                                        Text(isConnecting ? "Connecting…" : "Connect Apple Health")
+                                    }
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .tint(Color("AccentColor"))
+                                .disabled(isConnecting)
+                            }
+                        }
+                    }
+
+                    // Question 24: Measurements of interest
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                title: "Measurements of interest",
+                                subtitle: "Which health indicators are you most interested in following?",
+                                isOptional: true
+                            )
+
+                            FlowLayout(spacing: 8) {
+                                ForEach(metricInterests, id: \.self) { metric in
+                                    OnboardingChip(
+                                        title: metric,
+                                        isSelected: draft.measurementsOfInterest.contains(metric)
+                                    ) {
+                                        if draft.measurementsOfInterest.contains(metric) {
+                                            draft.measurementsOfInterest.remove(metric)
+                                        } else {
+                                            draft.measurementsOfInterest.insert(metric)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Clinical boundary disclosure
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Wearable Measurement Notice", systemImage: "info.circle")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(Color("AccentColor"))
+                            Text("Not every device supports every metric. Wearable readings provide wellness context and cannot establish clinical maternal or fetal wellbeing.")
+                                .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
                     }
+
+                    Spacer(minLength: 24)
                 }
-
-                OnboardingCard {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("Availability & Safety Notice", systemImage: "info.circle")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Color("AccentColor"))
-
-                        Text("Actual availability depends on the device and connected data sources. Permissions are requested only when you choose to connect, and only for required read data types.")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-
-                        Text("Smartwatch readings do not establish the mother’s or baby’s health, and are not a substitute for clinical diagnostics.")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                if isConnected {
-                    HStack(spacing: 10) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                            .font(.headline)
-                        Text("Apple Health connected successfully")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.primary)
-                    }
-                    .padding(14)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.green.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                }
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
             }
 
+            footerActions
+        }
+    }
+
+    private var headerBar: some View {
+        HStack {
+            OnboardingBackButton(action: onBack)
             Spacer()
-
-            VStack(spacing: 12) {
-                if !isConnected {
-                    Button {
-                        connectHealthKit()
-                    } label: {
-                        HStack(spacing: 8) {
-                            if isConnecting {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Image(systemName: "heart.fill")
-                            }
-                            Text(isConnecting ? "Connecting…" : "Connect Apple Health")
-                        }
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 15)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color("AccentColor"))
-                    .disabled(isConnecting)
-
-                    OnboardingSkipButton(title: "Maybe later", action: onSkip)
-                } else {
-                    OnboardingPrimaryButton(
-                        title: "Continue",
-                        systemImage: "arrow.right",
-                        isDisabled: false,
-                        action: onContinue
-                    )
-                }
-            }
         }
         .padding(.horizontal, 24)
-        .padding(.vertical, 20)
+        .padding(.top, 12)
+    }
+
+    private var titleSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Connected Health")
+                .font(.largeTitle.bold())
+                .foregroundStyle(Color("AccentColor"))
+            Text("Connect your Apple Watch or compatible trackers to view heart rate and rest trends.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var footerActions: some View {
+        VStack(spacing: 10) {
+            OnboardingPrimaryButton(
+                title: "Continue",
+                systemImage: "arrow.right",
+                isDisabled: false,
+                action: onContinue
+            )
+
+            OnboardingSkipButton(title: "Maybe later", action: onSkip)
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .background(Color(.systemBackground))
+    }
+
+    private func toggleDevice(_ dev: String) {
+        if dev.contains("None") {
+            draft.connectedDevices = ["None / iPhone only"]
+            return
+        }
+        draft.connectedDevices.remove("None / iPhone only")
+        if draft.connectedDevices.contains(dev) { draft.connectedDevices.remove(dev) }
+        else { draft.connectedDevices.insert(dev) }
     }
 
     private func connectHealthKit() {
         isConnecting = true
-        connectErrorMessage = nil
-
         Task {
             let service = HealthKitService()
             do {
                 let success = try await service.requestAuthorization()
                 await MainActor.run {
                     isConnecting = false
-                    isConnected = success
-                    if success {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                            onContinue()
-                        }
-                    } else {
-                        onContinue()
-                    }
+                    draft.connectedAppleHealth = success
                 }
             } catch {
                 await MainActor.run {
                     isConnecting = false
-                    isConnected = false
-                    onContinue()
+                    draft.connectedAppleHealth = false
                 }
             }
         }
     }
 }
 
-// MARK: - Q7: Reminders
-struct OnboardingRemindersView: View {
-    @Binding var selectedReminders: Set<OnboardingReminderType>
+// MARK: - Screen 7: Care and Reminders
+struct OnboardingScreen7RemindersView: View {
+    @Binding var draft: OnboardingDraft
     let onContinue: () -> Void
     let onBack: () -> Void
     let onSkip: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            OnboardingBackButton(action: onBack)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Which reminders would you like?")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(Color("AccentColor"))
-
-                Text("Select any reminders you'd like to receive. All reminders are optional and can be adjusted anytime.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            headerBar
 
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 10) {
-                    ForEach(OnboardingReminderType.allCases) { reminder in
-                        OnboardingMultiSelectCard(
-                            title: reminder.title,
-                            subtitle: reminder.subtitle,
-                            icon: reminder.iconName,
-                            isSelected: selectedReminders.contains(reminder)
-                        ) {
-                            toggleReminder(reminder)
+                VStack(alignment: .leading, spacing: 18) {
+                    titleSection
+
+                    // Question 25: Reminders Multi-select
+                    VStack(spacing: 10) {
+                        ForEach(OnboardingReminderType.allCases) { reminder in
+                            OnboardingMultiSelectCard(
+                                title: reminder.title,
+                                subtitle: reminder.subtitle,
+                                icon: reminder.iconName,
+                                isSelected: draft.selectedReminders.contains(reminder)
+                            ) {
+                                if draft.selectedReminders.contains(reminder) {
+                                    draft.selectedReminders.remove(reminder)
+                                } else {
+                                    draft.selectedReminders.insert(reminder)
+                                }
+                            }
                         }
                     }
 
+                    // Safety disclosure for medication schedules
                     OnboardingCard {
                         HStack(spacing: 10) {
                             Image(systemName: "exclamationmark.shield")
                                 .foregroundStyle(Color("AccentColor"))
-                            Text("Medication reminders must use schedules entered or confirmed by you, not AI-generated prescriptions.")
+                            Text("Medication reminders must use schedules entered or confirmed by you, never AI-generated prescriptions.")
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
                     }
+
+                    Spacer(minLength: 24)
                 }
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
             }
 
-            Spacer()
-
-            VStack(spacing: 12) {
-                OnboardingPrimaryButton(
-                    title: "Continue",
-                    systemImage: "arrow.right",
-                    isDisabled: false,
-                    action: onContinue
-                )
-
-                if selectedReminders.isEmpty {
-                    OnboardingSkipButton(title: "Skip for now", action: onSkip)
-                }
-            }
+            footerActions
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 20)
     }
 
-    private func toggleReminder(_ reminder: OnboardingReminderType) {
-        if selectedReminders.contains(reminder) {
-            selectedReminders.remove(reminder)
-        } else {
-            selectedReminders.insert(reminder)
+    private var headerBar: some View {
+        HStack {
+            OnboardingBackButton(action: onBack)
+            Spacer()
         }
+        .padding(.horizontal, 24)
+        .padding(.top, 12)
+    }
+
+    private var titleSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Care & Reminders")
+                .font(.largeTitle.bold())
+                .foregroundStyle(Color("AccentColor"))
+            Text("Choose which reminders and weekly summaries you’d like to receive. All reminders are optional.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var footerActions: some View {
+        VStack(spacing: 10) {
+            OnboardingPrimaryButton(
+                title: "Review Setup",
+                systemImage: "arrow.right",
+                isDisabled: false,
+                action: onContinue
+            )
+
+            OnboardingSkipButton(title: "Skip reminders for now", action: onSkip)
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .background(Color(.systemBackground))
     }
 }
 
-// MARK: - FlowLayout Helper for Tags
+// FlowLayout helper
 private struct FlowLayout: Layout {
     var spacing: CGFloat = 8
 

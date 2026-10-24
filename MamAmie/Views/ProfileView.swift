@@ -64,6 +64,11 @@ struct ProfileView: View {
                 Text(profile.stageDetailSummary)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                if profile.clinicalCareStatus != .unspecified {
+                    Text("Care: \(profile.clinicalCareStatus.title)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             } else {
                 Text("Complete onboarding to personalize MamAmie.")
                     .font(.subheadline)

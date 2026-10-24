@@ -1,308 +1,254 @@
 import SwiftUI
 
-struct OnboardingDatesView: View {
+// MARK: - Screen 3: Pregnancy History
+struct OnboardingScreen3HistoryView: View {
     @Binding var draft: OnboardingDraft
     let onContinue: () -> Void
     let onBack: () -> Void
+    let onSkip: () -> Void
 
-    @State private var datePickerTarget: DatePickerTarget?
-    @State private var datePickerInitialDate = Date()
+    private let commonComplications = [
+        "None",
+        "Gestational diabetes",
+        "Pre-eclampsia",
+        "Preterm birth (< 37 weeks)",
+        "C-section delivery",
+        "High blood pressure",
+        "Low birth weight",
+        "Prefer not to say"
+    ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
-            OnboardingBackButton(action: onBack)
+        VStack(alignment: .leading, spacing: 0) {
+            headerBar
 
-            switch draft.stage ?? .pregnant {
-            case .pregnant:
-                pregnantDatesSection
-            case .planning:
-                planningCycleSection
-            case .postpartum:
-                postpartumDatesSection
-            }
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 18) {
+                    titleSection
 
-            Spacer()
+                    // Question 9: First pregnancy?
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                title: "Is this your first pregnancy?",
+                                subtitle: "Helps us avoid redundant questions.",
+                                isOptional: true
+                            )
 
-            VStack(spacing: 12) {
-                OnboardingPrimaryButton(
-                    title: primaryButtonTitle,
-                    systemImage: "arrow.right",
-                    isDisabled: false,
-                    action: onContinue
-                )
+                            HStack(spacing: 12) {
+                                OnboardingChip(
+                                    title: "Yes, first pregnancy",
+                                    icon: "sparkles",
+                                    isSelected: draft.isFirstPregnancy == true
+                                ) {
+                                    draft.isFirstPregnancy = true
+                                    draft.totalPregnancies = 1
+                                    draft.previousBirths = 0
+                                }
 
-                if shouldShowSkipButton {
-                    OnboardingSkipButton(title: "Skip for now", action: onContinue)
+                                OnboardingChip(
+                                    title: "No, previously pregnant",
+                                    icon: "arrow.counterclockwise",
+                                    isSelected: draft.isFirstPregnancy == false
+                                ) {
+                                    draft.isFirstPregnancy = false
+                                }
+                            }
+                        }
+                    }
+
+                    // Question 10 & 11: Total pregnancies & previous births (shown if not first pregnancy or unsure)
+                    if draft.isFirstPregnancy == false {
+                        OnboardingCard {
+                            VStack(alignment: .leading, spacing: 14) {
+                                OnboardingSectionHeader(
+                                    title: "Past pregnancies & births",
+                                    subtitle: "Gravida & Para clinical context.",
+                                    isOptional: true
+                                )
+
+                                OnboardingNumberStepper(
+                                    title: "Total pregnancies",
+                                    subtitle: "Including your current pregnancy",
+                                    value: $draft.totalPregnancies,
+                                    range: 1...15
+                                )
+
+                                Divider()
+
+                                OnboardingNumberStepper(
+                                    title: "Previous births",
+                                    subtitle: "Number of deliveries",
+                                    value: $draft.previousBirths,
+                                    range: 0...15
+                                )
+                            }
+                        }
+                    }
+
+                    // Question 12: Expecting one baby or multiples? (Relevant for pregnant stage)
+                    if draft.stage == .pregnant || draft.stage == nil {
+                        OnboardingCard {
+                            VStack(alignment: .leading, spacing: 10) {
+                                OnboardingSectionHeader(
+                                    title: "Are you expecting one baby or multiples?",
+                                    subtitle: "Multiple pregnancies involve distinct milestone tracking.",
+                                    isOptional: true
+                                )
+
+                                FlowLayout(spacing: 8) {
+                                    ForEach(MultiplePregnancyType.allCases) { type in
+                                        OnboardingChip(
+                                            title: type.title,
+                                            isSelected: draft.multiplePregnancyType == type
+                                        ) {
+                                            draft.multiplePregnancyType = type
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Question 13: Previous complications or notes (sensitive & optional)
+                    OnboardingCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            OnboardingSectionHeader(
+                                title: "Previous complications or birth history",
+                                subtitle: "Sensitive & optional. Used only to tailor relevant health precautions.",
+                                isOptional: true
+                            )
+
+                            FlowLayout(spacing: 8) {
+                                ForEach(commonComplications, id: \.self) { comp in
+                                    OnboardingChip(
+                                        title: comp,
+                                        isSelected: isComplicationSelected(comp)
+                                    ) {
+                                        toggleComplication(comp)
+                                    }
+                                }
+                            }
+
+                            TextField("Any specific notes (optional)", text: $draft.previousComplicationsNotes)
+                                .padding(10)
+                                .background(Color(.systemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 1))
+                        }
+                    }
+
+                    Spacer(minLength: 24)
                 }
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
             }
+
+            footerActions
+        }
+    }
+
+    private var headerBar: some View {
+        HStack {
+            OnboardingBackButton(action: onBack)
+            Spacer()
         }
         .padding(.horizontal, 24)
-        .padding(.vertical, 20)
-        .sheet(item: $datePickerTarget) { target in
-            DatePickerSheet(
-                title: target.title,
-                initialDate: datePickerInitialDate,
-                range: target.range
-            ) { date in
-                switch target {
-                case .dueDate:
-                    draft.dueDate = date
-                case .lastPeriod:
-                    draft.lastPeriodDate = date
-                case .childbirthDate:
-                    draft.childbirthDate = date
-                }
-            }
+        .padding(.top, 12)
+    }
+
+    private var titleSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Pregnancy History")
+                .font(.largeTitle.bold())
+                .foregroundStyle(Color("AccentColor"))
+            Text("Understanding your reproductive background allows MamAmie to provide considerate, personalized care.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
     }
 
-    // MARK: - Pregnant View
-    private var pregnantDatesSection: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Pregnancy information")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(Color("AccentColor"))
-                Text("An estimated due date or last period date helps MamAmie show gestational week progress. Skip if you're not sure.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            VStack(spacing: 10) {
-                ForEach(PregnancyDatingMethod.allCases) { method in
-                    DatingMethodRow(
-                        method: method,
-                        isSelected: draft.datingMethod == method
-                    ) {
-                        select(method)
-                    }
-                }
-            }
-
-            if draft.datingMethod == .dueDate {
-                DateSelectionRow(
-                    title: "Due date",
-                    value: draft.dueDate,
-                    action: { presentPicker(.dueDate, currentDate: draft.dueDate) }
-                )
-            } else if draft.datingMethod == .lastPeriod {
-                DateSelectionRow(
-                    title: "First day of last period",
-                    value: draft.lastPeriodDate,
-                    action: { presentPicker(.lastPeriod, currentDate: draft.lastPeriodDate) }
-                )
-            }
-        }
-    }
-
-    // MARK: - Planning View
-    private var planningCycleSection: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Menstrual cycle tracking")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(Color("AccentColor"))
-                Text("Would you like to track your menstrual cycle in MamAmie to help with pre-pregnancy preparation?")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            VStack(spacing: 12) {
-                OnboardingSelectableCard(
-                    title: "Yes, track my cycle",
-                    subtitle: "Log your periods, fertile windows, and cycle patterns in the calendar.",
-                    icon: "calendar.badge.clock",
-                    isSelected: draft.trackCycle
-                ) {
-                    draft.trackCycle = true
-                }
-
-                OnboardingSelectableCard(
-                    title: "Not right now / Maybe later",
-                    subtitle: "Focus on general pre-pregnancy wellness without cycle logs. You can enable this anytime.",
-                    icon: "sparkles",
-                    isSelected: !draft.trackCycle
-                ) {
-                    draft.trackCycle = false
-                }
-            }
-        }
-    }
-
-    // MARK: - Postpartum View
-    private var postpartumDatesSection: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Postpartum recovery")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(Color("AccentColor"))
-                Text("Entering your date of childbirth helps us tailor your postpartum recovery weeks. Skip if you prefer.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            DateSelectionRow(
-                title: "Date of childbirth",
-                value: draft.childbirthDate,
-                action: { presentPicker(.childbirthDate, currentDate: draft.childbirthDate) }
+    private var footerActions: some View {
+        VStack(spacing: 10) {
+            OnboardingPrimaryButton(
+                title: "Continue",
+                systemImage: "arrow.right",
+                isDisabled: false,
+                action: onContinue
             )
 
-            if draft.childbirthDate != nil {
-                Button {
-                    draft.childbirthDate = nil
-                } label: {
-                    Text("Clear date")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
+            OnboardingSkipButton(title: "Skip this section", action: onSkip)
         }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .background(Color(.systemBackground))
     }
 
-    private var primaryButtonTitle: String {
-        switch draft.stage ?? .pregnant {
-        case .pregnant:
-            if draft.datingMethod == .notSet {
-                return "Continue without dates"
-            }
-            return "Continue"
-        case .planning:
-            return "Continue"
-        case .postpartum:
-            return draft.childbirthDate == nil ? "Continue without date" : "Continue"
+    private func isComplicationSelected(_ tag: String) -> Bool {
+        if tag == "None" || tag == "Prefer not to say" {
+            return draft.previousComplicationsNotes.contains(tag)
         }
+        return draft.previousComplicationsNotes.localizedCaseInsensitiveContains(tag)
     }
 
-    private var shouldShowSkipButton: Bool {
-        switch draft.stage ?? .pregnant {
-        case .pregnant:
-            return draft.datingMethod != .notSet && draft.resolvedDueDate == nil
-        case .planning:
-            return false
-        case .postpartum:
-            return draft.childbirthDate == nil
+    private func toggleComplication(_ tag: String) {
+        if tag == "None" || tag == "Prefer not to say" {
+            draft.previousComplicationsNotes = tag
+            return
         }
-    }
+        var current = draft.previousComplicationsNotes
+            .components(separatedBy: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && $0 != "None" && $0 != "Prefer not to say" }
 
-    private func select(_ method: PregnancyDatingMethod) {
-        draft.datingMethod = method
-        if method != .dueDate { draft.dueDate = nil }
-        if method != .lastPeriod { draft.lastPeriodDate = nil }
-    }
-
-    private func presentPicker(_ target: DatePickerTarget, currentDate: Date?) {
-        datePickerInitialDate = currentDate ?? target.defaultDate
-        datePickerTarget = target
+        if let index = current.firstIndex(where: { $0.caseInsensitiveCompare(tag) == .orderedSame }) {
+            current.remove(at: index)
+        } else {
+            current.append(tag)
+        }
+        draft.previousComplicationsNotes = current.joined(separator: ", ")
     }
 }
 
-private struct DatingMethodRow: View {
-    let method: PregnancyDatingMethod
-    let isSelected: Bool
-    let action: () -> Void
+// FlowLayout helper
+private struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
 
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 12) {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(isSelected ? Color("AccentColor") : Color(.tertiaryLabel))
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(method.title)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
-                    Text(method.detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
-                }
-                Spacer()
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? 300
+        var height: CGFloat = 0
+        var currentX: CGFloat = 0
+        var rowHeight: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if currentX + size.width > width && currentX > 0 {
+                height += rowHeight + spacing
+                currentX = 0
+                rowHeight = 0
             }
-            .padding(14)
-            .background(isSelected ? Color("AccentColor").opacity(0.09) : Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            currentX += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
         }
-        .buttonStyle(.plain)
-    }
-}
-
-private enum DatePickerTarget: String, Identifiable {
-    case dueDate
-    case lastPeriod
-    case childbirthDate
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .dueDate: return "Due date"
-        case .lastPeriod: return "First day of last period"
-        case .childbirthDate: return "Date of childbirth"
-        }
+        height += rowHeight
+        return CGSize(width: width, height: height)
     }
 
-    var defaultDate: Date {
-        Date()
-    }
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var currentX = bounds.minX
+        var currentY = bounds.minY
+        var rowHeight: CGFloat = 0
 
-    var range: ClosedRange<Date> {
-        let calendar = Calendar.autoupdatingCurrent
-        let today = calendar.startOfDay(for: Date())
-        switch self {
-        case .dueDate:
-            let earliest = calendar.date(byAdding: .day, value: -42, to: today) ?? today
-            let latest = calendar.date(byAdding: .day, value: 320, to: today) ?? today
-            return earliest...latest
-        case .lastPeriod:
-            let earliest = calendar.date(byAdding: .day, value: -320, to: today) ?? today
-            return earliest...today
-        case .childbirthDate:
-            let earliest = calendar.date(byAdding: .year, value: -2, to: today) ?? today
-            return earliest...today
-        }
-    }
-}
-
-private struct DatePickerSheet: View {
-    let title: String
-    let initialDate: Date
-    let range: ClosedRange<Date>
-    let onSave: (Date) -> Void
-
-    @Environment(\.dismiss) private var dismiss
-    @State private var selectedDate: Date
-
-    init(title: String, initialDate: Date, range: ClosedRange<Date>, onSave: @escaping (Date) -> Void) {
-        self.title = title
-        self.initialDate = initialDate
-        self.range = range
-        self.onSave = onSave
-        _selectedDate = State(initialValue: min(max(initialDate, range.lowerBound), range.upperBound))
-    }
-
-    var body: some View {
-        NavigationStack {
-            VStack {
-                DatePicker(title, selection: $selectedDate, in: range, displayedComponents: [.date])
-                    .datePickerStyle(.graphical)
-                    .padding()
-                Spacer()
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if currentX + size.width > bounds.maxX && currentX > bounds.minX {
+                currentY += rowHeight + spacing
+                currentX = bounds.minX
+                rowHeight = 0
             }
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        onSave(selectedDate)
-                        dismiss()
-                    }
-                    .fontWeight(.semibold)
-                }
-            }
+            subview.place(at: CGPoint(x: currentX, y: currentY), proposal: .unspecified)
+            currentX += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
         }
-        .presentationDetents([.medium])
     }
 }

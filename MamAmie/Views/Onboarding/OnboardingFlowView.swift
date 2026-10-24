@@ -16,9 +16,13 @@ struct OnboardingFlowView: View {
     var body: some View {
         VStack(spacing: 0) {
             if step != .welcome {
-                OnboardingProgressView(currentStep: step.progressNumber, totalSteps: OnboardingStep.totalSteps)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 14)
+                OnboardingProgressView(
+                    currentStep: step.progressNumber,
+                    totalSteps: OnboardingStep.totalSteps
+                )
+                .padding(.horizontal, 24)
+                .padding(.top, 14)
+                .padding(.bottom, 6)
             }
 
             Group {
@@ -26,65 +30,70 @@ struct OnboardingFlowView: View {
                 case .welcome:
                     OnboardingWelcomeView(onContinue: goForward)
 
-                case .name:
-                    OnboardingNameView(
-                        name: $draft.displayName,
-                        onContinue: goForward,
-                        onBack: goBack,
-                        onSkip: goForward
-                    )
-
-                case .stage:
-                    OnboardingStageView(
-                        stage: $draft.stage,
-                        onContinue: goForward,
-                        onBack: goBack
-                    )
-
-                case .dates:
-                    OnboardingDatesView(
+                case .aboutYou:
+                    OnboardingScreen1AboutYouView(
                         draft: $draft,
                         onContinue: goForward,
-                        onBack: goBack
+                        onBack: goBack,
+                        onSkip: goForward
                     )
 
-                case .healthAndAllergies:
-                    OnboardingHealthConditionsView(
-                        healthNotes: $draft.healthConditionsAndAllergies,
+                case .journey:
+                    OnboardingScreen2JourneyView(
+                        draft: $draft,
                         onContinue: goForward,
                         onBack: goBack,
                         onSkip: goForward
                     )
 
-                case .diet:
-                    OnboardingDietView(
-                        selectedDiet: $draft.dietaryPreference,
+                case .history:
+                    OnboardingScreen3HistoryView(
+                        draft: $draft,
                         onContinue: goForward,
                         onBack: goBack,
                         onSkip: goForward
                     )
 
-                case .appleHealth:
-                    OnboardingAppleHealthView(
-                        isConnected: $draft.connectedAppleHealth,
+                case .health:
+                    OnboardingScreen4HealthView(
+                        draft: $draft,
+                        onContinue: goForward,
+                        onBack: goBack,
+                        onSkip: goForward
+                    )
+
+                case .nutrition:
+                    OnboardingScreen5NutritionView(
+                        draft: $draft,
+                        onContinue: goForward,
+                        onBack: goBack,
+                        onSkip: goForward
+                    )
+
+                case .connectedHealth:
+                    OnboardingScreen6ConnectedHealthView(
+                        draft: $draft,
                         onContinue: goForward,
                         onBack: goBack,
                         onSkip: goForward
                     )
 
                 case .reminders:
-                    OnboardingRemindersView(
-                        selectedReminders: $draft.selectedReminders,
+                    OnboardingScreen7RemindersView(
+                        draft: $draft,
                         onContinue: goForward,
                         onBack: goBack,
                         onSkip: goForward
                     )
 
-                case .summary:
+                case .review:
                     OnboardingSummaryView(
                         draft: $draft,
                         onFinish: finish,
-                        onBack: goBack
+                        onBack: goBack,
+                        onEditStep: { stepNumber in
+                            jumpTo(stepNumber: stepNumber)
+                        }
                     )
                 }
             }
@@ -101,6 +110,12 @@ struct OnboardingFlowView: View {
             Button("OK", role: .cancel) { store.clearError() }
         } message: {
             Text(store.saveErrorMessage ?? "Please try again.")
+        }
+        .onAppear {
+            if store.profile == nil {
+                step = .welcome
+                draft = OnboardingDraft(profile: nil)
+            }
         }
     }
 
@@ -121,6 +136,13 @@ struct OnboardingFlowView: View {
         }
     }
 
+    private func jumpTo(stepNumber: Int) {
+        guard let target = OnboardingStep.from(progressNumber: stepNumber) else { return }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            step = target
+        }
+    }
+
     private func finish() {
         draft.acceptedPrivacy = true
         guard let profile = draft.makeProfile(), store.save(profile) else { return }
@@ -130,56 +152,70 @@ struct OnboardingFlowView: View {
 
 private enum OnboardingStep: Int, CaseIterable {
     case welcome
-    case name
-    case stage
-    case dates
-    case healthAndAllergies
-    case diet
-    case appleHealth
+    case aboutYou
+    case journey
+    case history
+    case health
+    case nutrition
+    case connectedHealth
     case reminders
-    case summary
+    case review
 
     static let totalSteps = 8
 
     var progressNumber: Int {
         switch self {
         case .welcome: return 1
-        case .name: return 1
-        case .stage: return 2
-        case .dates: return 3
-        case .healthAndAllergies: return 4
-        case .diet: return 5
-        case .appleHealth: return 6
+        case .aboutYou: return 1
+        case .journey: return 2
+        case .history: return 3
+        case .health: return 4
+        case .nutrition: return 5
+        case .connectedHealth: return 6
         case .reminders: return 7
-        case .summary: return 8
+        case .review: return 8
+        }
+    }
+
+    static func from(progressNumber: Int) -> OnboardingStep? {
+        switch progressNumber {
+        case 1: return .aboutYou
+        case 2: return .journey
+        case 3: return .history
+        case 4: return .health
+        case 5: return .nutrition
+        case 6: return .connectedHealth
+        case 7: return .reminders
+        case 8: return .review
+        default: return nil
         }
     }
 
     var next: OnboardingStep? {
         switch self {
-        case .welcome: return .name
-        case .name: return .stage
-        case .stage: return .dates
-        case .dates: return .healthAndAllergies
-        case .healthAndAllergies: return .diet
-        case .diet: return .appleHealth
-        case .appleHealth: return .reminders
-        case .reminders: return .summary
-        case .summary: return nil
+        case .welcome: return .aboutYou
+        case .aboutYou: return .journey
+        case .journey: return .history
+        case .history: return .health
+        case .health: return .nutrition
+        case .nutrition: return .connectedHealth
+        case .connectedHealth: return .reminders
+        case .reminders: return .review
+        case .review: return nil
         }
     }
 
     var previous: OnboardingStep? {
         switch self {
         case .welcome: return nil
-        case .name: return .welcome
-        case .stage: return .name
-        case .dates: return .stage
-        case .healthAndAllergies: return .dates
-        case .diet: return .healthAndAllergies
-        case .appleHealth: return .diet
-        case .reminders: return .appleHealth
-        case .summary: return .reminders
+        case .aboutYou: return .welcome
+        case .journey: return .aboutYou
+        case .history: return .journey
+        case .health: return .history
+        case .nutrition: return .health
+        case .connectedHealth: return .nutrition
+        case .reminders: return .connectedHealth
+        case .review: return .reminders
         }
     }
 }

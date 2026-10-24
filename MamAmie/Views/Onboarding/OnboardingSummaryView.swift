@@ -1,76 +1,113 @@
 import SwiftUI
 
+// MARK: - Screen 8: Review and Continue
 struct OnboardingSummaryView: View {
     @Binding var draft: OnboardingDraft
     let onFinish: () -> Void
     let onBack: () -> Void
+    var onEditStep: ((Int) -> Void)? = nil
 
     private var profile: OnboardingProfile? {
         draft.makeProfile()
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            OnboardingBackButton(action: onBack)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("You are all set")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(Color("AccentColor"))
-
-                Text("Review your choices before entering MamAmie. You can change them anytime in Profile.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            headerBar
 
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 10) {
-                    if let profile {
-                        OnboardingSummaryRow(
-                            title: "Name",
-                            value: profile.displayName.isEmpty ? "Not specified" : profile.displayName,
-                            icon: "person.fill"
-                        )
+                VStack(alignment: .leading, spacing: 18) {
+                    titleSection
 
-                        OnboardingSummaryRow(
-                            title: "Your journey",
-                            value: profile.stageSummary,
-                            icon: profile.stage.iconName
-                        )
+                    // Group 1: About You
+                    SummaryGroupCard(title: "About You", stepNumber: 1, onEdit: { onEditStep?(1) }) {
+                        SummaryFieldRow(label: "Name", value: draft.displayName.isEmpty ? nil : draft.displayName)
+                        SummaryFieldRow(label: "Age", value: draft.calculatedAge != nil ? "\(draft.calculatedAge!) years old" : nil)
+                        SummaryFieldRow(label: "Country", value: draft.country.isEmpty ? nil : draft.country)
+                        SummaryFieldRow(label: "Language", value: draft.preferredLanguage)
+                    }
 
-                        OnboardingSummaryRow(
-                            title: stageDetailTitle(profile.stage),
-                            value: profile.stageDetailSummary,
-                            icon: stageDetailIcon(profile.stage)
-                        )
+                    // Group 2: Your Journey
+                    SummaryGroupCard(title: "Pregnancy Journey", stepNumber: 2, onEdit: { onEditStep?(2) }) {
+                        SummaryFieldRow(label: "Stage", value: draft.stage?.title)
+                        SummaryFieldRow(label: "Timeline", value: profile?.dateSummary)
+                        SummaryFieldRow(label: "Clinical Care", value: draft.clinicalCareStatus != .unspecified ? draft.clinicalCareStatus.title : nil)
+                    }
 
-                        OnboardingSummaryRow(
-                            title: "Dietary preference",
-                            value: profile.dietaryPreference?.title ?? "None specified",
-                            icon: profile.dietaryPreference?.iconName ?? "fork.knife"
-                        )
-
-                        if !profile.healthConditionsAndAllergies.isEmpty {
-                            OnboardingSummaryRow(
-                                title: "Health & allergies",
-                                value: profile.healthConditionsAndAllergies,
-                                icon: "cross.case.fill"
-                            )
+                    // Group 3: Pregnancy History
+                    SummaryGroupCard(title: "Pregnancy History", stepNumber: 3, onEdit: { onEditStep?(3) }) {
+                        if let isFirst = draft.isFirstPregnancy {
+                            SummaryFieldRow(label: "First pregnancy", value: isFirst ? "Yes" : "No")
+                            if !isFirst {
+                                SummaryFieldRow(label: "Total pregnancies", value: "\(draft.totalPregnancies)")
+                                SummaryFieldRow(label: "Previous births", value: "\(draft.previousBirths)")
+                            }
+                        } else {
+                            SummaryFieldRow(label: "Pregnancy history", value: nil)
                         }
 
-                        OnboardingSummaryRow(
-                            title: "Apple Health",
-                            value: profile.connectedAppleHealth ? "Connected" : "Not connected (can add later)",
-                            icon: "applewatch"
-                        )
+                        if draft.stage == .pregnant || draft.stage == nil {
+                            SummaryFieldRow(label: "Expecting", value: draft.multiplePregnancyType.title)
+                        }
 
-                        OnboardingSummaryRow(
-                            title: "Active reminders",
-                            value: remindersSummary(profile.selectedReminders),
-                            icon: "bell.badge.fill"
+                        if !draft.previousComplicationsNotes.isEmpty {
+                            SummaryFieldRow(label: "Complications / notes", value: draft.previousComplicationsNotes)
+                        }
+                    }
+
+                    // Group 4: Your Health
+                    SummaryGroupCard(title: "Your Health", stepNumber: 4, onEdit: { onEditStep?(4) }) {
+                        SummaryFieldRow(
+                            label: "Medical conditions",
+                            value: draft.medicalConditions.isEmpty ? nil : draft.medicalConditions.joined(separator: ", ")
+                        )
+                        SummaryFieldRow(
+                            label: "Allergies",
+                            value: draft.allergies.isEmpty ? nil : draft.allergies.joined(separator: ", ")
+                        )
+                        SummaryFieldRow(
+                            label: "Supplements",
+                            value: draft.medicationsAndSupplements.isEmpty ? nil : draft.medicationsAndSupplements.joined(separator: ", ")
+                        )
+                        if !draft.clinicalInstructions.isEmpty {
+                            SummaryFieldRow(label: "Clinician instructions", value: draft.clinicalInstructions)
+                        }
+                    }
+
+                    // Group 5: Nutrition & Lifestyle
+                    SummaryGroupCard(title: "Nutrition & Lifestyle", stepNumber: 5, onEdit: { onEditStep?(5) }) {
+                        SummaryFieldRow(label: "Diet preference", value: draft.dietaryPreference?.title)
+                        if !draft.dietaryRestrictionsNotes.isEmpty {
+                            SummaryFieldRow(label: "Restrictions", value: draft.dietaryRestrictionsNotes)
+                        }
+                        SummaryFieldRow(label: "Meal tracking", value: draft.mealTrackingPreference.title)
+                        SummaryFieldRow(
+                            label: "Lifestyle habits",
+                            value: draft.lifestyleTrackingPriorities.isEmpty ? nil : draft.lifestyleTrackingPriorities.joined(separator: ", ")
                         )
                     }
 
+                    // Group 6: Connected Health
+                    SummaryGroupCard(title: "Connected Health", stepNumber: 6, onEdit: { onEditStep?(6) }) {
+                        SummaryFieldRow(
+                            label: "Trackers & devices",
+                            value: draft.connectedDevices.isEmpty ? nil : draft.connectedDevices.joined(separator: ", ")
+                        )
+                        SummaryFieldRow(
+                            label: "Apple Health",
+                            value: draft.connectedAppleHealth ? "Connected" : "Not connected (can connect later)"
+                        )
+                    }
+
+                    // Group 7: Care & Reminders
+                    SummaryGroupCard(title: "Care & Reminders", stepNumber: 7, onEdit: { onEditStep?(7) }) {
+                        SummaryFieldRow(
+                            label: "Active reminders",
+                            value: draft.selectedReminders.isEmpty ? "None enabled" : "\(draft.selectedReminders.count) categories active"
+                        )
+                    }
+
+                    // Medical Safety Boundary Card
                     OnboardingCard {
                         VStack(alignment: .leading, spacing: 6) {
                             Label("A gentle medical boundary", systemImage: "hand.raised.shield.fill")
@@ -82,11 +119,42 @@ struct OnboardingSummaryView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+
+                    Spacer(minLength: 24)
                 }
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
             }
 
-            Spacer()
+            footerActions
+        }
+        .onAppear {
+            draft.acceptedPrivacy = true
+        }
+    }
 
+    private var headerBar: some View {
+        HStack {
+            OnboardingBackButton(action: onBack)
+            Spacer()
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 12)
+    }
+
+    private var titleSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Review & Continue")
+                .font(.largeTitle.bold())
+                .foregroundStyle(Color("AccentColor"))
+            Text("Review your personalized answers. You can change them anytime in your Profile.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var footerActions: some View {
+        VStack(spacing: 8) {
             OnboardingPrimaryButton(
                 title: "Enter MamAmie",
                 systemImage: "arrow.right",
@@ -95,63 +163,84 @@ struct OnboardingSummaryView: View {
             )
         }
         .padding(.horizontal, 24)
-        .padding(.vertical, 20)
-        .onAppear {
-            draft.acceptedPrivacy = true
-        }
-    }
-
-    private func stageDetailTitle(_ stage: OnboardingStage) -> String {
-        switch stage {
-        case .pregnant: return "Pregnancy timeline"
-        case .planning: return "Cycle tracking"
-        case .postpartum: return "Postpartum details"
-        }
-    }
-
-    private func stageDetailIcon(_ stage: OnboardingStage) -> String {
-        switch stage {
-        case .pregnant: return "calendar"
-        case .planning: return "calendar.badge.clock"
-        case .postpartum: return "heart.circle.fill"
-        }
-    }
-
-    private func remindersSummary(_ reminders: [OnboardingReminderType]) -> String {
-        if reminders.isEmpty { return "None selected" }
-        if reminders.count == OnboardingReminderType.allCases.count {
-            return "All reminders enabled"
-        }
-        return "\(reminders.count) reminder categories active"
+        .padding(.vertical, 16)
+        .background(Color(.systemBackground))
     }
 }
 
-private struct OnboardingSummaryRow: View {
+// MARK: - Helper Views for Summary
+private struct SummaryGroupCard<Content: View>: View {
     let title: String
-    let value: String
-    let icon: String
+    let stepNumber: Int
+    var onEdit: (() -> Void)? = nil
+    let content: Content
+
+    init(title: String, stepNumber: Int, onEdit: (() -> Void)? = nil, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.stepNumber = stepNumber
+        self.onEdit = onEdit
+        self.content = content()
+    }
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .foregroundStyle(Color("AccentColor"))
-                .frame(width: 36, height: 36)
-                .background(Color("AccentColor").opacity(0.12))
-                .clipShape(Circle())
+        OnboardingCard {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text(title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color("AccentColor"))
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(value)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    Spacer()
+
+                    if let onEdit {
+                        Button(action: onEdit) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "pencil")
+                                Text("Edit")
+                            }
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color("AccentColor"))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                Divider()
+
+                content
             }
+        }
+    }
+}
+
+private struct SummaryFieldRow: View {
+    let label: String
+    let value: String?
+
+    var body: some View {
+        HStack(alignment: .top) {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(width: 120, alignment: .leading)
 
             Spacer()
+
+            if let value, !value.isEmpty {
+                Text(value)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .multilineTextAlignment(.trailing)
+            } else {
+                Text("Optional · Not added")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color(.tertiarySystemFill))
+                    .clipShape(Capsule())
+            }
         }
-        .padding(14)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .padding(.vertical, 2)
     }
 }
