@@ -67,6 +67,13 @@ struct CalendarJournalView: View {
                 // MARK: - Daily Checkpoints
                 DayCheckpointsView(
                     store: store,
+                    profile: onboardingStore.profile,
+                    dayKey: selectedDayKey
+                )
+
+                // MARK: - Maternal Weight Tracker
+                DayWeightTrackerView(
+                    store: store,
                     dayKey: selectedDayKey
                 )
 

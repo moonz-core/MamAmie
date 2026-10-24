@@ -15,6 +15,37 @@ struct MaternalClinicalMilestone: Identifiable, Codable, Equatable {
     let defaultTimeMinutes: Int // Minutes after midnight (e.g., 600 = 10:00 AM)
     let allowableWeekWindow: ClosedRange<Int>
     let conditionTags: [String]
+    var recurrenceWeeks: Int? = nil
+
+    init(
+        id: String,
+        weekNumber: Int,
+        title: String,
+        category: EntryCategory,
+        clinicalPurpose: String,
+        questionsForDoctor: [String],
+        isSonography: Bool,
+        isBloodTest: Bool,
+        isHospitalVisit: Bool,
+        defaultTimeMinutes: Int,
+        allowableWeekWindow: ClosedRange<Int>,
+        conditionTags: [String],
+        recurrenceWeeks: Int? = nil
+    ) {
+        self.id = id
+        self.weekNumber = weekNumber
+        self.title = title
+        self.category = category
+        self.clinicalPurpose = clinicalPurpose
+        self.questionsForDoctor = questionsForDoctor
+        self.isSonography = isSonography
+        self.isBloodTest = isBloodTest
+        self.isHospitalVisit = isHospitalVisit
+        self.defaultTimeMinutes = defaultTimeMinutes
+        self.allowableWeekWindow = allowableWeekWindow
+        self.conditionTags = conditionTags
+        self.recurrenceWeeks = recurrenceWeeks
+    }
 }
 
 // MARK: - Maternal Schedule Planner Service
@@ -455,7 +486,8 @@ final class MaternalSchedulePlanner {
             isHospitalVisit: false,
             defaultTimeMinutes: 600, // 10:00 AM
             allowableWeekWindow: 8...41,
-            conditionTags: ["yoga"]
+            conditionTags: ["yoga"],
+            recurrenceWeeks: 1
         ),
         MaternalClinicalMilestone(
             id: "maternal_wellness_vit_d",
@@ -469,7 +501,8 @@ final class MaternalSchedulePlanner {
             isHospitalVisit: false,
             defaultTimeMinutes: 510, // 8:30 AM
             allowableWeekWindow: 4...41,
-            conditionTags: ["sunlight"]
+            conditionTags: ["sunlight"],
+            recurrenceWeeks: 2
         ),
         MaternalClinicalMilestone(
             id: "maternal_wellness_hydration",
@@ -497,7 +530,8 @@ final class MaternalSchedulePlanner {
             isHospitalVisit: false,
             defaultTimeMinutes: 1230, // 8:30 PM
             allowableWeekWindow: 14...41,
-            conditionTags: ["magnesium"]
+            conditionTags: ["magnesium"],
+            recurrenceWeeks: 2
         ),
         MaternalClinicalMilestone(
             id: "maternal_wellness_kegels",
@@ -567,7 +601,8 @@ final class MaternalSchedulePlanner {
             isHospitalVisit: false,
             defaultTimeMinutes: 1260, // 9:00 PM
             allowableWeekWindow: 34...41,
-            conditionTags: ["labor_prep"]
+            conditionTags: ["labor_prep"],
+            recurrenceWeeks: 2
         ),
         MaternalClinicalMilestone(
             id: "maternal_wellness_hospital_bag",
@@ -616,68 +651,77 @@ final class MaternalSchedulePlanner {
         let combinedMilestones = Self.allMilestones + Self.wellnessMilestones
 
         for milestone in combinedMilestones {
-            // Calculate target date: pregnancyStartDate + (weekNumber * 7) days
-            guard let milestoneDate = calendar.date(byAdding: .day, value: milestone.weekNumber * 7, to: pregnancyStartDate) else {
-                continue
-            }
-
-            let dayKey = LocalDay.key(for: milestoneDate)
-            let isPast = milestoneDate < now
-
-            // Determine appointment / test status
-            let appointmentDetails: AppointmentDetails?
-            let medicalRecordDetails: MedicalRecordDetails?
-
-            if milestone.category == .appointment {
-                appointmentDetails = AppointmentDetails(
-                    clinicianOrClinic: profile.clinicalCareStatus.title,
-                    location: milestone.isHospitalVisit ? "Hospital / OB Clinic" : "Clinic",
-                    questions: milestone.questionsForDoctor.joined(separator: "\n• "),
-                    status: isPast ? .completed : .scheduled
-                )
-                medicalRecordDetails = nil
-            } else if milestone.category == .test {
-                appointmentDetails = nil
-                medicalRecordDetails = MedicalRecordDetails(
-                    reportStatus: isPast ? .reportReceived : .planned,
-                    followUpDayKey: nil
-                )
+            let weeksToSchedule: [Int]
+            if let recurrence = milestone.recurrenceWeeks, recurrence > 0 {
+                weeksToSchedule = stride(from: milestone.allowableWeekWindow.lowerBound, through: milestone.allowableWeekWindow.upperBound, by: recurrence).map { $0 }
             } else {
-                appointmentDetails = nil
-                medicalRecordDetails = nil
+                weeksToSchedule = [milestone.weekNumber]
             }
 
-            let notesText = """
-            \(milestone.clinicalPurpose)
+            for weekNum in weeksToSchedule {
+                // Calculate target date: pregnancyStartDate + (weekNum * 7) days
+                guard let milestoneDate = calendar.date(byAdding: .day, value: weekNum * 7, to: pregnancyStartDate) else {
+                    continue
+                }
 
-            Key Questions for Clinician:
-            • \(milestone.questionsForDoctor.joined(separator: "\n• "))
-            """
+                let dayKey = LocalDay.key(for: milestoneDate)
+                let isPast = milestoneDate < now
 
-            // Deterministic UUID based on milestone id to prevent duplication
-            let deterministicID = UUID(uuidString: Self.deterministicUUIDString(for: milestone.id)) ?? UUID()
+                // Determine appointment / test status
+                let appointmentDetails: AppointmentDetails?
+                let medicalRecordDetails: MedicalRecordDetails?
 
-            let entry = CalendarEntry(
-                id: deterministicID,
-                title: milestone.title,
-                category: milestone.category,
-                dayKey: dayKey,
-                timeMinutes: milestone.defaultTimeMinutes,
-                notes: notesText,
-                createdAt: now,
-                modifiedAt: now,
-                attachments: [],
-                medicationID: nil,
-                appointment: appointmentDetails,
-                medicalRecord: medicalRecordDetails,
-                symptom: nil,
-                food: nil,
-                journal: nil,
-                milestone: MilestoneDetails(isPersonal: false),
-                task: TaskDetails(completed: isPast)
-            )
+                if milestone.category == .appointment {
+                    appointmentDetails = AppointmentDetails(
+                        clinicianOrClinic: profile.clinicalCareStatus.title,
+                        location: milestone.isHospitalVisit ? "Hospital / OB Clinic" : "Clinic",
+                        questions: milestone.questionsForDoctor.joined(separator: "\n• "),
+                        status: isPast ? .completed : .scheduled
+                    )
+                    medicalRecordDetails = nil
+                } else if milestone.category == .test {
+                    appointmentDetails = nil
+                    medicalRecordDetails = MedicalRecordDetails(
+                        reportStatus: isPast ? .reportReceived : .planned,
+                        followUpDayKey: nil
+                    )
+                } else {
+                    appointmentDetails = nil
+                    medicalRecordDetails = nil
+                }
 
-            entries.append(entry)
+                let notesText = """
+                \(milestone.clinicalPurpose)
+
+                Key Questions for Clinician:
+                • \(milestone.questionsForDoctor.joined(separator: "\n• "))
+                """
+
+                let instanceID = milestone.recurrenceWeeks != nil ? "\(milestone.id)_w\(weekNum)" : milestone.id
+                let deterministicID = UUID(uuidString: Self.deterministicUUIDString(for: instanceID)) ?? UUID()
+
+                let entry = CalendarEntry(
+                    id: deterministicID,
+                    title: milestone.title,
+                    category: milestone.category,
+                    dayKey: dayKey,
+                    timeMinutes: milestone.defaultTimeMinutes,
+                    notes: notesText,
+                    createdAt: now,
+                    modifiedAt: now,
+                    attachments: [],
+                    medicationID: nil,
+                    appointment: appointmentDetails,
+                    medicalRecord: medicalRecordDetails,
+                    symptom: nil,
+                    food: nil,
+                    journal: nil,
+                    milestone: MilestoneDetails(isPersonal: false),
+                    task: TaskDetails(completed: isPast)
+                )
+
+                entries.append(entry)
+            }
         }
 
         return entries

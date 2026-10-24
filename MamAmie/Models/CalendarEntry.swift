@@ -43,6 +43,11 @@ struct TaskDetails: Codable, Equatable {
     var completed: Bool = false
 }
 
+struct WeightDetails: Codable, Equatable {
+    var weightKg: Double
+    var unit: String = "kg"
+}
+
 struct CalendarEntry: Codable, Identifiable, Equatable {
     let id: UUID
     var title: String
@@ -63,4 +68,45 @@ struct CalendarEntry: Codable, Identifiable, Equatable {
     var journal: JournalDetails?
     var milestone: MilestoneDetails?
     var task: TaskDetails?
+    var weight: WeightDetails?
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        category: EntryCategory,
+        dayKey: String,
+        timeMinutes: Int? = nil,
+        notes: String = "",
+        createdAt: Date = Date(),
+        modifiedAt: Date = Date(),
+        attachments: [AttachmentReference] = [],
+        medicationID: UUID? = nil,
+        appointment: AppointmentDetails? = nil,
+        medicalRecord: MedicalRecordDetails? = nil,
+        symptom: SymptomDetails? = nil,
+        food: FoodDetails? = nil,
+        journal: JournalDetails? = nil,
+        milestone: MilestoneDetails? = nil,
+        task: TaskDetails? = nil,
+        weight: WeightDetails? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.category = category
+        self.dayKey = dayKey
+        self.timeMinutes = timeMinutes
+        self.notes = notes
+        self.createdAt = createdAt
+        self.modifiedAt = modifiedAt
+        self.attachments = attachments
+        self.medicationID = medicationID
+        self.appointment = appointment
+        self.medicalRecord = medicalRecord
+        self.symptom = symptom
+        self.food = food
+        self.journal = journal
+        self.milestone = milestone
+        self.task = task
+        self.weight = weight
+    }
 }
