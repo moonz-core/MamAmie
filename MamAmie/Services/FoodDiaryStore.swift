@@ -54,6 +54,12 @@ final class FoodDiaryStore: ObservableObject {
 
     func delete(_ meal: FoodMeal) { persist(meals.filter { $0.id != meal.id }) }
 
+    func reset() {
+        meals = []
+        try? FileManager.default.removeItem(at: fileURL)
+        errorMessage = nil
+    }
+
     func meals(on date: Date = .now, calendar: Calendar = .current) -> [FoodMeal] {
         meals.filter { calendar.isDate($0.loggedAt, inSameDayAs: date) }
     }

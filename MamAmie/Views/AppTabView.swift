@@ -58,7 +58,12 @@ struct AppTabView: View {
 
             ProfileView(
                 profile: onboardingStore.profile,
-                onEditOnboarding: onEditOnboarding
+                onEditOnboarding: onEditOnboarding,
+                onClearData: {
+                    journalStore.reset()
+                    foodDiaryStore.reset()
+                    onboardingStore.reset()
+                }
             )
             .tabItem {
                 Label("Profile", systemImage: "person.crop.circle")

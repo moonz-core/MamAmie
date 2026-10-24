@@ -62,6 +62,15 @@ final class JournalPersistence {
         try? fileManager.removeItem(at: attachmentURL(for: reference))
     }
 
+    func removeAll() throws {
+        if fileManager.fileExists(atPath: journalURL.path) {
+            try fileManager.removeItem(at: journalURL)
+        }
+        if fileManager.fileExists(atPath: attachmentDirectory.path) {
+            try? fileManager.removeItem(at: attachmentDirectory)
+        }
+    }
+
     func data(for reference: AttachmentReference) -> Data? {
         try? Data(contentsOf: attachmentURL(for: reference))
     }

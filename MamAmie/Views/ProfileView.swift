@@ -3,6 +3,9 @@ import SwiftUI
 struct ProfileView: View {
     let profile: OnboardingProfile?
     let onEditOnboarding: () -> Void
+    var onClearData: (() -> Void)? = nil
+
+    @State private var showClearConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -12,6 +15,7 @@ struct ProfileView: View {
                     journeyCard
                     preferencesCard
                     privacyCard
+                    dataManagementCard
 
                     Button(action: onEditOnboarding) {
                         Label("Review onboarding answers", systemImage: "pencil")
@@ -27,6 +31,18 @@ struct ProfileView: View {
             .background(Color(.systemBackground))
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.inline)
+            .confirmationDialog(
+                "Clear all app data?",
+                isPresented: $showClearConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Clear all data", role: .destructive) {
+                    onClearData?()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This will permanently delete your profile, onboarding answers, calendar entries, medication schedules, and food diary from this device. You will be returned to the initial welcome screen.")
+            }
         }
     }
 
@@ -124,6 +140,33 @@ struct ProfileView: View {
             Text("Onboarding answers are stored locally using the app's device storage. You can review or update them anytime from this screen.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var dataManagementCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Data Management", systemImage: "internaldrive")
+                .font(.headline)
+                .foregroundStyle(Color("AccentColor"))
+
+            Text("Your journey profile, calendar journal entries, medication schedules, and food diary are stored exclusively on this device. You can reset and clear all data anytime.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Button(role: .destructive) {
+                showClearConfirmation = true
+            } label: {
+                Label("Clear all app data", systemImage: "trash.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+            }
+            .buttonStyle(.bordered)
+            .tint(.red)
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
