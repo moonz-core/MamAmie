@@ -557,6 +557,22 @@ private struct GeminiApiKeySheet: View {
                     }
                     .disabled(isTesting || keyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
+                    Button {
+                        let key = keyInput.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !key.isEmpty {
+                            gemini.setApiKey(key)
+                            dismiss()
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "checkmark.circle")
+                            Text("Save Key & Close")
+                                .font(.subheadline)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .disabled(keyInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
                     if gemini.hasApiKey {
                         Button("Remove Saved Key", role: .destructive) {
                             gemini.clearApiKey()
@@ -608,6 +624,9 @@ private struct GeminiApiKeySheet: View {
 
     private func testAndSave() {
         let key = keyInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !key.isEmpty else { return }
+        // Always save immediately to local storage so user is never blocked
+        gemini.setApiKey(key)
         isTesting = true
         testResult = nil
 
@@ -618,7 +637,9 @@ private struct GeminiApiKeySheet: View {
                 testSuccess = res.success
                 testResult = res.message
                 if res.success {
-                    gemini.setApiKey(key)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        dismiss()
+                    }
                 }
             }
         }

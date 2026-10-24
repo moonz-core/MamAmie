@@ -382,25 +382,29 @@ final class GeminiChatService: ObservableObject {
         contextSnapshot: MaternalContextSnapshot,
         conversationHistory: [GeminiChatMessage]
     ) async throws -> String {
-        let primaryModel = "gemini-1.5-flash"
-        let fallbackModel = "gemini-2.0-flash"
+        let candidateModels = [
+            "gemini-2.5-flash",
+            "gemini-flash-latest",
+            "gemini-1.5-flash",
+            "gemini-2.0-flash",
+            "gemini-pro-latest"
+        ]
 
-        do {
-            return try await executeGeminiRequest(
-                model: primaryModel,
-                userPrompt: userPrompt,
-                contextSnapshot: contextSnapshot,
-                conversationHistory: conversationHistory
-            )
-        } catch {
-            // Attempt fallback to gemini-2.0-flash
-            return try await executeGeminiRequest(
-                model: fallbackModel,
-                userPrompt: userPrompt,
-                contextSnapshot: contextSnapshot,
-                conversationHistory: conversationHistory
-            )
+        var lastError: Error = URLError(.badServerResponse)
+        for model in candidateModels {
+            do {
+                return try await executeGeminiRequest(
+                    model: model,
+                    userPrompt: userPrompt,
+                    contextSnapshot: contextSnapshot,
+                    conversationHistory: conversationHistory
+                )
+            } catch {
+                lastError = error
+                continue
+            }
         }
+        throw lastError
     }
 
     private func executeGeminiRequest(
@@ -500,33 +504,29 @@ final class GeminiChatService: ObservableObject {
             return (false, "API key cannot be empty.")
         }
 
-        guard let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=\(trimmed)") else {
+        // Test with Google Generative Language Models endpoint (returns 200 for valid key, 400 if invalid)
+        guard let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models?key=\(trimmed)") else {
             return (false, "Invalid URL structure.")
         }
 
         var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.timeoutInterval = 15
-
-        let body: [String: Any] = [
-            "contents": [
-                ["role": "user", "parts": [["text": "Hello, respond with 'OK'."]]]
-            ]
-        ]
-        req.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        req.httpMethod = "GET"
+        req.timeoutInterval = 12
 
         do {
             let (data, resp) = try await URLSession.shared.data(for: req)
-            if let http = resp as? HTTPURLResponse, http.statusCode == 200 {
-                return (true, "Key successfully verified with Gemini 1.5 Flash ✨")
+            guard let http = resp as? HTTPURLResponse else {
+                return (false, "No network response from Gemini.")
+            }
+            if http.statusCode == 200 {
+                return (true, "Key successfully connected and verified with Google Gemini ✨")
             } else {
                 if let errJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let errObj = errJson["error"] as? [String: Any],
                    let msg = errObj["message"] as? String {
                     return (false, msg)
                 }
-                return (false, "Verification failed with status code \((resp as? HTTPURLResponse)?.statusCode ?? -1)")
+                return (false, "Verification failed with status code \(http.statusCode)")
             }
         } catch {
             return (false, error.localizedDescription)
