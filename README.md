@@ -72,6 +72,6 @@ MamAmie provides a dedicated **Connected Health** section integrating with Apple
 
 ### Testing & Simulation
 
-* **Sample Demonstration Mode**: A dedicated toggle in Connected Health Settings (`⚙️`) allows developers and reviewers to test the complete maternal trend visualization and charts in the iOS Simulator or without a physical Apple Watch. All sample data is explicitly watermarked with a `Demo` tag so it is never confused with real medical records.
+* **Sample Demonstration Mode**: A dedicated toggle in Connected Health Settings allows developers and reviewers to test the complete maternal trend visualization and charts in the iOS Simulator or without a physical Apple Watch. All sample data is explicitly watermarked with a `Demo` tag so it is never confused with real medical records.
 * **Privacy & Local Processing**: All HealthKit queries are read-only and processed entirely on-device. Health data is never transmitted to external servers or AI endpoints.
 * **Medical Safety**: The application includes explicit clinical safety notices and emergency escalation guidance, emphasizing that wearables do not monitor fetal heart rate or diagnose pregnancy complications (e.g. preeclampsia).
