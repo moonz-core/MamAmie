@@ -276,6 +276,10 @@ public struct OnboardingProfile: Codable, Equatable {
         }
     }
 
+    public var stageDetailSummary: String {
+        dateSummary
+    }
+
     public var stageSummary: String {
         if stage == .pregnant, let gestationalWeek {
             return "Week \(gestationalWeek) · \(stage.title)"
