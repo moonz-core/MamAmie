@@ -167,6 +167,12 @@ alembic upgrade head
 pytest -q
 ```
 
+Food photo analysis is available at authenticated `POST /api/v1/nutrition/analyze-image`
+as a multipart upload with the field name `image`. It requires `AI_PROVIDER=gemini`
+with `GEMINI_API_KEY`, or `AI_PROVIDER=openai` with `OPENAI_API_KEY`. The response is
+always an estimate and must be reviewed by the user; the image is sent only to the
+configured backend provider and provider credentials are never shipped in the iOS app.
+
 Development and test environments seed a small curated corpus of official WHO
 and Indian government source summaries. Every seeded record is marked
 `unreviewed_demo`; these summaries are not clinician reviewed, and licensing

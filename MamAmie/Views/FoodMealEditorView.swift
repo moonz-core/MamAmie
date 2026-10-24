@@ -3,6 +3,7 @@ import UIKit
 
 struct FoodMealEditorView: View {
     @ObservedObject var store: FoodDiaryStore
+    @ObservedObject var assistantAPI: AssistantAPIClient
     @Environment(\.dismiss) private var dismiss
     @State private var name: String
     @State private var mealID: UUID
@@ -12,9 +13,11 @@ struct FoodMealEditorView: View {
     @State private var note: String
     @State private var showSaved = false
     @State private var recognitionMessage: String?
+    @State private var isAnalyzing = false
 
-    init(store: FoodDiaryStore, image: UIImage?) {
+    init(store: FoodDiaryStore, image: UIImage?, assistantAPI: AssistantAPIClient) {
         self.store = store
+        self.assistantAPI = assistantAPI
         _name = State(initialValue: "Meal")
         _mealID = State(initialValue: UUID())
         _loggedAt = State(initialValue: .now)
@@ -23,8 +26,9 @@ struct FoodMealEditorView: View {
         _note = State(initialValue: "")
     }
 
-    init(store: FoodDiaryStore, meal: FoodMeal) {
+    init(store: FoodDiaryStore, meal: FoodMeal, assistantAPI: AssistantAPIClient) {
         self.store = store
+        self.assistantAPI = assistantAPI
         _name = State(initialValue: meal.name)
         _mealID = State(initialValue: meal.id)
         _loggedAt = State(initialValue: meal.loggedAt)
@@ -40,17 +44,36 @@ struct FoodMealEditorView: View {
                     Section {
                         Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 230)
                             .frame(maxWidth: .infinity).clipShape(RoundedRectangle(cornerRadius: 14))
-                        Label("Photo recognition isn’t connected. Identify the visible foods below; the image stays on this device.", systemImage: "info.circle")
+                        Label("Review the AI estimate carefully. The photo is sent to MamAmie’s configured AI provider for analysis.", systemImage: "info.circle")
                             .font(.caption).foregroundStyle(.secondary)
                         Button {
                             Task {
+                                isAnalyzing = true
+                                defer { isAnalyzing = false }
                                 do {
-                                    _ = try await UnconfiguredFoodImageRecognizer().analyze(imageData: imageData)
+                                    let result = try await assistantAPI.analyzeFoodImage(imageData)
+                                    items = [FoodMealItem(name: result.suggestedName, portionGrams: 100,
+                                        ingredients: result.ingredients.joined(separator: ", "),
+                                        preparation: result.portionDescription,
+                                        nutrients: FoodNutrients(energyKcal: result.estimatedCalories,
+                                            proteinG: result.estimatedProteinG, carbohydrateG: result.estimatedCarbsG,
+                                            fatG: result.estimatedFatG, fibreG: result.estimatedFibreG,
+                                            ironMg: result.estimatedIronMg, folateMcg: result.estimatedFolateMcg,
+                                            calciumMg: result.estimatedCalciumMg, vitaminB12Mcg: nil,
+                                            vitaminDMcg: nil, vitaminCMg: nil, sodiumMg: nil),
+                                        dataSource: "AI estimate; review before saving")]
+                                    name = result.suggestedName
+                                    recognitionMessage = result.maternalSafetyNote
                                 } catch {
                                     recognitionMessage = error.localizedDescription
                                 }
                             }
-                        } label: { Label("Analyze My Meal", systemImage: "sparkles") }
+                        } label: { Label(isAnalyzing ? "Analyzing…" : "Analyze My Meal", systemImage: "sparkles") }
+                        .disabled(isAnalyzing || !assistantAPI.isSignedIn)
+                        if !assistantAPI.isSignedIn {
+                            Text("Sign in from the Assistant tab before analyzing a meal photo.")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
                     } header: { Text("Meal photo") }
                 }
 
@@ -106,7 +129,7 @@ struct FoodMealEditorView: View {
             }
             .alert("Meal saved", isPresented: $showSaved) { Button("Done") { dismiss() } }
             message: { Text("Your meal is saved privately on this device. Nutrient totals remain unavailable until verified data is connected.") }
-            .alert("Photo analysis unavailable", isPresented: Binding(get: { recognitionMessage != nil }, set: { if !$0 { recognitionMessage = nil } })) {
+            .alert("Review photo analysis", isPresented: Binding(get: { recognitionMessage != nil }, set: { if !$0 { recognitionMessage = nil } })) {
                 Button("Continue manually", role: .cancel) { recognitionMessage = nil }
             } message: { Text(recognitionMessage ?? "") }
         }

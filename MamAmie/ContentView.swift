@@ -4,6 +4,7 @@ struct ContentView: View {
     @ObservedObject var onboardingStore: OnboardingStore
     @ObservedObject var journalStore: JournalStore
     @ObservedObject var foodDiaryStore: FoodDiaryStore
+    @ObservedObject var assistantAPI: AssistantAPIClient
     @ObservedObject var watchBridge: WatchConnectivityBridge
     @State private var showingOnboarding = false
 
@@ -11,11 +12,13 @@ struct ContentView: View {
         onboardingStore: OnboardingStore,
         journalStore: JournalStore,
         foodDiaryStore: FoodDiaryStore,
+        assistantAPI: AssistantAPIClient,
         watchBridge: WatchConnectivityBridge
     ) {
         self.onboardingStore = onboardingStore
         self.journalStore = journalStore
         self.foodDiaryStore = foodDiaryStore
+        self.assistantAPI = assistantAPI
         self.watchBridge = watchBridge
     }
 
@@ -26,6 +29,7 @@ struct ContentView: View {
                     onboardingStore: onboardingStore,
                     journalStore: journalStore,
                     foodDiaryStore: foodDiaryStore,
+                    assistantAPI: assistantAPI,
                     onEditOnboarding: { showingOnboarding = true }
                 )
             } else {
@@ -51,6 +55,7 @@ struct ContentView_Previews: PreviewProvider {
             onboardingStore: OnboardingStore(),
             journalStore: JournalStore(),
             foodDiaryStore: FoodDiaryStore(),
+            assistantAPI: AssistantAPIClient(),
             watchBridge: WatchConnectivityBridge()
         )
     }
