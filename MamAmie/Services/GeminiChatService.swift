@@ -2,22 +2,22 @@ import Combine
 import Foundation
 import SwiftUI
 
-public struct GeminiChatMessage: Identifiable, Codable, Equatable {
-    public let id: UUID
-    public let role: Role
-    public var text: String
-    public let timestamp: Date
-    public var isEmergency: Bool
-    public var emergencyAction: String?
-    public var isPending: Bool
+struct GeminiChatMessage: Identifiable, Codable, Equatable {
+    let id: UUID
+    let role: Role
+    var text: String
+    let timestamp: Date
+    var isEmergency: Bool
+    var emergencyAction: String?
+    var isPending: Bool
 
-    public enum Role: String, Codable {
+    enum Role: String, Codable {
         case user
         case model
         case system
     }
 
-    public init(
+    init(
         id: UUID = UUID(),
         role: Role,
         text: String,
@@ -36,31 +36,31 @@ public struct GeminiChatMessage: Identifiable, Codable, Equatable {
     }
 }
 
-public struct MaternalContextSnapshot: Equatable {
-    public let stageName: String
-    public let gestationalWeekText: String?
-    public let dueDateText: String?
-    public let lmpText: String?
-    public let daysRemainingText: String?
-    public let todaysMealCount: Int
-    public let todaysCaloriesText: String?
-    public let todaysKeyNutrientsSummary: String?
-    public let fullContextString: String
+struct MaternalContextSnapshot: Equatable {
+    let stageName: String
+    let gestationalWeekText: String?
+    let dueDateText: String?
+    let lmpText: String?
+    let daysRemainingText: String?
+    let todaysMealCount: Int
+    let todaysCaloriesText: String?
+    let todaysKeyNutrientsSummary: String?
+    let fullContextString: String
 }
 
 @MainActor
-public final class GeminiChatService: ObservableObject {
-    public static let shared = GeminiChatService()
+final class GeminiChatService: ObservableObject {
+    static let shared = GeminiChatService()
 
-    @Published public var messages: [GeminiChatMessage] = []
-    @Published public var isGenerating: Bool = false
-    @Published public var lastErrorMessage: String?
-    @Published public var activeApiKey: String = ""
+    @Published var messages: [GeminiChatMessage] = []
+    @Published var isGenerating: Bool = false
+    @Published var lastErrorMessage: String?
+    @Published var activeApiKey: String = ""
 
     private let userDefaultsKey = "mamamie_gemini_api_key"
     private let chatHistoryDefaultsKey = "mamamie_gemini_chat_history"
 
-    public init() {
+    init() {
         loadApiKey()
         loadHistory()
         if messages.isEmpty {
@@ -68,17 +68,17 @@ public final class GeminiChatService: ObservableObject {
         }
     }
 
-    public var hasApiKey: Bool {
+    var hasApiKey: Bool {
         !activeApiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    public func setApiKey(_ key: String) {
+    func setApiKey(_ key: String) {
         let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
         activeApiKey = trimmed
         UserDefaults.standard.set(trimmed, forKey: userDefaultsKey)
     }
 
-    public func clearApiKey() {
+    func clearApiKey() {
         activeApiKey = ""
         UserDefaults.standard.removeObject(forKey: userDefaultsKey)
     }
@@ -92,7 +92,7 @@ public final class GeminiChatService: ObservableObject {
         }
     }
 
-    public func clearHistory() {
+    func clearHistory() {
         messages = []
         UserDefaults.standard.removeObject(forKey: chatHistoryDefaultsKey)
         addWelcomeMessage()
@@ -108,7 +108,7 @@ public final class GeminiChatService: ObservableObject {
 
     // MARK: - Context Generation
 
-    public func buildContextSnapshot(profile: OnboardingProfile?, meals: [FoodMeal]) -> MaternalContextSnapshot {
+    func buildContextSnapshot(profile: OnboardingProfile?, meals: [FoodMeal]) -> MaternalContextSnapshot {
         let calendar = Calendar.current
         let today = Date()
 
@@ -252,7 +252,7 @@ public final class GeminiChatService: ObservableObject {
 
     // MARK: - Sending Messages
 
-    public func sendMessage(
+    func sendMessage(
         _ text: String,
         profile: OnboardingProfile?,
         meals: [FoodMeal]
@@ -453,7 +453,7 @@ public final class GeminiChatService: ObservableObject {
 
     // MARK: - API Key Verification
 
-    public func testApiKey(_ key: String) async -> (success: Bool, message: String) {
+    func testApiKey(_ key: String) async -> (success: Bool, message: String) {
         let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             return (false, "API key cannot be empty.")
