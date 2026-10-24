@@ -231,6 +231,50 @@ struct FoodMealDetailView: View {
                 Text("No verified food-composition record is linked to these entries yet.")
                     .font(.caption).foregroundStyle(.secondary)
             }
+            if let insight = meal.insight {
+                Section("AI Maternal Guidance & Recommendations") {
+                    if !insight.safetyNote.isEmpty {
+                        HStack(spacing: 8) {
+                            Image(systemName: insight.isSafeForPregnancy ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
+                                .foregroundStyle(insight.isSafeForPregnancy ? .green : .orange)
+                            Text(insight.safetyNote)
+                                .font(.caption)
+                        }
+                    }
+
+                    if !insight.suggestedSupplements.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Recommended Supplements to Buy:")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(.purple)
+                            ForEach(insight.suggestedSupplements) { supp in
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("• \(supp.supplementName): \(supp.dosageTip)")
+                                        .font(.caption.weight(.semibold))
+                                    if !supp.whyItIsGood.isEmpty {
+                                        Text(supp.whyItIsGood)
+                                            .font(.caption2)
+                                            .foregroundStyle(.pink)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if !insight.suggestedFoods.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Foods to Cover Missing Nutrients:")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(Color("AccentColor"))
+                            ForEach(insight.suggestedFoods) { food in
+                                Text("• \(food.foodName) (\(food.richIn))")
+                                    .font(.caption2)
+                            }
+                        }
+                    }
+                }
+            }
+
             Section("What this tells you") {
                 Text("The foods and portions recorded here can help you review your eating pattern over time. This entry does not establish nutrient status or diagnose a deficiency.")
                     .font(.subheadline).foregroundStyle(.secondary)

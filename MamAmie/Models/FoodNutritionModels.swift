@@ -14,6 +14,8 @@ struct FoodNutrients: Codable, Equatable {
     var vitaminDMcg: Double?
     var vitaminCMg: Double?
     var sodiumMg: Double?
+    var dhaMg: Double?
+    var cholineMg: Double?
 
     static let unavailable = FoodNutrients()
 }
@@ -29,6 +31,43 @@ struct FoodMealItem: Codable, Identifiable, Equatable {
     var dataSource: String = "No verified food-composition record configured"
 }
 
+struct MaternalNutritionInsight: Codable, Equatable, Identifiable {
+    var id = UUID()
+    var mealName: String
+    var strengths: [String]
+    var missingNutrients: [MaternalNutrientGap]
+    var suggestedFoods: [MaternalFoodSuggestion]
+    var suggestedSupplements: [MaternalSupplementSuggestion]
+    var clinicalGuidance: String
+    var isSafeForPregnancy: Bool
+    var safetyNote: String
+}
+
+struct MaternalNutrientGap: Codable, Equatable, Identifiable {
+    var id: String { nutrientName }
+    var nutrientName: String
+    var amountInMeal: String
+    var dailyTarget: String
+    var urgencyLevel: String // "Moderate" or "High Priority"
+    var whyBabyNeedsIt: String
+}
+
+struct MaternalFoodSuggestion: Codable, Equatable, Identifiable {
+    var id = UUID()
+    var foodName: String
+    var richIn: String
+    var portionTip: String
+}
+
+struct MaternalSupplementSuggestion: Codable, Equatable, Identifiable {
+    var id = UUID()
+    var supplementName: String
+    var dosageTip: String
+    var purpose: String
+    var whyItIsGood: String = ""
+    var buyingAdvice: String
+}
+
 struct FoodMeal: Codable, Identifiable, Equatable {
     var id = UUID()
     var name: String
@@ -36,6 +75,7 @@ struct FoodMeal: Codable, Identifiable, Equatable {
     var loggedAt = Date()
     var imageData: Data?
     var note: String = ""
+    var insight: MaternalNutritionInsight? = nil
 
     var totals: FoodNutrients { FoodNutritionCalculator.sum(items.map(\.nutrients)) }
 }
@@ -54,7 +94,8 @@ enum FoodNutritionCalculator {
             fibreG: total(\.fibreG), ironMg: total(\.ironMg),
             folateMcg: total(\.folateMcg), calciumMg: total(\.calciumMg),
             vitaminB12Mcg: total(\.vitaminB12Mcg), vitaminDMcg: total(\.vitaminDMcg),
-            vitaminCMg: total(\.vitaminCMg), sodiumMg: total(\.sodiumMg)
+            vitaminCMg: total(\.vitaminCMg), sodiumMg: total(\.sodiumMg),
+            dhaMg: total(\.dhaMg), cholineMg: total(\.cholineMg)
         )
     }
 

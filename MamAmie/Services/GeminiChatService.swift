@@ -423,6 +423,115 @@ final class GeminiChatService: ObservableObject {
         throw lastError
     }
 
+    /// Multimodal LLM completion method that accepts image data + prompt.
+    /// Uses Gemini vision models and candidate fallback cascade.
+    func generateMultimodalFeatureCompletion(
+        systemInstruction: String,
+        userPrompt: String,
+        imageData: Data,
+        mimeType: String = "image/jpeg",
+        temperature: Double = 0.4,
+        fallbackText: String? = nil
+    ) async throws -> String {
+        var lastError: Error = URLError(.badServerResponse)
+
+        for model in Self.candidateModels {
+            do {
+                return try await executeMultimodalGeminiRequest(
+                    model: model,
+                    systemInstruction: systemInstruction,
+                    userPrompt: userPrompt,
+                    imageData: imageData,
+                    mimeType: mimeType,
+                    temperature: temperature
+                )
+            } catch {
+                lastError = error
+                continue
+            }
+        }
+
+        if let fallback = fallbackText {
+            return fallback
+        }
+        throw lastError
+    }
+
+    private func executeMultimodalGeminiRequest(
+        model: String,
+        systemInstruction: String,
+        userPrompt: String,
+        imageData: Data,
+        mimeType: String,
+        temperature: Double
+    ) async throws -> String {
+        guard let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/\(model):generateContent?key=\(activeApiKey)") else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 25
+
+        let base64String = imageData.base64EncodedString()
+        let payload: [String: Any] = [
+            "systemInstruction": [
+                "parts": [["text": systemInstruction]]
+            ],
+            "contents": [
+                [
+                    "role": "user",
+                    "parts": [
+                        [
+                            "inlineData": [
+                                "mimeType": mimeType,
+                                "data": base64String
+                            ]
+                        ],
+                        [
+                            "text": userPrompt
+                        ]
+                    ]
+                ]
+            ],
+            "generationConfig": [
+                "temperature": temperature,
+                "topP": 0.95,
+                "maxOutputTokens": 2048
+            ]
+        ]
+
+        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        if httpResponse.statusCode != 200 {
+            if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let errorObj = errorJson["error"] as? [String: Any],
+               let errorMessage = errorObj["message"] as? String {
+                throw NSError(domain: "GeminiAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+            }
+            throw NSError(domain: "GeminiAPI", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "Server returned HTTP \(httpResponse.statusCode)"])
+        }
+
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let candidates = json["candidates"] as? [[String: Any]],
+              let firstCandidate = candidates.first,
+              let content = firstCandidate["content"] as? [String: Any],
+              let parts = content["parts"] as? [[String: Any]],
+              let firstPart = parts.first,
+              let text = firstPart["text"] as? String else {
+            throw NSError(domain: "GeminiAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Malformed response format from Gemini API"])
+        }
+
+        return text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private func executeGenericGeminiRequest(
         model: String,
         systemInstruction: String,

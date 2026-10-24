@@ -93,6 +93,7 @@
 		J10000000000000000000004 /* DayCheckpointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000004 /* DayCheckpointsView.swift */; };
 		J10000000000000000000005 /* DayWeightTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000005 /* DayWeightTrackerView.swift */; };
 		J10000000000000000000006 /* AIExerciseAdaptationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000006 /* AIExerciseAdaptationService.swift */; };
+		J10000000000000000000007 /* MaternalFoodAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000007 /* MaternalFoodAIService.swift */; };
 		H10000000000000000000001 /* MaternalVisualCharts.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000000000000000000001 /* MaternalVisualCharts.swift */; };
 		H10000000000000000000002 /* MaternalAIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000000000000000000002 /* MaternalAIView.swift */; };
 		D10000000000000000000001 /* MamAmieWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000001 /* MamAmieWatchApp.swift */; };
@@ -200,6 +201,7 @@
 		J20000000000000000000004 /* DayCheckpointsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayCheckpointsView.swift; sourceTree = "<group>"; };
 		J20000000000000000000005 /* DayWeightTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayWeightTrackerView.swift; sourceTree = "<group>"; };
 		J20000000000000000000006 /* AIExerciseAdaptationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIExerciseAdaptationService.swift; sourceTree = "<group>"; };
+		J20000000000000000000007 /* MaternalFoodAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaternalFoodAIService.swift; sourceTree = "<group>"; };
 		H20000000000000000000001 /* MaternalVisualCharts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AI/MaternalVisualCharts.swift"; sourceTree = "<group>"; };
 		H20000000000000000000002 /* MaternalAIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AI/MaternalAIView.swift"; sourceTree = "<group>"; };
 		E20000000000000000000000 /* MamAmieWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MamAmieWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -325,6 +327,7 @@
 				G20000000000000000000004 /* GeminiChatService.swift */,
 				J20000000000000000000001 /* MaternalSchedulePlanner.swift */,
 				J20000000000000000000006 /* AIExerciseAdaptationService.swift */,
+				J20000000000000000000007 /* MaternalFoodAIService.swift */,
 				E40000000000000000000002 /* Watch */,
 			);
 			path = Services;
@@ -590,6 +593,7 @@
 				J10000000000000000000004 /* DayCheckpointsView.swift in Sources */,
 				J10000000000000000000005 /* DayWeightTrackerView.swift in Sources */,
 				J10000000000000000000006 /* AIExerciseAdaptationService.swift in Sources */,
+				J10000000000000000000007 /* MaternalFoodAIService.swift in Sources */,
 				H10000000000000000000001 /* MaternalVisualCharts.swift in Sources */,
 				H10000000000000000000002 /* MaternalAIView.swift in Sources */,
 				D10000000000000000000006 /* WatchCompanionPayload.swift in iOS Sources */,
@@ -732,6 +736,7 @@
 		AA0000000000000000000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MamAmie/MamAmie.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
@@ -761,6 +766,7 @@
 		AA0000000000000000000002 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MamAmie/MamAmie.entitlements;
 				CURRENT_PROJECT_VERSION = 1;

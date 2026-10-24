@@ -47,17 +47,23 @@ struct ProfileView: View {
     }
 
     private var profileHeader: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: "person.crop.circle.fill")
-                .font(.system(size: 56))
-                .foregroundStyle(Color("AccentColor"))
+        HStack(alignment: .center, spacing: 16) {
+            Image("AppLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 68, height: 68)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color("AccentColor").opacity(0.2), lineWidth: 1.5))
+                .shadow(color: Color("AccentColor").opacity(0.12), radius: 6, x: 0, y: 3)
 
-            Text(displayName)
-                .font(.largeTitle.bold())
+            VStack(alignment: .leading, spacing: 4) {
+                Text(displayName)
+                    .font(.title2.bold())
 
-            Text("Your setup stays private on this device and can be changed whenever you need.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                Text("Your setup stays private on this device and can be changed whenever you need.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 

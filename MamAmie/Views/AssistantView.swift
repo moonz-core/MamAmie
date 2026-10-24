@@ -292,11 +292,15 @@ struct AssistantView: View {
                 // MamAmie Avatar
                 ZStack {
                     Circle()
-                        .fill(Color("AccentColor").opacity(0.15))
+                        .fill(Color("AccentColor").opacity(0.12))
                         .frame(width: 32, height: 32)
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(Color("AccentColor"))
+
+                    Image("AppLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 28, height: 28)
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color("AccentColor").opacity(0.2), lineWidth: 1))
                 }
             } else {
                 Spacer(minLength: 40)
