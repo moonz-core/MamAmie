@@ -2,8 +2,11 @@ import SwiftUI
 
 public struct ConnectedHealthDashboardView: View {
     @StateObject private var viewModel = ConnectedHealthViewModel()
+    private let initialProfile: MaternalHealthProfile?
 
-    public init() {}
+    public init(initialProfile: MaternalHealthProfile? = nil) {
+        self.initialProfile = initialProfile
+    }
 
     public var body: some View {
         NavigationStack {
@@ -54,6 +57,10 @@ public struct ConnectedHealthDashboardView: View {
                 HealthSourceSettingsSheet(viewModel: viewModel)
             }
             .task {
+                if let initialProfile {
+                    viewModel.profile = initialProfile
+                }
+
                 // If in demo mode or already authorized, load data
                 if viewModel.connectionState == .connected || viewModel.isDemoMode {
                     await viewModel.loadAllHealthData()

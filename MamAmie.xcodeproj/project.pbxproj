@@ -39,8 +39,6 @@
 		C10000000000000000000022 /* EntryDetailContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000022 /* EntryDetailContentView.swift */; };
 		C10000000000000000000023 /* EntryDetailComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000023 /* EntryDetailComponents.swift */; };
 		C10000000000000000000024 /* AttachmentImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000024 /* AttachmentImageLoader.swift */; };
-		C10000000000000000000025 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000025 /* HomeView.swift */; };
-		C10000000000000000000026 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000026 /* PlaceholderView.swift */; };
 		C10000000000000000000027 /* AttachmentViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000027 /* AttachmentViews.swift */; };
 		A10000000000000000000011 /* HealthMetricType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* HealthMetricType.swift */; };
 		A10000000000000000000012 /* HealthReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* HealthReading.swift */; };
@@ -54,11 +52,31 @@
 		A10000000000000000000020 /* ConnectedHealthDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* ConnectedHealthDashboardView.swift */; };
 		A10000000000000000000021 /* HealthMetricCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* HealthMetricCardView.swift */; };
 		A10000000000000000000022 /* HealthMetricDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* HealthMetricDetailView.swift */; };
+		A10000000000000000000031 /* HealthTrendFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000031 /* HealthTrendFormatting.swift */; };
+		A10000000000000000000032 /* PregnancyReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000032 /* PregnancyReference.swift */; };
+		A10000000000000000000033 /* HealthTrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000033 /* HealthTrendChartView.swift */; };
+		A10000000000000000000034 /* HealthMetricStatsCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000034 /* HealthMetricStatsCardView.swift */; };
+		A10000000000000000000035 /* PregnancyComparisonCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000035 /* PregnancyComparisonCard.swift */; };
+		A10000000000000000000036 /* TrendReadingsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000036 /* TrendReadingsListView.swift */; };
 		A10000000000000000000023 /* WeeklyWellbeingSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* WeeklyWellbeingSummaryCard.swift */; };
 		A10000000000000000000024 /* HealthPermissionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* HealthPermissionSheet.swift */; };
 		A10000000000000000000025 /* HealthSourceSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* HealthSourceSettingsSheet.swift */; };
 		A10000000000000000000026 /* MedicalSafetyBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* MedicalSafetyBannerView.swift */; };
 		A10000000000000000000030 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20000000000000000000030 /* HealthKit.framework */; };
+		A10000000000000000000041 /* OnboardingProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000041 /* OnboardingProfile.swift */; };
+		A10000000000000000000042 /* OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* OnboardingStore.swift */; };
+		A10000000000000000000043 /* OnboardingComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000043 /* OnboardingComponents.swift */; };
+		A10000000000000000000044 /* OnboardingWelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000044 /* OnboardingWelcomeView.swift */; };
+		A10000000000000000000045 /* OnboardingStageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000045 /* OnboardingStageView.swift */; };
+		A10000000000000000000046 /* OnboardingDatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000046 /* OnboardingDatesView.swift */; };
+		A10000000000000000000047 /* OnboardingPersonalizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000047 /* OnboardingPersonalizationView.swift */; };
+		A10000000000000000000048 /* OnboardingSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000048 /* OnboardingSummaryView.swift */; };
+		A10000000000000000000049 /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000049 /* OnboardingFlowView.swift */; };
+		A10000000000000000000050 /* AppTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000050 /* AppTabView.swift */; };
+		A10000000000000000000051 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000051 /* HomeView.swift */; };
+		A10000000000000000000052 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000052 /* PlaceholderView.swift */; };
+		A10000000000000000000053 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000053 /* ProfileView.swift */; };
+		A10000000000000000000054 /* OnboardingPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000054 /* OnboardingPersistence.swift */; };
 		F10000000000000000000001 /* FoodNutritionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000001 /* FoodNutritionModels.swift */; };
 		F10000000000000000000002 /* FoodDiaryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000002 /* FoodDiaryStore.swift */; };
 		F10000000000000000000003 /* FoodScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000003 /* FoodScannerView.swift */; };
@@ -120,8 +138,6 @@
 		C20000000000000000000022 /* EntryDetailContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailContentView.swift; sourceTree = "<group>"; };
 		C20000000000000000000023 /* EntryDetailComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailComponents.swift; sourceTree = "<group>"; };
 		C20000000000000000000024 /* AttachmentImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentImageLoader.swift; sourceTree = "<group>"; };
-		C20000000000000000000025 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		C20000000000000000000026 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		C20000000000000000000027 /* AttachmentViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentViews.swift; sourceTree = "<group>"; };
 		A20000000000000000000011 /* HealthMetricType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/HealthMetricType.swift"; sourceTree = "<group>"; };
 		A20000000000000000000012 /* HealthReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/HealthReading.swift"; sourceTree = "<group>"; };
@@ -135,12 +151,32 @@
 		A20000000000000000000020 /* ConnectedHealthDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/ConnectedHealthDashboardView.swift"; sourceTree = "<group>"; };
 		A20000000000000000000021 /* HealthMetricCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthMetricCardView.swift"; sourceTree = "<group>"; };
 		A20000000000000000000022 /* HealthMetricDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthMetricDetailView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000031 /* HealthTrendFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/HealthTrendFormatting.swift"; sourceTree = "<group>"; };
+		A20000000000000000000032 /* PregnancyReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Health/PregnancyReference.swift"; sourceTree = "<group>"; };
+		A20000000000000000000033 /* HealthTrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthTrendChartView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000034 /* HealthMetricStatsCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthMetricStatsCardView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000035 /* PregnancyComparisonCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/PregnancyComparisonCard.swift"; sourceTree = "<group>"; };
+		A20000000000000000000036 /* TrendReadingsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/TrendReadingsListView.swift"; sourceTree = "<group>"; };
 		A20000000000000000000023 /* WeeklyWellbeingSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/WeeklyWellbeingSummaryCard.swift"; sourceTree = "<group>"; };
 		A20000000000000000000024 /* HealthPermissionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthPermissionSheet.swift"; sourceTree = "<group>"; };
 		A20000000000000000000025 /* HealthSourceSettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/HealthSourceSettingsSheet.swift"; sourceTree = "<group>"; };
 		A20000000000000000000026 /* MedicalSafetyBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Health/MedicalSafetyBannerView.swift"; sourceTree = "<group>"; };
 		A20000000000000000000027 /* MamAmie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MamAmie.entitlements; sourceTree = "<group>"; };
 		A20000000000000000000030 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		A20000000000000000000041 /* OnboardingProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/Onboarding/OnboardingProfile.swift"; sourceTree = "<group>"; };
+		A20000000000000000000042 /* OnboardingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/Onboarding/OnboardingStore.swift"; sourceTree = "<group>"; };
+		A20000000000000000000043 /* OnboardingComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingComponents.swift"; sourceTree = "<group>"; };
+		A20000000000000000000044 /* OnboardingWelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingWelcomeView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000045 /* OnboardingStageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingStageView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000046 /* OnboardingDatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingDatesView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000047 /* OnboardingPersonalizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingPersonalizationView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000048 /* OnboardingSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingSummaryView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000049 /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingFlowView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000050 /* AppTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/AppTabView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000051 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/HomeView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000052 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/PlaceholderView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000053 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/ProfileView.swift"; sourceTree = "<group>"; };
+		A20000000000000000000054 /* OnboardingPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/Onboarding/OnboardingPersistence.swift"; sourceTree = "<group>"; };
 		F20000000000000000000001 /* FoodNutritionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodNutritionModels.swift; sourceTree = "<group>"; };
 		F20000000000000000000002 /* FoodDiaryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDiaryStore.swift; sourceTree = "<group>"; };
 		F20000000000000000000003 /* FoodScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodScannerView.swift; sourceTree = "<group>"; };
@@ -206,6 +242,8 @@
 				A20000000000000000000011 /* HealthMetricType.swift */,
 				A20000000000000000000012 /* HealthReading.swift */,
 				A20000000000000000000013 /* HealthTrendPoint.swift */,
+				A20000000000000000000031 /* HealthTrendFormatting.swift */,
+				A20000000000000000000032 /* PregnancyReference.swift */,
 				A20000000000000000000014 /* PersonalHealthSummary.swift */,
 				A20000000000000000000015 /* MaternalHealthProfile.swift */,
 				A20000000000000000000016 /* HealthKitServiceProtocol.swift */,
@@ -215,11 +253,29 @@
 				A20000000000000000000020 /* ConnectedHealthDashboardView.swift */,
 				A20000000000000000000021 /* HealthMetricCardView.swift */,
 				A20000000000000000000022 /* HealthMetricDetailView.swift */,
+				A20000000000000000000033 /* HealthTrendChartView.swift */,
+				A20000000000000000000034 /* HealthMetricStatsCardView.swift */,
+				A20000000000000000000035 /* PregnancyComparisonCard.swift */,
+				A20000000000000000000036 /* TrendReadingsListView.swift */,
 				A20000000000000000000023 /* WeeklyWellbeingSummaryCard.swift */,
 				A20000000000000000000024 /* HealthPermissionSheet.swift */,
 				A20000000000000000000025 /* HealthSourceSettingsSheet.swift */,
 				A20000000000000000000026 /* MedicalSafetyBannerView.swift */,
 				A20000000000000000000030 /* HealthKit.framework */,
+				A20000000000000000000041 /* OnboardingProfile.swift */,
+				A20000000000000000000042 /* OnboardingStore.swift */,
+				A20000000000000000000043 /* OnboardingComponents.swift */,
+				A20000000000000000000044 /* OnboardingWelcomeView.swift */,
+				A20000000000000000000045 /* OnboardingStageView.swift */,
+				A20000000000000000000046 /* OnboardingDatesView.swift */,
+				A20000000000000000000047 /* OnboardingPersonalizationView.swift */,
+				A20000000000000000000048 /* OnboardingSummaryView.swift */,
+				A20000000000000000000049 /* OnboardingFlowView.swift */,
+				A20000000000000000000050 /* AppTabView.swift */,
+				A20000000000000000000051 /* HomeView.swift */,
+				A20000000000000000000052 /* PlaceholderView.swift */,
+				A20000000000000000000053 /* ProfileView.swift */,
+				A20000000000000000000054 /* OnboardingPersistence.swift */,
 			);
 			path = MamAmie;
 			sourceTree = "<group>";
@@ -283,8 +339,6 @@
 			isa = PBXGroup;
 			children = (
 				B20000000000000000000003 /* CalendarJournalView.swift */,
-				C20000000000000000000025 /* HomeView.swift */,
-				C20000000000000000000026 /* PlaceholderView.swift */,
 				C20000000000000000000010 /* CalendarHeaderView.swift */,
 				C20000000000000000000011 /* CalendarCategoryStyle.swift */,
 				C20000000000000000000012 /* MonthCalendarView.swift */,
@@ -462,8 +516,6 @@
 				C10000000000000000000022 /* EntryDetailContentView.swift in Sources */,
 				C10000000000000000000023 /* EntryDetailComponents.swift in Sources */,
 				C10000000000000000000024 /* AttachmentImageLoader.swift in Sources */,
-				C10000000000000000000025 /* HomeView.swift in Sources */,
-				C10000000000000000000026 /* PlaceholderView.swift in Sources */,
 				C10000000000000000000027 /* AttachmentViews.swift in Sources */,
 				A10000000000000000000011 /* HealthMetricType.swift in Sources */,
 				A10000000000000000000012 /* HealthReading.swift in Sources */,
@@ -477,10 +529,30 @@
 				A10000000000000000000020 /* ConnectedHealthDashboardView.swift in Sources */,
 				A10000000000000000000021 /* HealthMetricCardView.swift in Sources */,
 				A10000000000000000000022 /* HealthMetricDetailView.swift in Sources */,
+				A10000000000000000000031 /* HealthTrendFormatting.swift in Sources */,
+				A10000000000000000000032 /* PregnancyReference.swift in Sources */,
+				A10000000000000000000033 /* HealthTrendChartView.swift in Sources */,
+				A10000000000000000000034 /* HealthMetricStatsCardView.swift in Sources */,
+				A10000000000000000000035 /* PregnancyComparisonCard.swift in Sources */,
+				A10000000000000000000036 /* TrendReadingsListView.swift in Sources */,
 				A10000000000000000000023 /* WeeklyWellbeingSummaryCard.swift in Sources */,
 				A10000000000000000000024 /* HealthPermissionSheet.swift in Sources */,
 				A10000000000000000000025 /* HealthSourceSettingsSheet.swift in Sources */,
 				A10000000000000000000026 /* MedicalSafetyBannerView.swift in Sources */,
+				A10000000000000000000041 /* OnboardingProfile.swift in Sources */,
+				A10000000000000000000042 /* OnboardingStore.swift in Sources */,
+				A10000000000000000000043 /* OnboardingComponents.swift in Sources */,
+				A10000000000000000000044 /* OnboardingWelcomeView.swift in Sources */,
+				A10000000000000000000045 /* OnboardingStageView.swift in Sources */,
+				A10000000000000000000046 /* OnboardingDatesView.swift in Sources */,
+				A10000000000000000000047 /* OnboardingPersonalizationView.swift in Sources */,
+				A10000000000000000000048 /* OnboardingSummaryView.swift in Sources */,
+				A10000000000000000000049 /* OnboardingFlowView.swift in Sources */,
+				A10000000000000000000050 /* AppTabView.swift in Sources */,
+				A10000000000000000000051 /* HomeView.swift in Sources */,
+				A10000000000000000000052 /* PlaceholderView.swift in Sources */,
+				A10000000000000000000053 /* ProfileView.swift in Sources */,
+				A10000000000000000000054 /* OnboardingPersistence.swift in Sources */,
 				F10000000000000000000001 /* FoodNutritionModels.swift in Sources */,
 				F10000000000000000000002 /* FoodDiaryStore.swift in Sources */,
 				F10000000000000000000003 /* FoodScannerView.swift in Sources */,

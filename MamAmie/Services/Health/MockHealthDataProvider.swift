@@ -124,9 +124,6 @@ public final class MockHealthDataProvider: HealthKitServiceProtocol {
         case .wristTemperature: baseVal = 36.5; variance = 0.3
         }
 
-        let labelFormatter = DateFormatter()
-        labelFormatter.dateFormat = scope == .day ? "h a" : (scope == .week ? "EEE" : "d")
-
         for index in 0..<count {
             let offset = count - 1 - index
             let pointDate: Date
@@ -147,7 +144,7 @@ public final class MockHealthDataProvider: HealthKitServiceProtocol {
                     secondaryValue: secVal,
                     minValue: val - (variance * 0.4),
                     maxValue: val + (variance * 0.4),
-                    label: labelFormatter.string(from: pointDate)
+                    label: HealthTrendFormatting.axisLabel(for: pointDate, scope: scope)
                 )
             )
         }

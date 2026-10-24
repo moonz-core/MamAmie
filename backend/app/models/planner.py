@@ -17,6 +17,6 @@ class PlannerEntry(Base, UUIDMixin, TimestampMixin):
     time_minutes: Mapped[Optional[int]] = mapped_column(Integer, nullable=True) # minutes after midnight
     notes: Mapped[str] = mapped_column(Text, default="", nullable=False)
     is_completed: Mapped[bool] = mapped_column(Boolean, default=False, index=True, nullable=False)
-    
+
     # Structured category details payload matching CalendarEntry.swift
     extra_data: Mapped[Optional[dict]] = mapped_column(JSON, default=dict, nullable=True)

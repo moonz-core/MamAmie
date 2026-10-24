@@ -14,6 +14,14 @@ public enum TimeScope: String, CaseIterable, Identifiable {
         case .month: return 30
         }
     }
+
+    public var axisLabelCount: Int {
+        switch self {
+        case .day: return 6
+        case .week: return 7
+        case .month: return 6
+        }
+    }
 }
 
 public enum TrendDirection: Equatable {
