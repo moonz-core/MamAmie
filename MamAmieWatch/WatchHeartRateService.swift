@@ -58,7 +58,7 @@ final class WatchHeartRateService: ObservableObject {
     }
 
     func refresh() async {
-        guard let healthStore,
+        guard healthStore != nil,
               let type = HKObjectType.quantityType(forIdentifier: .heartRate) else {
             state = .unavailable
             return

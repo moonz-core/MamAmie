@@ -1,6 +1,6 @@
 import Foundation
 
-public enum TimeScope: String, CaseIterable, Identifiable {
+public enum TimeScope: String, CaseIterable, Identifiable, Sendable {
     case day = "Day"
     case week = "Week"
     case month = "Month"
