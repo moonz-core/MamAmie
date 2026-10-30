@@ -25,134 +25,137 @@ struct FoodScannerView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
-                    headerSection
-                    actionButtons
-                    sampleMealsSection
-                    diarySummaryRow
-
-                    if let latest = store.meals.first {
-                        recentMealSection(latest)
-                    }
-
-                    if todayMeals.isEmpty {
-                        emptyDiaryMessage
-                    }
-
-                    footerDisclaimer
+            mainContent
+                .background(Color(.systemBackground))
+                .navigationTitle("Food Scanner")
+                .navigationBarTitleDisplayMode(.inline)
+                .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)
+                .onChange(of: selectedPhoto) { item in
+                    handleSelectedPhoto(item)
                 }
-                .padding(20)
-            }
-            .background(Color(.systemBackground))
-            .navigationTitle("Food Scanner").navigationBarTitleDisplayMode(.inline)
-            .confirmationDialog("Add a meal photo", isPresented: $showPhotoOptions, titleVisibility: .visible) {
-                Button {
-                    showPhotoPicker = true
-                } label: {
-                    Label("Choose from photo library", systemImage: "photo")
-                }
-
-                Button {
-                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                        showCamera = true
-                    } else {
-                        // Simulator friendly: simulate camera capture using sample image
-                        if let img = UIImage(named: "sample_spinach_dal") {
-                            photo = img
-                            showEditor = true
-                        } else {
-                            showCameraUnavailable = true
-                        }
-                    }
-                } label: {
-                    Label(
-                        UIImagePickerController.isSourceTypeAvailable(.camera) ? "Take a photo" : "Simulate camera photo (Test meal)",
-                        systemImage: "camera"
-                    )
-                }
-
-                Button {
-                    showSamplePicker = true
-                } label: {
-                    Label("Try a sample maternal meal", systemImage: "sparkles")
-                }
-
-                Button {
-                    saveSampleMealsToPhotos()
-                } label: {
-                    Label("Save 3 sample meals to photo library", systemImage: "square.and.arrow.down")
-                }
-
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("Photograph the whole plate in good light, or pick a sample meal for quick testing on Simulator.")
-            }
-            .onChange(of: selectedPhoto) { item in
-                guard let item else { return }
-                isLoadingPhoto = true
-                Task {
-                    guard let data = try? await item.loadTransferable(type: Data.self),
-                          let image = UIImage(data: data) else {
-                        await MainActor.run { isLoadingPhoto = false; photoLoadFailed = true }
-                        return
-                    }
-                    await MainActor.run {
-                        isLoadingPhoto = false
-                        photo = resized(image)
-                        showEditor = true
+                .overlay {
+                    if isLoadingPhoto {
+                        loadingOverlay
                     }
                 }
-            }
-            .sheet(isPresented: $showCamera) {
-                CameraCaptureView { image in
-                    photo = resized(image)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { showEditor = true }
+                .confirmationDialog("Add a meal photo", isPresented: $showPhotoOptions, titleVisibility: .visible) {
+                    photoOptionButtons
+                } message: {
+                    Text("Photograph the whole plate in good light, or pick a sample meal for quick testing on Simulator.")
                 }
-                .ignoresSafeArea()
-            }
-            .sheet(isPresented: $showEditor) {
-                FoodMealEditorView(
+                .modifier(FoodScannerSheetsModifier(
+                    showCamera: $showCamera,
+                    showEditor: $showEditor,
+                    showDashboard: $showDashboard,
+                    showSamplePicker: $showSamplePicker,
+                    photo: $photo,
                     store: store,
-                    image: photo,
                     journalStore: journalStore,
                     profile: profile,
-                    assistantAPI: assistantAPI
-                )
-            }
-            .sheet(isPresented: $showDashboard) {
-                FoodDailyDashboardView(store: store, assistantAPI: assistantAPI)
-            }
-            .sheet(isPresented: $showSamplePicker) {
-                sampleMealsSheetView
-            }
-            .alert("Camera unavailable", isPresented: $showCameraUnavailable) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text("Camera is not available on Simulator. You can use the Sample Meals or Photo Library.")
-            }
-            .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)
-            .alert("Could not load photo", isPresented: $photoLoadFailed) {
-                Button("OK", role: .cancel) { selectedPhoto = nil }
-            } message: {
-                Text("Choose another image or enter the meal manually.")
-            }
-            .overlay {
-                if isLoadingPhoto {
-                    ProgressView("Loading selected photo…")
-                        .padding(20)
-                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
-                }
-            }
-            .alert("Photos Saved", isPresented: $gallerySavedToast) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text("Saved 3 high-quality maternal meal photos to your device Photo Library! You can now choose them from the Photos picker.")
-            }
-            .alert("Diary issue", isPresented: Binding(get: { store.errorMessage != nil }, set: { if !$0 { store.errorMessage = nil } })) {
-                Button("OK", role: .cancel) { store.errorMessage = nil }
-            } message: { Text(store.errorMessage ?? "") }
+                    assistantAPI: assistantAPI,
+                    onSaveSamples: saveSampleMealsToPhotos,
+                    onResize: resized
+                ))
+                .modifier(FoodScannerAlertsModifier(
+                    showCameraUnavailable: $showCameraUnavailable,
+                    photoLoadFailed: $photoLoadFailed,
+                    gallerySavedToast: $gallerySavedToast,
+                    store: store,
+                    onResetSelectedPhoto: { selectedPhoto = nil }
+                ))
         }
+    }
+
+    private var mainContent: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                headerSection
+                actionButtons
+                sampleMealsSection
+                diarySummaryRow
+
+                if let latest = store.meals.first {
+                    recentMealSection(latest)
+                }
+
+                if todayMeals.isEmpty {
+                    emptyDiaryMessage
+                }
+
+                footerDisclaimer
+            }
+            .padding(20)
+        }
+    }
+
+    @ViewBuilder
+    private var photoOptionButtons: some View {
+        Button {
+            showPhotoPicker = true
+        } label: {
+            Label("Choose from photo library", systemImage: "photo")
+        }
+
+        Button {
+            handleCameraOption()
+        } label: {
+            Label(
+                UIImagePickerController.isSourceTypeAvailable(.camera) ? "Take a photo" : "Simulate camera photo (Test meal)",
+                systemImage: "camera"
+            )
+        }
+
+        Button {
+            showSamplePicker = true
+        } label: {
+            Label("Try a sample maternal meal", systemImage: "sparkles")
+        }
+
+        Button {
+            saveSampleMealsToPhotos()
+        } label: {
+            Label("Save 3 sample meals to photo library", systemImage: "square.and.arrow.down")
+        }
+
+        Button("Cancel", role: .cancel) { }
+    }
+
+    private func handleCameraOption() {
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            showCamera = true
+        } else if let img = UIImage(named: "sample_spinach_dal") {
+            // Simulator friendly: simulate camera capture using sample image
+            photo = img
+            showEditor = true
+        } else {
+            showCameraUnavailable = true
+        }
+    }
+
+    private func handleSelectedPhoto(_ item: PhotosPickerItem?) {
+        guard let item else { return }
+        isLoadingPhoto = true
+        Task {
+            guard let data = try? await item.loadTransferable(type: Data.self),
+                  let image = UIImage(data: data) else {
+                await MainActor.run {
+                    isLoadingPhoto = false
+                    photoLoadFailed = true
+                }
+                return
+            }
+            await MainActor.run {
+                isLoadingPhoto = false
+                photo = resized(image)
+                showEditor = true
+            }
+        }
+    }
+
+    private var loadingOverlay: some View {
+        ProgressView("Loading selected photo…")
+            .padding(20)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
     private var headerSection: some View {
@@ -201,127 +204,84 @@ struct FoodScannerView: View {
     // MARK: - Sample Meals Section (Simulator Friendly)
     private var sampleMealsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                HStack(spacing: 6) {
-                    Image(systemName: "sparkles")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(Color("AccentColor"))
-                    Text("TRY SAMPLE MATERNAL MEALS")
-                        .font(.caption2.weight(.bold)).tracking(1)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                Button {
-                    saveSampleMealsToPhotos()
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "square.and.arrow.down")
-                        Text("Save to Gallery")
-                    }
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(Color("AccentColor"))
-                }
-            }
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 14) {
-                    ForEach(MaternalFoodAIService.sampleMeals) { meal in
-                        Button {
-                            if let img = UIImage(named: meal.imageName) {
-                                photo = img
-                                showEditor = true
-                            }
-                        } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                if let img = UIImage(named: meal.imageName) {
-                                    Image(uiImage: img)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 170, height: 110)
-                                        .clipped()
-                                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                                } else {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color(.systemGray5))
-                                        .frame(width: 170, height: 110)
-                                }
-
-                                Text(meal.name)
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(.primary)
-                                    .lineLimit(1)
-
-                                Text(meal.subtitle)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
-                            .frame(width: 170)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
+            sampleMealsHeader
+            sampleMealsScrollView
         }
         .padding(14)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
-    private var sampleMealsSheetView: some View {
-        NavigationStack {
-            List(MaternalFoodAIService.sampleMeals) { meal in
-                Button {
-                    if let img = UIImage(named: meal.imageName) {
-                        photo = img
-                        showSamplePicker = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+    private var sampleMealsHeader: some View {
+        HStack {
+            HStack(spacing: 6) {
+                Image(systemName: "sparkles")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color("AccentColor"))
+                Text("TRY SAMPLE MATERNAL MEALS")
+                    .font(.caption2.weight(.bold)).tracking(1)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button {
+                saveSampleMealsToPhotos()
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "square.and.arrow.down")
+                    Text("Save to Gallery")
+                }
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(Color("AccentColor"))
+            }
+        }
+    }
+
+    private var sampleMealsScrollView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 14) {
+                ForEach(MaternalFoodAIService.sampleMeals) { meal in
+                    Button {
+                        if let img = UIImage(named: meal.imageName) {
+                            photo = img
                             showEditor = true
                         }
+                    } label: {
+                        sampleMealCard(meal)
                     }
-                } label: {
-                    HStack(spacing: 14) {
-                        if let img = UIImage(named: meal.imageName) {
-                            Image(uiImage: img)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 70, height: 70)
-                                .clipped()
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        }
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(meal.name)
-                                .font(.subheadline.weight(.bold))
-                                .foregroundStyle(.primary)
-                            Text(meal.subtitle)
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(Color("AccentColor"))
-                            Text(meal.description)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-            }
-            .navigationTitle("Sample Maternal Meals")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { showSamplePicker = false }
-                }
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Save All to Gallery") {
-                        saveSampleMealsToPhotos()
-                    }
-                    .font(.caption.weight(.semibold))
+                    .buttonStyle(.plain)
                 }
             }
         }
+    }
+
+    private func sampleMealCard(_ meal: SampleMaternalMeal) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if let img = UIImage(named: meal.imageName) {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 170, height: 110)
+                    .clipped()
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            } else {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemGray5))
+                    .frame(width: 170, height: 110)
+            }
+
+            Text(meal.name)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+
+            Text(meal.subtitle)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        }
+        .frame(width: 170)
     }
 
     private func saveSampleMealsToPhotos() {
@@ -378,7 +338,8 @@ struct FoodScannerView: View {
             .font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
     }
 
-    @ViewBuilder private func mealThumbnail(_ data: Data?) -> some View {
+    @ViewBuilder
+    private func mealThumbnail(_ data: Data?) -> some View {
         if let data, let image = UIImage(data: data) {
             Image(uiImage: image).resizable().scaledToFill().frame(width: 48, height: 48).clipShape(RoundedRectangle(cornerRadius: 10))
         } else {
@@ -395,5 +356,159 @@ struct FoodScannerView: View {
         let newSize = CGSize(width: size.width * scale, height: size.height * scale)
         let renderer = UIGraphicsImageRenderer(size: newSize)
         return renderer.image { _ in image.draw(in: CGRect(origin: .zero, size: newSize)) }
+    }
+}
+
+// MARK: - Subviews & Modifiers to Optimize Swift Type-Checking
+
+private struct FoodScannerSheetsModifier: ViewModifier {
+    @Binding var showCamera: Bool
+    @Binding var showEditor: Bool
+    @Binding var showDashboard: Bool
+    @Binding var showSamplePicker: Bool
+    @Binding var photo: UIImage?
+
+    @ObservedObject var store: FoodDiaryStore
+    var journalStore: JournalStore?
+    var profile: OnboardingProfile?
+    @ObservedObject var assistantAPI: AssistantAPIClient
+    let onSaveSamples: () -> Void
+    let onResize: (UIImage) -> UIImage
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: $showCamera) {
+                CameraCaptureView { image in
+                    photo = onResize(image)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showEditor = true
+                    }
+                }
+                .ignoresSafeArea()
+            }
+            .sheet(isPresented: $showEditor) {
+                FoodMealEditorView(
+                    store: store,
+                    image: photo,
+                    journalStore: journalStore,
+                    profile: profile,
+                    assistantAPI: assistantAPI
+                )
+            }
+            .sheet(isPresented: $showDashboard) {
+                FoodDailyDashboardView(store: store, assistantAPI: assistantAPI)
+            }
+            .sheet(isPresented: $showSamplePicker) {
+                SampleMealsSheetView(
+                    isPresented: $showSamplePicker,
+                    onSaveSamples: onSaveSamples,
+                    onSelectMealImage: { img in
+                        photo = img
+                        showSamplePicker = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            showEditor = true
+                        }
+                    }
+                )
+            }
+    }
+}
+
+private struct FoodScannerAlertsModifier: ViewModifier {
+    @Binding var showCameraUnavailable: Bool
+    @Binding var photoLoadFailed: Bool
+    @Binding var gallerySavedToast: Bool
+    @ObservedObject var store: FoodDiaryStore
+    let onResetSelectedPhoto: () -> Void
+
+    private var diaryErrorPresented: Binding<Bool> {
+        Binding<Bool>(
+            get: { store.errorMessage != nil },
+            set: { if !$0 { store.errorMessage = nil } }
+        )
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .alert("Camera unavailable", isPresented: $showCameraUnavailable) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Camera is not available on Simulator. You can use the Sample Meals or Photo Library.")
+            }
+            .alert("Could not load photo", isPresented: $photoLoadFailed) {
+                Button("OK", role: .cancel) { onResetSelectedPhoto() }
+            } message: {
+                Text("Choose another image or enter the meal manually.")
+            }
+            .alert("Photos Saved", isPresented: $gallerySavedToast) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Saved 3 high-quality maternal meal photos to your device Photo Library! You can now choose them from the Photos picker.")
+            }
+            .alert("Diary issue", isPresented: diaryErrorPresented) {
+                Button("OK", role: .cancel) { store.errorMessage = nil }
+            } message: {
+                Text(store.errorMessage ?? "")
+            }
+    }
+}
+
+private struct SampleMealsSheetView: View {
+    @Binding var isPresented: Bool
+    let onSaveSamples: () -> Void
+    let onSelectMealImage: (UIImage) -> Void
+
+    var body: some View {
+        NavigationStack {
+            List(MaternalFoodAIService.sampleMeals) { meal in
+                Button {
+                    if let img = UIImage(named: meal.imageName) {
+                        onSelectMealImage(img)
+                    }
+                } label: {
+                    sampleMealRow(meal)
+                }
+            }
+            .navigationTitle("Sample Maternal Meals")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { isPresented = false }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Save All to Gallery") {
+                        onSaveSamples()
+                    }
+                    .font(.caption.weight(.semibold))
+                }
+            }
+        }
+    }
+
+    private func sampleMealRow(_ meal: SampleMaternalMeal) -> some View {
+        HStack(spacing: 14) {
+            if let img = UIImage(named: meal.imageName) {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 70, height: 70)
+                    .clipped()
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(meal.name)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.primary)
+                Text(meal.subtitle)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(Color("AccentColor"))
+                Text(meal.description)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
